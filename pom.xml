@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.blogschool</groupId>
-    <artifactId>Blogs</artifactId>
+    <artifactId>FBlog</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Blogs</name>
     <description>Blogs</description>
