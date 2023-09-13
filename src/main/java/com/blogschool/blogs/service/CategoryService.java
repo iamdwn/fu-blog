@@ -1,6 +1,5 @@
 package com.blogschool.blogs.service;
 
-import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.CategoryEntity;
 import com.blogschool.blogs.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +12,7 @@ public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    public List<BlogPostEntity> findCategoryByName(String name) {
-        List<BlogPostEntity> listBlog = categoryRepository.findByCategoryName(name).getBlogPosts();
-        return listBlog;
+    public List<CategoryEntity> findAllCategory() {
+        return categoryRepository.findAll();
     }
 }
