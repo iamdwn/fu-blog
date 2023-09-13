@@ -1,5 +1,6 @@
 package com.blogschool.blogs.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -22,10 +23,12 @@ public class CommentEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private UserEntity userComment;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
+    @JsonIgnore
     private BlogPostEntity postComment;
 
     public Long getCommentId() {

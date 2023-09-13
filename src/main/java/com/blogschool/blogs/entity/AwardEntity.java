@@ -1,5 +1,6 @@
 package com.blogschool.blogs.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +29,7 @@ public class AwardEntity {
     @JoinTable(name = "UserAward",
             joinColumns = @JoinColumn(name = "award_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JsonIgnore
     private List<UserEntity> users = new ArrayList<>();
 
 

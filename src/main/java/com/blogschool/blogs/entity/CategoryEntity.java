@@ -1,5 +1,6 @@
 package com.blogschool.blogs.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -17,10 +18,12 @@ public class CategoryEntity {
     private String categoryName;
 
     @OneToMany(mappedBy = "category")
+    @JsonIgnore
     private List<BlogPostEntity> blogPosts = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "create_by")
+    @JsonIgnore
     private UserEntity category;
 
     public UserEntity getCategory() {

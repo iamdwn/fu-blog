@@ -1,5 +1,6 @@
 package com.blogschool.blogs.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -19,6 +20,7 @@ public class FollowEntity {
 
     @ManyToOne
     @JoinColumn(name = "following_Id")
+    @JsonIgnore
     private UserEntity following;
 
     public Long getFollowId() {

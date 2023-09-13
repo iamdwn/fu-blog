@@ -1,5 +1,6 @@
 package com.blogschool.blogs.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,14 +20,17 @@ public class ApprovalRequestEntity {
 
     @ManyToOne
     @JoinColumn(name = "request_id")
+    @JsonIgnore
     private UserEntity request;
 
     @ManyToOne
     @JoinColumn(name = "review_id")
+    @JsonIgnore
     private UserEntity review;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
+    @JsonIgnore
     private BlogPostEntity blogPost;
 
 

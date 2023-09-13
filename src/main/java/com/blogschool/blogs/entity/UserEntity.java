@@ -1,5 +1,6 @@
 package com.blogschool.blogs.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -29,35 +30,46 @@ public class UserEntity {
     private String userType;
 
     @OneToMany(mappedBy = "authors")
+    @JsonIgnore
     private List<BlogPostEntity> blogAuthors = new ArrayList<>();
     @OneToMany(mappedBy = "authorsModified")
+    @JsonIgnore
     private List<BlogPostEntity> blogAuthorsModified = new ArrayList<>();
 
     @OneToMany(mappedBy = "request")
+    @JsonIgnore
     private List<ApprovalRequestEntity> requested = new ArrayList<>();
 
     @OneToMany(mappedBy = "review")
+    @JsonIgnore
     private List<ApprovalRequestEntity> reviewed = new ArrayList<>();
 
     @OneToMany(mappedBy = "userComment")
+    @JsonIgnore
     private List<CommentEntity> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "userVote")
+    @JsonIgnore
     private List<VoteEntity> votes = new ArrayList<>();
 
     @OneToMany(mappedBy = "notification")
+    @JsonIgnore
     private List<NotificationEntity> notificationList = new ArrayList<>();
 
     @OneToMany(mappedBy = "category")
+    @JsonIgnore
     private List<CategoryEntity> categories = new ArrayList<>();
 
     @OneToMany(mappedBy = "following")
+    @JsonIgnore
     private List<FollowEntity> followingList = new ArrayList<>();
 
     @OneToMany(mappedBy = "follower")
+    @JsonIgnore
     private List<FollowEntity> followersList = new ArrayList<>();
 
     @ManyToMany(mappedBy = "users")
+    @JsonIgnore
     private List<AwardEntity> awards = new ArrayList<>();
 
 

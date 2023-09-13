@@ -1,5 +1,6 @@
 package com.blogschool.blogs.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class TagEntity {
     @JoinTable(name = "PostTag",
             joinColumns = @JoinColumn(name = "tag_id"),
             inverseJoinColumns = @JoinColumn(name = "post_id"))
+    @JsonIgnore
     private List<BlogPostEntity> blogPosts = new ArrayList<>();
 
     public Long getTagId() {
