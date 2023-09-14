@@ -180,4 +180,22 @@ public class BlogPostEntity {
     public void setAuthorsModified(UserEntity authorsModified) {
         this.authorsModified = authorsModified;
     }
+
+    public BlogPostEntity() {
+    }
+
+    public BlogPostEntity(String typePost, String title, String content, Date createdDate, Date modifiedDate,
+                          Long approvedBy, Boolean isApproved, CategoryEntity category,
+                          UserEntity authors, UserEntity authorsModified) {
+        this.typePost = typePost;
+        this.title = title;
+        this.content = content;
+        this.createdDate = createdDate;
+        this.modifiedDate = modifiedDate;
+        this.approvedBy = approvedBy;
+        this.isApproved = isApproved;
+        this.category = category;
+        this.authors = authors;
+        this.authorsModified = authorsModified;
+    }
 }
