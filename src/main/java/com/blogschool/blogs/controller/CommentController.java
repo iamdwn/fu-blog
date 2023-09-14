@@ -18,6 +18,11 @@ public class CommentController {
         this.commentService = commentService;
     }
 
+    @GetMapping("/view")
+    public ResponseEntity<ResponeObject> viewComment(@RequestParam Long postId) {
+        return commentService.viewComment(postId);
+    }
+
     @PostMapping("/insert")
     public ResponseEntity<ResponeObject> insertComment(
             @RequestParam Date createdDate,

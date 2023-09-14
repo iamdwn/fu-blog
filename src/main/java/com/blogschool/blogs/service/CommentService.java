@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,6 +29,20 @@ public class CommentService {
         this.userRepository = userRepository;
     }
 
+    public ResponseEntity<ResponeObject> viewComment(Long postId) {
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+        if (blogPostEntity.isPresent()) {
+            List<CommentEntity> list = commentRepository.findByPostComment(blogPostEntity.get());
+            return list != null ?
+                    ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponeObject("ok", "comment of postId: " + postId, list)) :
+                    ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(new ResponeObject("failed", "no comment found of postId: " + postId, ""));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponeObject("failed", "post doesn't exists", ""));
+        }
+    }
+
     public ResponseEntity<ResponeObject> insertComment(Date createdDate, String content, Long postId, Long userId) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         Optional<UserEntity> userEntity = userRepository.findById(userId);
@@ -35,9 +50,11 @@ public class CommentService {
             BlogPostEntity blogPost = blogPostEntity.get();
             UserEntity user = userEntity.get();
             CommentEntity commentEntity = new CommentEntity(content, createdDate, user, blogPost);
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponeObject("ok", "comment have been inserted", commentRepository.save(commentEntity)));
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponeObject("ok", "comment have been inserted", commentRepository.save(commentEntity)));
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponeObject("failed", "comment can not insert", ""));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponeObject("failed", "post or user doesn't exists", ""));
         }
     }
 }

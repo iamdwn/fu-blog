@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,6 +27,20 @@ public class VotesService {
         this.votesRepository = votesRepository;
         this.blogPostRepository = blogPostRepository;
         this.userRepository = userRepository;
+    }
+
+    public ResponseEntity<ResponeObject> viewVotes(Long postId) {
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+        if (blogPostEntity.isPresent()) {
+            List<VoteEntity> list = votesRepository.findByPostVote(blogPostEntity.get());
+            return list != null ?
+                    ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponeObject("ok", "votes of postId: " + postId, list)) :
+                    ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(new ResponeObject("failed", "no votes found of postId: " + postId, ""));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponeObject("failed", "blog doesn't exists", ""));
+        }
     }
 
     public ResponseEntity<ResponeObject> insertVotes(Long voteValue, Long postId, Long userId) {

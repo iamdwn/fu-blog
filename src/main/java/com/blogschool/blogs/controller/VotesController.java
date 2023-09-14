@@ -4,10 +4,7 @@ import com.blogschool.blogs.entity.ResponeObject;
 import com.blogschool.blogs.service.VotesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
@@ -19,6 +16,11 @@ public class VotesController {
     @Autowired
     public VotesController(VotesService votesService) {
         this.votesService = votesService;
+    }
+
+    @GetMapping("/view")
+    public ResponseEntity<ResponeObject> viewVotes(@RequestParam Long postId) {
+        return votesService.viewVotes(postId);
     }
 
     @PostMapping("/insert")
