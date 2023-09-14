@@ -1,15 +1,15 @@
 package com.blogschool.blogs.entity;
 
 
-public class ResponeEntity {
+public class ResponeObject {
     private String status;
     private String message;
     private Object data;
 
-    public ResponeEntity() {
+    public ResponeObject() {
     }
 
-    public ResponeEntity(String status, String message, Object data) {
+    public ResponeObject(String status, String message, Object data) {
         this.status = status;
         this.message = message;
         this.data = data;
