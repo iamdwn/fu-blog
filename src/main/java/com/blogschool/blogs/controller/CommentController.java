@@ -11,9 +11,9 @@ import java.util.Date;
 @RestController
 @RequestMapping("/comment")
 public class CommentController {
-    @Autowired
     private final CommentService commentService;
 
+    @Autowired
     public CommentController(CommentService commentService) {
         this.commentService = commentService;
     }

@@ -1,5 +1,6 @@
 package com.blogschool.blogs.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 
@@ -18,10 +19,12 @@ public class VoteEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private UserEntity userVote;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
+    @JsonIgnore
     private BlogPostEntity postVote;
 
     public Long getVoteId() {
@@ -49,6 +52,15 @@ public class VoteEntity {
     }
 
     public void setPostVote(BlogPostEntity postVote) {
+        this.postVote = postVote;
+    }
+
+    public VoteEntity() {
+    }
+
+    public VoteEntity(Long voteValue, UserEntity userVote, BlogPostEntity postVote) {
+        this.voteValue = voteValue;
+        this.userVote = userVote;
         this.postVote = postVote;
     }
 }
