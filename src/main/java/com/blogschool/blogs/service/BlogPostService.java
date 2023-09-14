@@ -1,8 +1,10 @@
 package com.blogschool.blogs.service;
 
+import com.blogschool.blogs.entity.ApprovalRequestEntity;
 import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.CategoryEntity;
 import com.blogschool.blogs.entity.UserEntity;
+import com.blogschool.blogs.repository.ApprovalRequestRepository;
 import com.blogschool.blogs.repository.BlogPostRepository;
 import com.blogschool.blogs.repository.CategoryRepository;
 import com.blogschool.blogs.repository.UserRepository;
@@ -25,6 +27,9 @@ public class BlogPostService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ApprovalRequestRepository approvalRequestRepository;
+
 
     public List<BlogPostEntity> getAllBlogPosts() {
         return blogPostRepository.findAll();
@@ -36,14 +41,25 @@ public class BlogPostService {
     }
 
 
-    public Boolean deleteBlogPost(Long postId) {
-        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
-//        BlogPostEntity blogPostEntity = this.getBlogPostById(postId);
-        if (blogPostEntity.isPresent()) {
-            blogPostRepository.deleteById(postId);
-            return true;
-        }
-        return false;
+    public BlogPostEntity deleteBlogPost(Long postId) {
+        BlogPostEntity blogPostEntity = this.getBlogPostById(postId);
+
+        blogPostEntity.setStatus(false);
+        return blogPostRepository.save(blogPostEntity);
+
+    }
+
+    public BlogPostEntity approveBlogPost(Long postId, Long approveId) {
+//        Optional<ApprovalRequestEntity> approvalRequestEntity = approvalRequestRepository.findById(approveId);
+//        ApprovalRequestEntity approvalRequest = approvalRequestEntity.get();
+
+        BlogPostEntity blogPostEntity = this.getBlogPostById(postId);
+
+        blogPostEntity.setApprovedBy(approveId);
+        blogPostEntity.setApproved(true);
+
+        return blogPostRepository.save(blogPostEntity);
+
     }
 
 
@@ -60,7 +76,7 @@ public class BlogPostService {
             Date createdDate = new Date();
 
             BlogPostEntity newBlogPost = new BlogPostEntity(typePost, title, content, createdDate, null,
-                    null, false, category, authors, null);
+                    null, false, category, authors, null, true);
             return blogPostRepository.save(newBlogPost);
         }
         return null;

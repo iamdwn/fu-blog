@@ -1,30 +1,3 @@
 Manifest-Version: 1.0
 Main-Class: com.blogschool.blogs.BlogsApplication
-Class-Path: log4j-to-slf4j-2.20.0.jar jackson-databind-2.15.2.jar tomcat
- -embed-websocket-10.1.12.jar spring-boot-starter-jdbc-3.1.3.jar spring-
- boot-starter-data-jpa-3.1.3.jar jakarta.transaction-api-2.0.1.jar txw2-
- 4.0.3.jar spring-boot-starter-logging-3.1.3.jar classmate-1.5.1.jar spr
- ing-boot-devtools-3.1.3.jar spring-boot-configuration-processor-3.1.3.j
- ar slf4j-api-2.0.7.jar spring-data-jpa-3.1.3.jar log4j-api-2.20.0.jar s
- pring-boot-starter-aop-3.1.3.jar spring-core-6.0.11.jar spring-web-6.0.
- 11.jar jaxb-runtime-4.0.3.jar jackson-annotations-2.15.2.jar antlr4-run
- time-4.10.1.jar spring-aspects-6.0.11.jar jackson-datatype-jdk8-2.15.2.
- jar mysql-connector-j-8.0.33.jar logback-classic-1.4.11.jar logback-cor
- e-1.4.11.jar jackson-datatype-jsr310-2.15.2.jar tomcat-embed-core-10.1.
- 12.jar spring-expression-6.0.11.jar angus-activation-2.0.1.jar lombok-1
- .18.28.jar spring-jdbc-6.0.11.jar spring-tx-6.0.11.jar spring-boot-star
- ter-web-3.1.3.jar spring-boot-starter-json-3.1.3.jar spring-boot-autoco
- nfigure-3.1.3.jar spring-context-6.0.11.jar spring-webmvc-6.0.11.jar sp
- ring-aop-6.0.11.jar jackson-module-parameter-names-2.15.2.jar snakeyaml
- -1.33.jar jakarta.activation-api-2.1.2.jar jandex-3.0.5.jar spring-data
- -commons-3.1.3.jar spring-beans-6.0.11.jar spring-boot-starter-3.1.3.ja
- r jackson-core-2.15.2.jar micrometer-commons-1.11.3.jar hibernate-core-
- 6.2.7.Final.jar jul-to-slf4j-2.0.7.jar spring-boot-starter-tomcat-3.1.3
- .jar istack-commons-runtime-4.1.2.jar spring-orm-6.0.11.jar hibernate-c
- ommons-annotations-6.0.6.Final.jar HikariCP-5.0.1.jar tomcat-embed-el-1
- 0.1.12.jar jaxb-core-4.0.3.jar spring-boot-3.1.3.jar micrometer-observa
- tion-1.11.3.jar aspectjweaver-1.9.20.jar spring-jcl-6.0.11.jar jakarta.
- annotation-api-2.1.1.jar jakarta.persistence-api-3.1.0.jar jboss-loggin
- g-3.5.3.Final.jar byte-buddy-1.14.6.jar jakarta.xml.bind-api-4.0.0.jar 
- jakarta.inject-api-2.0.1.jar
 

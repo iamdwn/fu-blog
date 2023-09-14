@@ -3,16 +3,13 @@ package com.blogschool.blogs.controller;
 import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.CategoryEntity;
 import com.blogschool.blogs.entity.UserEntity;
-import com.blogschool.blogs.repository.BlogPostRepository;
+
 import com.blogschool.blogs.service.BlogPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import java.util.List;
 
@@ -59,13 +56,18 @@ public class BlogPostController {
     }
 
     @DeleteMapping("/deleteBlog/{postId}")
-    public ResponseEntity<String> deleteBlog(@PathVariable Long postId) {
+    public BlogPostEntity deleteBlog(@PathVariable Long postId) {
+        return blogPostService.deleteBlogPost(postId);
+    }
 
-        if (blogPostService.deleteBlogPost(postId)) {
-            return ResponseEntity.ok("BlogPost with ID " + postId + " has been deleted.");
-        } else {
-            return ResponseEntity.ok("NOT FOUND with ID " + postId);
-        }
+
+    @PutMapping("/manageBlog/approve/{postId}")
+    public BlogPostEntity approveBlog(
+            @PathVariable Long postId,
+            @RequestParam Long approveId
+    ) {
+
+        return blogPostService.approveBlogPost(postId, approveId);
     }
 
 }

@@ -29,6 +29,9 @@ public class UserEntity {
     @Column
     private String userType;
 
+    @Column
+    private String status;
+
     @OneToMany(mappedBy = "authors")
     @JsonIgnore
     private List<BlogPostEntity> blogAuthors = new ArrayList<>();
@@ -204,4 +207,8 @@ public class UserEntity {
     public void setAwards(List<AwardEntity> awards) {
         this.awards = awards;
     }
+
+    public String getStatus() {return status;}
+
+    public void setStatus(String status) {this.status = status;}
 }

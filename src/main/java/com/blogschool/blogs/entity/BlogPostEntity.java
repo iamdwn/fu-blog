@@ -40,6 +40,9 @@ public class BlogPostEntity {
     @Column
     private Boolean isApproved;
 
+    @Column
+    private Boolean status;
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     @JsonIgnore
@@ -177,6 +180,10 @@ public class BlogPostEntity {
         return authorsModified;
     }
 
+    public Boolean getStatus() {return status;}
+
+    public void setStatus(Boolean status) {this.status = status;}
+
     public void setAuthorsModified(UserEntity authorsModified) {
         this.authorsModified = authorsModified;
     }
@@ -186,7 +193,7 @@ public class BlogPostEntity {
 
     public BlogPostEntity(String typePost, String title, String content, Date createdDate, Date modifiedDate,
                           Long approvedBy, Boolean isApproved, CategoryEntity category,
-                          UserEntity authors, UserEntity authorsModified) {
+                          UserEntity authors, UserEntity authorsModified, Boolean status) {
         this.typePost = typePost;
         this.title = title;
         this.content = content;
@@ -197,5 +204,6 @@ public class BlogPostEntity {
         this.category = category;
         this.authors = authors;
         this.authorsModified = authorsModified;
+        this.status = status;
     }
 }
