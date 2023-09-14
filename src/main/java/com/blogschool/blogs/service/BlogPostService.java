@@ -36,8 +36,14 @@ public class BlogPostService {
     }
 
 
-    public void deleteBlogPost(Long id) {
-        blogPostRepository.deleteById(id);
+    public Boolean deleteBlogPost(Long postId) {
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+//        BlogPostEntity blogPostEntity = this.getBlogPostById(postId);
+        if (blogPostEntity.isPresent()) {
+            blogPostRepository.deleteById(postId);
+            return true;
+        }
+        return false;
     }
 
 
@@ -62,28 +68,28 @@ public class BlogPostService {
 
 
     public BlogPostEntity updateBlogPost(Long postId, String typePost, String title, String content,
-                                         Long categoryId,Long authorsModified) {
+                                         Long categoryId, Long authorsModified) {
 
         Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId);
         Optional<UserEntity> userEntity = userRepository.findById(authorsModified);
         BlogPostEntity blogPostEntity = this.getBlogPostById(postId);
 
-            if (categoryEntity.isPresent()
-                    && userEntity.isPresent()) {
+        if (categoryEntity.isPresent()
+                && userEntity.isPresent()) {
 
-                CategoryEntity category = categoryEntity.get();
-                UserEntity authors = userEntity.get();
-                Date modifiedDate = new Date();
+            CategoryEntity category = categoryEntity.get();
+            UserEntity authors = userEntity.get();
+            Date modifiedDate = new Date();
 
-                blogPostEntity.setTypePost(typePost);
-                blogPostEntity.setTitle(title);
-                blogPostEntity.setContent(content);
-                blogPostEntity.setModifiedDate(modifiedDate);
-                blogPostEntity.setCategory(category);
-                blogPostEntity.setAuthorsModified(authors);
+            blogPostEntity.setTypePost(typePost);
+            blogPostEntity.setTitle(title);
+            blogPostEntity.setContent(content);
+            blogPostEntity.setModifiedDate(modifiedDate);
+            blogPostEntity.setCategory(category);
+            blogPostEntity.setAuthorsModified(authors);
 
-                return blogPostRepository.save(blogPostEntity);
-            }
+            return blogPostRepository.save(blogPostEntity);
+        }
         return null;
     }
 
