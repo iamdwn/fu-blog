@@ -47,9 +47,9 @@ public class CommentService {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (blogPostEntity.isPresent() && userEntity.isPresent()) {
-            BlogPostEntity blogPost = blogPostEntity.get();
-            UserEntity user = userEntity.get();
-            CommentEntity commentEntity = new CommentEntity(content, createdDate, user, blogPost);
+//            BlogPostEntity blogPost = blogPostEntity.get();
+//            UserEntity user = userEntity.get();
+            CommentEntity commentEntity = new CommentEntity(content, createdDate, userEntity.get(), blogPostEntity.get());
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponeObject("ok", "comment have been inserted", commentRepository.save(commentEntity)));
         } else {

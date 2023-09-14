@@ -47,9 +47,9 @@ public class VotesService {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (blogPostEntity.isPresent() && userEntity.isPresent()) {
-            BlogPostEntity blogPost = blogPostEntity.get();
-            UserEntity user = userEntity.get();
-            VoteEntity voteEntity = new VoteEntity(voteValue, user, blogPost);
+//            BlogPostEntity blogPost = blogPostEntity.get();
+//            UserEntity user = userEntity.get();
+            VoteEntity voteEntity = new VoteEntity(voteValue, userEntity.get(), blogPostEntity.get());
             return ResponseEntity.status(HttpStatus.OK).body(new ResponeObject("ok", "vote have been inserted", votesRepository.save(voteEntity)));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponeObject("failed", "vote can not insert", ""));
