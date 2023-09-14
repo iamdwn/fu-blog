@@ -19,7 +19,7 @@ public class SearchBlogController {
         this.blogPostService = blogPostService;
     }
 
-    @GetMapping("/{category}")
+    @GetMapping("/search/{category}")
     ResponseEntity<ResponeObject> findBlogByCategory(@PathVariable String category) {
         return blogPostService.findBlogByCategory(category);
     }
