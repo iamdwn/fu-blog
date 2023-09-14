@@ -33,7 +33,7 @@ public class VotesService {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         if (blogPostEntity.isPresent()) {
             List<VoteEntity> list = votesRepository.findByPostVote(blogPostEntity.get());
-            return list != null ?
+            return list.size() > 0 ?
                     ResponseEntity.status(HttpStatus.OK)
                             .body(new ResponeObject("ok", "votes of postId: " + postId, list)) :
                     ResponseEntity.status(HttpStatus.NOT_FOUND)

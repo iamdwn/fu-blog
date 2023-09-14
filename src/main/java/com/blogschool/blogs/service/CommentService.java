@@ -33,7 +33,7 @@ public class CommentService {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         if (blogPostEntity.isPresent()) {
             List<CommentEntity> list = commentRepository.findByPostComment(blogPostEntity.get());
-            return list != null ?
+            return list.size() > 0 ?
                     ResponseEntity.status(HttpStatus.OK)
                             .body(new ResponeObject("ok", "comment of postId: " + postId, list)) :
                     ResponseEntity.status(HttpStatus.NOT_FOUND)
