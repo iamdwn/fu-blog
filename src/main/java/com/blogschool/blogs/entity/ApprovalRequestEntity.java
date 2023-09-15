@@ -33,7 +33,34 @@ public class ApprovalRequestEntity {
     @JsonIgnore
     private BlogPostEntity blogPost;
 
+    public Long getId() {return Id;}
 
+    public void setId(Long id) {Id = id;}
 
+    public boolean isApproved() {return isApproved;}
+
+    public void setApproved(boolean approved) {isApproved = approved;}
+
+    public UserEntity getRequest() {return request;}
+
+    public void setRequest(UserEntity request) {this.request = request;}
+
+    public UserEntity getReview() {return review;}
+
+    public void setReview(UserEntity review) {this.review = review;}
+
+    public BlogPostEntity getBlogPost() {return blogPost;}
+
+    public void setBlogPost(BlogPostEntity blogPost) {this.blogPost = blogPost;}
+
+    public ApprovalRequestEntity() {
+    }
+
+    public ApprovalRequestEntity(boolean isApproved, UserEntity request, UserEntity review, BlogPostEntity blogPost) {
+        this.isApproved = isApproved;
+        this.request = request;
+        this.review = review;
+        this.blogPost = blogPost;
+    }
 }
 

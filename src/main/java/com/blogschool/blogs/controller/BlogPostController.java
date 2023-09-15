@@ -23,10 +23,26 @@ public class BlogPostController {
 
     @GetMapping("/viewBlog")
     List<BlogPostEntity> getAllBlogPost() {
+
         return blogPostService.getAllBlogPosts();
     }
 
 
+    @DeleteMapping("/deleteBlog/{postId}")
+    public BlogPostEntity deleteBlog(@PathVariable Long postId) {
+
+        return blogPostService.deleteBlogPost(postId);
+    }
+
+
+//    @PostMapping("/writeBlog")
+//    public BlogPostEntity createBlog(@RequestBody blogPost) {
+//
+//        return blogPostService.createBlogPost(blogPost);
+//    }
+
+
+    //work with @RequestParam
     @PostMapping("/writeBlog")
     public BlogPostEntity createBlog(
             @RequestParam String typePost,
@@ -40,7 +56,6 @@ public class BlogPostController {
                 category, authors);
     }
 
-
     @PutMapping("/editBlog/{postId}")
     public BlogPostEntity updateBlog(
             @PathVariable Long postId,
@@ -53,21 +68,6 @@ public class BlogPostController {
 
         return blogPostService.updateBlogPost(postId, typePost, title, content,
                 category, authorsModified);
-    }
-
-    @DeleteMapping("/deleteBlog/{postId}")
-    public BlogPostEntity deleteBlog(@PathVariable Long postId) {
-        return blogPostService.deleteBlogPost(postId);
-    }
-
-
-    @PutMapping("/manageBlog/approve/{postId}")
-    public BlogPostEntity approveBlog(
-            @PathVariable Long postId,
-            @RequestParam Long approveId
-    ) {
-
-        return blogPostService.approveBlogPost(postId, approveId);
     }
 
 }

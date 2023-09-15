@@ -11,9 +11,7 @@ import com.blogschool.blogs.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class BlogPostService {
@@ -30,36 +28,52 @@ public class BlogPostService {
     @Autowired
     private ApprovalRequestRepository approvalRequestRepository;
 
+    @Autowired
+    private ApprovalRequestService approvalRequestService;
+
 
     public List<BlogPostEntity> getAllBlogPosts() {
-        return blogPostRepository.findAll();
+        List<BlogPostEntity> blogPostEntity = blogPostRepository.findAll();
+        List<BlogPostEntity> blogPostList = new ArrayList<>();
+
+        for (int i = 0; i < blogPostEntity.size(); i++) {
+            if (blogPostEntity.get(i).getStatus()) {
+                blogPostList.add(blogPostEntity.get(i));
+            }
+        }
+        sort(blogPostList);
+
+        return blogPostList;
     }
 
 
-    public BlogPostEntity getBlogPostById(Long id) {
-        return blogPostRepository.findById(id).orElse(null);
+    //lấy cả BlogPost bị xoá
+//    public List<BlogPostEntity> getAllBlogPosts() {
+//        return blogPostRepository.findAll();
+//    }
+
+
+    public BlogPostEntity getBlogPostById(Long postId) {
+
+        return blogPostRepository.findById(postId).orElse(null);
     }
 
 
+    //xoá --> set Status = 0
     public BlogPostEntity deleteBlogPost(Long postId) {
         BlogPostEntity blogPostEntity = this.getBlogPostById(postId);
 
         blogPostEntity.setStatus(false);
+
         return blogPostRepository.save(blogPostEntity);
 
     }
 
-    public BlogPostEntity approveBlogPost(Long postId, Long approveId) {
-//        Optional<ApprovalRequestEntity> approvalRequestEntity = approvalRequestRepository.findById(approveId);
-//        ApprovalRequestEntity approvalRequest = approvalRequestEntity.get();
 
+    //xoá luôn dữ liệu trong Database
+    public void deleteBlogPost2(Long postId) {                          //xoa trong database
         BlogPostEntity blogPostEntity = this.getBlogPostById(postId);
-
-        blogPostEntity.setApprovedBy(approveId);
-        blogPostEntity.setApproved(true);
-
-        return blogPostRepository.save(blogPostEntity);
-
+        blogPostRepository.delete(blogPostEntity);
     }
 
 
@@ -75,9 +89,18 @@ public class BlogPostService {
             UserEntity authors = userEntity.get();
             Date createdDate = new Date();
 
+
+            //tạo và save bài BlogPost mới
             BlogPostEntity newBlogPost = new BlogPostEntity(typePost, title, content, createdDate, null,
                     null, false, category, authors, null, true);
-            return blogPostRepository.save(newBlogPost);
+            blogPostRepository.save(newBlogPost);
+
+
+            //tạo Approval Request cho bài BlogPost
+            Optional<BlogPostEntity> newBlogPostEntity = blogPostRepository.findById(newBlogPost.getPostId());
+            approvalRequestService.createApprovalRequestById(newBlogPostEntity.get(), authors);
+
+            return newBlogPost;
         }
         return null;
     }
@@ -109,5 +132,23 @@ public class BlogPostService {
         return null;
     }
 
+
+    //sort theo thứ tự bài BlogPost mới nằm đầu tiên (giảm dần theo postId)
+    public void sort(List<BlogPostEntity> blogPostList) {
+        Collections.sort(blogPostList, new Comparator<BlogPostEntity>() {
+            @Override
+            public int compare(BlogPostEntity o1, BlogPostEntity o2) {
+                if (o1.getPostId() < o2.getPostId()) {
+                    return 1;
+                } else {
+                    if (o1.getPostId() == o2.getPostId()) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                }
+            }
+        });
+    }
 
 }
