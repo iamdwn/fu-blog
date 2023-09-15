@@ -45,33 +45,27 @@ public class BlogPostEntity {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    @JsonIgnore
+//    @JsonIgnore
     private CategoryEntity category;
 
 
     @ManyToOne
     @JoinColumn(name = "author_id")
-    @JsonIgnore
     private UserEntity authors;
     @ManyToOne
     @JoinColumn(name = "authorModified_id")
-    @JsonIgnore
     private UserEntity authorsModified;
 
     @OneToMany(mappedBy = "postVote")
-    @JsonIgnore
     private List<VoteEntity> votes = new ArrayList<>();
 
     @OneToMany(mappedBy = "blogPost")
-    @JsonIgnore
     private List<ApprovalRequestEntity> approvalRequests = new ArrayList<>();
 
     @OneToMany(mappedBy = "postComment")
-    @JsonIgnore
     private List<CommentEntity> postComments = new ArrayList<>();
 
     @ManyToMany(mappedBy = "blogPosts")
-    @JsonIgnore
 
     private List<TagEntity> tags = new ArrayList<>();
 
