@@ -1,6 +1,8 @@
 package com.blogschool.blogs.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,33 @@ public class UserEntity {
 
     @Column
     private String userType;
+
+    @Column
+    private  Boolean status;
+
+
+    public UserEntity(String username, String password, String email, String fullName, String userType, Boolean status) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.fullName = fullName;
+        this.userType = userType;
+        this.status = status;
+    }
+
+    public UserEntity() {
+
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
+
+
 
     @OneToMany(mappedBy = "authors")
     private List<BlogPostEntity> blogAuthors = new ArrayList<>();

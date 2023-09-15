@@ -63,6 +63,16 @@ public class BlogPostEntity {
     @ManyToMany(mappedBy = "blogPosts")
     private List<TagEntity> tags = new ArrayList<>();
 
+    @Column
+    private  Boolean status;
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
     public List<VoteEntity> getVotes() {
         return votes;
     }
