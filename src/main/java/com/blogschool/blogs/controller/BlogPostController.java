@@ -4,6 +4,7 @@ import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.CategoryEntity;
 import com.blogschool.blogs.entity.UserEntity;
 
+import com.blogschool.blogs.model.ResponseObject;
 import com.blogschool.blogs.service.BlogPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,14 +23,14 @@ public class BlogPostController {
 
 
     @GetMapping("/viewBlog")
-    List<BlogPostEntity> getAllBlogPost() {
+    ResponseEntity<ResponseObject> getAllBlogPost() {
 
         return blogPostService.getAllBlogPosts();
     }
 
 
     @DeleteMapping("/deleteBlog/{postId}")
-    public BlogPostEntity deleteBlog(@PathVariable Long postId) {
+    public ResponseEntity<ResponseObject> deleteBlog(@PathVariable Long postId) {
 
         return blogPostService.deleteBlogPost(postId);
     }
@@ -44,7 +45,7 @@ public class BlogPostController {
 
     //work with @RequestParam
     @PostMapping("/writeBlog")
-    public BlogPostEntity createBlog(
+    public ResponseEntity<ResponseObject> createBlog(
             @RequestParam String typePost,
             @RequestParam String title,
             @RequestParam String content,
@@ -57,7 +58,7 @@ public class BlogPostController {
     }
 
     @PutMapping("/editBlog/{postId}")
-    public BlogPostEntity updateBlog(
+    public ResponseEntity<ResponseObject> updateBlog(
             @PathVariable Long postId,
             @RequestParam String typePost,
             @RequestParam String title,

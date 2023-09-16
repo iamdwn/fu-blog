@@ -4,10 +4,13 @@ package com.blogschool.blogs.service;
 import com.blogschool.blogs.entity.ApprovalRequestEntity;
 import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.UserEntity;
+import com.blogschool.blogs.model.ResponseObject;
 import com.blogschool.blogs.repository.ApprovalRequestRepository;
 import com.blogschool.blogs.repository.BlogPostRepository;
 import com.blogschool.blogs.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -38,20 +41,27 @@ public class ApprovalRequestService {
     }
 
 
-    public ApprovalRequestEntity approveBlogPost(Long postId, Long reviewId, String command) {
+    public ResponseEntity<ResponseObject> approveBlogPost(Long postId, Long reviewId, String command) {
 
         Optional<UserEntity> userEntity = userRepository.findById(reviewId);
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         ApprovalRequestEntity approvalRequestEntity = this.getApprovalRequestById(postId);
+        if (blogPostEntity.isPresent()) {
+            if (command.equalsIgnoreCase("approve")) {
 
-        if (command.equalsIgnoreCase("approve")) {
+                UserEntity reviewer = userEntity.get();
 
-            UserEntity reviewer = userEntity.get();
+                approvalRequestEntity.setReview(reviewer);
+                approvalRequestEntity.setApproved(true);
 
-            approvalRequestEntity.setReview(reviewer);
-            approvalRequestEntity.setApproved(true);
+                approvalRequestRepository.save(approvalRequestEntity);
 
-            return approvalRequestRepository.save(approvalRequestEntity);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "APPROVED SUCCESSFUL", approvalRequestEntity));
+            }
         }
-        return null;
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ResponseObject("failed", "APPROVED FAILED", ""));
     }
 }
