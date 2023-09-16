@@ -54,4 +54,13 @@ public class VoteEntity {
     public void setPostVote(BlogPostEntity postVote) {
         this.postVote = postVote;
     }
+
+    public VoteEntity() {
+    }
+
+    public VoteEntity(Long voteValue, UserEntity userVote, BlogPostEntity postVote) {
+        this.voteValue = voteValue;
+        this.userVote = userVote;
+        this.postVote = postVote;
+    }
 }

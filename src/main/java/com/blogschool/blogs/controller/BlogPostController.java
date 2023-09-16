@@ -71,4 +71,11 @@ public class BlogPostController {
                 category, authorsModified);
     }
 
+    @GetMapping("/search/{category}")
+    ResponseEntity<ResponseObject> findBlogByCategory(@PathVariable String category) {
+        return blogPostService.findBlogByCategory(category);
+    }
+
 }
+
+

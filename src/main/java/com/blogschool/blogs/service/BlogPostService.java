@@ -160,6 +160,23 @@ public class BlogPostService {
                 .body(new ResponseObject("failed", "UPDATED FAILED", ""));
     }
 
+    public ResponseEntity<ResponseObject> findBlogByCategory(String name) {
+        CategoryEntity category = categoryRepository.findByCategoryName(name);
+        if (category != null) {
+            List<BlogPostEntity> blogPostList = category.getBlogPosts();
+            if (!blogPostList.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "FOUND", blogPostList));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseObject("failed", "cannot found any blog with category", ""));
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseObject("failed", "category not exists", ""));
+        }
+    }
+
 
     //sort theo thứ tự bài BlogPost mới nằm đầu tiên (giảm dần theo postId)
     public void sort(List<BlogPostEntity> blogPostList) {

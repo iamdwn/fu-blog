@@ -66,4 +66,14 @@ public class CommentEntity {
     public void setPostComment(BlogPostEntity postComment) {
         this.postComment = postComment;
     }
+
+    public CommentEntity() {
+    }
+
+    public CommentEntity(String content, Date createdDate, UserEntity userComment, BlogPostEntity postComment) {
+        this.content = content;
+        this.createdDate = createdDate;
+        this.userComment = userComment;
+        this.postComment = postComment;
+    }
 }
