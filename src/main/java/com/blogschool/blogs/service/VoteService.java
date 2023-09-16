@@ -30,8 +30,10 @@ public class VoteService {
     }
 
     public ResponseEntity<ResponseObject> viewVotes(Long postId) {
+
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         if (blogPostEntity.isPresent()) {
+
             List<VoteEntity> list = voteRepository.findByPostVote(blogPostEntity.get());
             return list.size() > 0 ?
                     ResponseEntity.status(HttpStatus.OK)
@@ -39,19 +41,24 @@ public class VoteService {
                     ResponseEntity.status(HttpStatus.NOT_FOUND)
                             .body(new ResponseObject("failed", "no votes found of postId: " + postId, ""));
         } else {
+
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("failed", "blog doesn't exists", ""));
         }
     }
 
     public ResponseEntity<ResponseObject> insertVotes(Long voteValue, Long postId, Long userId) {
+
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         Optional<UserEntity> userEntity = userRepository.findById(userId);
+
         if (blogPostEntity.isPresent() && userEntity.isPresent()) {
 //            BlogPostEntity blogPost = blogPostEntity.get();
 //            UserEntity user = userEntity.get();
             VoteEntity voteEntity = new VoteEntity(voteValue, userEntity.get(), blogPostEntity.get());
+
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok", "vote have been inserted", voteRepository.save(voteEntity)));
         } else {
+
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("failed", "vote can not insert", ""));
         }
     }

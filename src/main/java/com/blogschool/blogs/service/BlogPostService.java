@@ -35,7 +35,7 @@ public class BlogPostService {
         List<BlogPostEntity> blogPostEntity = blogPostRepository.findAll();
         List<BlogPostEntity> blogPostList = new ArrayList<>();
 
-        if(!blogPostEntity.isEmpty()) {
+        if (!blogPostEntity.isEmpty()) {
             for (int i = 0; i < blogPostEntity.size(); i++) {
                 if (blogPostEntity.get(i).getStatus()) {
                     blogPostList.add(blogPostEntity.get(i));
@@ -44,7 +44,7 @@ public class BlogPostService {
             sort(blogPostList);
 
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "FOUND",blogPostList ));
+                    .body(new ResponseObject("ok", "FOUND", blogPostList));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ResponseObject("failed", "NOT FOUND", ""));
@@ -67,7 +67,7 @@ public class BlogPostService {
     public ResponseEntity<ResponseObject> deleteBlogPost(Long postId) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
 
-        if(blogPostEntity.isPresent()) {
+        if (blogPostEntity.isPresent()) {
             BlogPostEntity blogPost = this.getBlogPostById(postId);
 
             blogPost.setStatus(false);
@@ -91,7 +91,7 @@ public class BlogPostService {
 
 
     public ResponseEntity<ResponseObject> createBlogPost(String typePost, String title, String content,
-                                         Long categoryId, Long authorsId) {
+                                                         Long categoryId, Long authorsId) {
         Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId);
         Optional<UserEntity> userEntity = userRepository.findById(authorsId);
 
@@ -110,7 +110,7 @@ public class BlogPostService {
             //tạo Approval Request cho bài BlogPost
             Optional<BlogPostEntity> newBlogPostEntity = blogPostRepository.findById(newBlogPost.getPostId());
 
-            if(newBlogPostEntity.isPresent()) {
+            if (newBlogPostEntity.isPresent()) {
                 approvalRequestService.createApprovalRequestById(newBlogPostEntity.get(), authors);
 
                 return ResponseEntity.status(HttpStatus.OK)
@@ -127,7 +127,7 @@ public class BlogPostService {
 
 
     public ResponseEntity<ResponseObject> updateBlogPost(Long postId, String typePost, String title, String content,
-                                         Long categoryId, Long authorsModified) {
+                                                         Long categoryId, Long authorsModified) {
 
         Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId);
         Optional<UserEntity> userEntity = userRepository.findById(authorsModified);
@@ -135,9 +135,9 @@ public class BlogPostService {
 
         if (blogPostEntity.isPresent()
                 && categoryEntity.isPresent()
-                    && userEntity.isPresent()) {
+                && userEntity.isPresent()) {
 
-        BlogPostEntity blogPost = this.getBlogPostById(postId);
+            BlogPostEntity blogPost = this.getBlogPostById(postId);
 
             CategoryEntity category = categoryEntity.get();
             UserEntity authors = userEntity.get();
@@ -160,18 +160,26 @@ public class BlogPostService {
                 .body(new ResponseObject("failed", "UPDATED FAILED", ""));
     }
 
+
     public ResponseEntity<ResponseObject> findBlogByCategory(String name) {
+
         CategoryEntity category = categoryRepository.findByCategoryName(name);
+
         if (category != null) {
+
             List<BlogPostEntity> blogPostList = category.getBlogPosts();
+
             if (!blogPostList.isEmpty()) {
+
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "FOUND", blogPostList));
             } else {
+
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(new ResponseObject("failed", "cannot found any blog with category", ""));
             }
         } else {
+
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ResponseObject("failed", "category not exists", ""));
         }
@@ -180,19 +188,21 @@ public class BlogPostService {
 
     //sort theo thứ tự bài BlogPost mới nằm đầu tiên (giảm dần theo postId)
     public void sort(List<BlogPostEntity> blogPostList) {
+
         Collections.sort(blogPostList, new Comparator<BlogPostEntity>() {
+
             @Override
             public int compare(BlogPostEntity o1, BlogPostEntity o2) {
+
                 if (o1.getPostId() < o2.getPostId()) {
                     return 1;
+                } else if (o1.getPostId() == o2.getPostId()) {
+                    return 0;
                 } else {
-                    if (o1.getPostId() == o2.getPostId()) {
-                        return 0;
-                    } else {
-                        return -1;
-                    }
+                    return -1;
                 }
             }
+
         });
     }
 
