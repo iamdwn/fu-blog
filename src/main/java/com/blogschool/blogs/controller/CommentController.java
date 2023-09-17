@@ -1,17 +1,16 @@
 package com.blogschool.blogs.controller;
 
+import com.blogschool.blogs.dto.CommentDTO;
 import com.blogschool.blogs.model.ResponseObject;
 import com.blogschool.blogs.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-
 @RestController
 @RequestMapping("/api/blogPosts")
 public class CommentController {
-    private final CommentService commentService;
+    private CommentService commentService;
 
     @Autowired
     public CommentController(CommentService commentService) {
@@ -23,12 +22,12 @@ public class CommentController {
         return commentService.viewComment(postId);
     }
 
+
     @PostMapping("/insertComment/{postId}")
     public ResponseEntity<ResponseObject> insertComment(
             @PathVariable Long postId,
-            @RequestParam String content,
-            @RequestParam Long userId
-    ) {
-        return commentService.insertComment(content, postId, userId);
+            @RequestBody CommentDTO commentDTO) {
+        return commentService.insertComment(postId, commentDTO);
     }
+
 }

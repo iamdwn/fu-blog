@@ -1,5 +1,6 @@
 package com.blogschool.blogs.service;
 
+import com.blogschool.blogs.dto.CommentDTO;
 import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.CommentEntity;
 import com.blogschool.blogs.model.ResponseObject;
@@ -51,20 +52,23 @@ public class CommentService {
         }
     }
 
-    public ResponseEntity<ResponseObject> insertComment(String content, Long postId, Long userId) {
+    public ResponseEntity<ResponseObject> insertComment(Long postId, CommentDTO commentDTO) {
 
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
-        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        Optional<UserEntity> userEntity = userRepository.findById(commentDTO.getUserId());
 
         if (blogPostEntity.isPresent() && userEntity.isPresent()) {
-//            BlogPostEntity blogPost = blogPostEntity.get();
-//            UserEntity user = userEntity.get();
+
+            UserEntity user = userEntity.get();
 
             Date createdDate = new Date();
-            CommentEntity commentEntity = new CommentEntity(content, createdDate, userEntity.get(), blogPostEntity.get());
+            CommentEntity commentEntity = new CommentEntity(commentDTO.getContent(), createdDate,
+                    user, blogPostEntity.get());
+
+            commentRepository.save(commentEntity);
 
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "comment have been inserted", commentRepository.save(commentEntity)));
+                    .body(new ResponseObject("ok", "comment have been inserted", commentEntity));
         } else {
 
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

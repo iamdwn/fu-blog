@@ -1,9 +1,9 @@
 package com.blogschool.blogs.service;
 
+import com.blogschool.blogs.dto.BlogPostDTO;
 import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.CategoryEntity;
 import com.blogschool.blogs.entity.UserEntity;
-import com.blogschool.blogs.repository.ApprovalRequestRepository;
 import com.blogschool.blogs.repository.BlogPostRepository;
 import com.blogschool.blogs.repository.CategoryRepository;
 import com.blogschool.blogs.repository.UserRepository;
@@ -27,9 +27,6 @@ public class BlogPostService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private ApprovalRequestService approvalRequestService;
-
 
     public ResponseEntity<ResponseObject> getAllBlogPosts() {
         List<BlogPostEntity> blogPostEntity = blogPostRepository.findAll();
@@ -37,24 +34,19 @@ public class BlogPostService {
 
         if (!blogPostEntity.isEmpty()) {
             for (int i = 0; i < blogPostEntity.size(); i++) {
-                if (blogPostEntity.get(i).getStatus()) {
+                if (blogPostEntity.get(i).getStatus()!=null
+                        && blogPostEntity.get(i).getStatus()) {
                     blogPostList.add(blogPostEntity.get(i));
                 }
             }
             sort(blogPostList);
 
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "FOUND", blogPostList));
+                    .body(new ResponseObject("ok", "found", blogPostList));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ResponseObject("failed", "NOT FOUND", ""));
+                .body(new ResponseObject("failed", "not found", ""));
     }
-
-
-    //lấy cả BlogPost bị xoá
-//    public List<BlogPostEntity> getAllBlogPosts2() {
-//        return blogPostRepository.findAll();
-//    }
 
 
     public BlogPostEntity getBlogPostById(Long postId) {
@@ -75,25 +67,17 @@ public class BlogPostService {
             blogPostRepository.save(blogPost);
 
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "DELETED SUCCESSFUL", blogPost));
+                    .body(new ResponseObject("ok", "deleted successful", ""));
         }
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ResponseObject("failed", "DELETED FAILED", ""));
+                .body(new ResponseObject("failed", "deleted failed", ""));
     }
 
 
-    //xoá luôn dữ liệu trong Database
-//    public void deleteBlogPost2(Long postId) {
-//        BlogPostEntity blogPostEntity = this.getBlogPostById(postId);
-//        blogPostRepository.delete(blogPostEntity);
-//    }
-
-
-    public ResponseEntity<ResponseObject> createBlogPost(String typePost, String title, String content,
-                                                         Long categoryId, Long authorsId) {
-        Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId);
-        Optional<UserEntity> userEntity = userRepository.findById(authorsId);
+    public BlogPostEntity createBlogPost(BlogPostDTO blogPostDTO) {
+        Optional<CategoryEntity> categoryEntity = categoryRepository.findById(blogPostDTO.getCategory());
+        Optional<UserEntity> userEntity = userRepository.findById(blogPostDTO.getAuthors());
 
         if (categoryEntity.isPresent()
                 && userEntity.isPresent()) {
@@ -101,36 +85,24 @@ public class BlogPostService {
             CategoryEntity category = categoryEntity.get();
             UserEntity authors = userEntity.get();
             Date createdDate = new Date();
+            String typePost = blogPostDTO.getTypePost();
+            String title = blogPostDTO.getTitle();
+            String content = blogPostDTO.getContent();
 
-            //tạo và save bài BlogPost mới
+//            //tạo và save bài BlogPost mới
             BlogPostEntity newBlogPost = new BlogPostEntity(typePost, title, content, createdDate, null,
                     null, false, category, authors, null, true);
-            blogPostRepository.save(newBlogPost);
-
-            //tạo Approval Request cho bài BlogPost
-            Optional<BlogPostEntity> newBlogPostEntity = blogPostRepository.findById(newBlogPost.getPostId());
-
-            if (newBlogPostEntity.isPresent()) {
-                approvalRequestService.createApprovalRequestById(newBlogPostEntity.get(), authors);
-
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "CREATED SUCCESSFUL", newBlogPost));
-            } else {
-
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ResponseObject("failed", "CREATED FAILED", ""));
-            }
+             return blogPostRepository.save(newBlogPost);
         }
 
         return null;
     }
 
 
-    public ResponseEntity<ResponseObject> updateBlogPost(Long postId, String typePost, String title, String content,
-                                                         Long categoryId, Long authorsModified) {
+    public ResponseEntity<ResponseObject> updateBlogPost(Long postId, BlogPostDTO blogPostDTO) {
 
-        Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId);
-        Optional<UserEntity> userEntity = userRepository.findById(authorsModified);
+        Optional<CategoryEntity> categoryEntity = categoryRepository.findById(blogPostDTO.getCategory());
+        Optional<UserEntity> userEntity = userRepository.findById(blogPostDTO.getAuthors());
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
 
         if (blogPostEntity.isPresent()
@@ -143,9 +115,9 @@ public class BlogPostService {
             UserEntity authors = userEntity.get();
             Date modifiedDate = new Date();
 
-            blogPost.setTypePost(typePost);
-            blogPost.setTitle(title);
-            blogPost.setContent(content);
+            blogPost.setTypePost(blogPostDTO.getTypePost());
+            blogPost.setTitle(blogPostDTO.getTitle());
+            blogPost.setContent(blogPostDTO.getContent());
             blogPost.setModifiedDate(modifiedDate);
             blogPost.setCategory(category);
             blogPost.setAuthorsModified(authors);
@@ -153,11 +125,11 @@ public class BlogPostService {
             blogPostRepository.save(blogPost);
 
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "UPDATED SUCCESSFUL", blogPost));
+                    .body(new ResponseObject("ok", "updated successful", ""));
         }
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ResponseObject("failed", "UPDATED FAILED", ""));
+                .body(new ResponseObject("failed", "updated failed", ""));
     }
 
 
@@ -172,7 +144,7 @@ public class BlogPostService {
             if (!blogPostList.isEmpty()) {
 
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "FOUND", blogPostList));
+                        .body(new ResponseObject("ok", "found", blogPostList));
             } else {
 
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)

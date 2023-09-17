@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequestEntity, Long> {
+    ApprovalRequestEntity findByBlogPost(BlogPostEntity blogPost);
 }

@@ -1,5 +1,6 @@
 package com.blogschool.blogs.controller;
 
+import com.blogschool.blogs.dto.VoteDTO;
 import com.blogschool.blogs.model.ResponseObject;
 import com.blogschool.blogs.service.VoteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +18,20 @@ public class VoteController {
     }
 
     @GetMapping("/viewVote/{postId}")
-    public ResponseEntity<ResponseObject> viewVote(@PathVariable Long postId) {
+    public ResponseEntity<ResponseObject> viewVote(@PathVariable Long postId)
+    {
+
         return voteService.viewVotes(postId);
     }
+
 
     @PostMapping("/insertVote/{postId}")
     public ResponseEntity<ResponseObject> insertVote(
             @PathVariable Long postId,
-            @RequestParam Long voteValue,
-            @RequestParam Long userId
+            @RequestBody VoteDTO voteDTO
     ) {
 
-        return voteService.insertVotes(voteValue, postId, userId);
+        return voteService.insertVotes(postId, voteDTO);
     }
 
 }

@@ -53,4 +53,13 @@ public class CategoryEntity {
     public void setBlogPosts(List<BlogPostEntity> blogPosts) {
         this.blogPosts = blogPosts;
     }
+
+    public CategoryEntity() {
+    }
+
+    public CategoryEntity(String categoryName, List<BlogPostEntity> blogPosts, UserEntity category) {
+        this.categoryName = categoryName;
+        this.blogPosts = blogPosts;
+        this.category = category;
+    }
 }

@@ -1,6 +1,7 @@
 package com.blogschool.blogs.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -45,7 +46,7 @@ public class BlogPostEntity {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-//    @JsonIgnore
+
     private CategoryEntity category;
 
 
@@ -60,13 +61,14 @@ public class BlogPostEntity {
     private List<VoteEntity> votes = new ArrayList<>();
 
     @OneToMany(mappedBy = "blogPost")
+    @JsonIgnore
     private List<ApprovalRequestEntity> approvalRequests = new ArrayList<>();
 
     @OneToMany(mappedBy = "postComment")
+    @JsonIgnore
     private List<CommentEntity> postComments = new ArrayList<>();
 
     @ManyToMany(mappedBy = "blogPosts")
-
     private List<TagEntity> tags = new ArrayList<>();
 
     public List<VoteEntity> getVotes() {

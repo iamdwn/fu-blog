@@ -1,5 +1,6 @@
 package com.blogschool.blogs.service;
 
+import com.blogschool.blogs.dto.VoteDTO;
 import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.UserEntity;
 import com.blogschool.blogs.entity.VoteEntity;
@@ -46,15 +47,14 @@ public class VoteService {
         }
     }
 
-    public ResponseEntity<ResponseObject> insertVotes(Long voteValue, Long postId, Long userId) {
+    public ResponseEntity<ResponseObject> insertVotes(Long postId, VoteDTO voteDTO) {
 
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
-        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        Optional<UserEntity> userEntity = userRepository.findById(voteDTO.getUserId());
 
         if (blogPostEntity.isPresent() && userEntity.isPresent()) {
-//            BlogPostEntity blogPost = blogPostEntity.get();
-//            UserEntity user = userEntity.get();
-            VoteEntity voteEntity = new VoteEntity(voteValue, userEntity.get(), blogPostEntity.get());
+
+            VoteEntity voteEntity = new VoteEntity(voteDTO.getVoteValue(), userEntity.get(), blogPostEntity.get());
 
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok", "vote have been inserted", voteRepository.save(voteEntity)));
         } else {

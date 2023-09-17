@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApprovalRequestDTO {
-    private Long reviewId;
-    private String command;
-
+public class CommentDTO {
+    private String content;
+    private Long userId;
 }

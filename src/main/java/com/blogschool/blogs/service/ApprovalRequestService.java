@@ -1,6 +1,7 @@
 package com.blogschool.blogs.service;
 
 
+import com.blogschool.blogs.dto.ApprovalRequestDTO;
 import com.blogschool.blogs.entity.ApprovalRequestEntity;
 import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.UserEntity;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,27 +29,44 @@ public class ApprovalRequestService {
     @Autowired
     private ApprovalRequestRepository approvalRequestRepository;
 
+
+    public ResponseEntity<ResponseObject> getAllApprovalRequest() {
+        List<ApprovalRequestEntity> requestEntityList = approvalRequestRepository.findAll();
+        return requestEntityList.size() > 0 ?
+                ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "list exists", requestEntityList)) :
+                ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseObject("not found", "list empty", requestEntityList));
+    }
+
+
     public ApprovalRequestEntity getApprovalRequestById(Long postId) {
 
         return approvalRequestRepository.findById(postId).orElse(null);
     }
 
 
-    public void createApprovalRequestById(BlogPostEntity newBlogPost, UserEntity reviewer) {
+    public ResponseEntity<ResponseObject> createApprovalRequestById(BlogPostEntity newBlogPost) {
+        Optional<UserEntity> userEntity = userRepository.findById(newBlogPost.getAuthors().getUserId());
 
-        ApprovalRequestEntity newApprovalRequest = new ApprovalRequestEntity(false, reviewer,
+        ApprovalRequestEntity newApprovalRequest = new ApprovalRequestEntity(false, userEntity.get(),
                 null, newBlogPost);
+
         approvalRequestRepository.save(newApprovalRequest);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "the post is waiting approve", ""));
     }
 
 
-    public ResponseEntity<ResponseObject> approveBlogPost(Long postId, Long reviewId, String command) {
+    public ResponseEntity<ResponseObject> approveBlogPost(Long postId, ApprovalRequestDTO approvalRequestDTO) {
 
-        Optional<UserEntity> userEntity = userRepository.findById(reviewId);
+        Optional<UserEntity> userEntity = userRepository.findById(approvalRequestDTO.getReviewId());
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
-        ApprovalRequestEntity approvalRequestEntity = this.getApprovalRequestById(postId);
+        ApprovalRequestEntity approvalRequestEntity = approvalRequestRepository.findByBlogPost(blogPostEntity.get());
+
         if (blogPostEntity.isPresent()) {
-            if (command.equalsIgnoreCase("approve")) {
+            if (approvalRequestDTO.getCommand().equalsIgnoreCase("approve")) {
 
                 UserEntity reviewer = userEntity.get();
 
@@ -57,11 +76,11 @@ public class ApprovalRequestService {
                 approvalRequestRepository.save(approvalRequestEntity);
 
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "APPROVED SUCCESSFUL", approvalRequestEntity));
+                        .body(new ResponseObject("ok", "approved successful", ""));
             }
         }
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ResponseObject("failed", "APPROVED FAILED", ""));
+                .body(new ResponseObject("failed", "approved failed", ""));
     }
 }

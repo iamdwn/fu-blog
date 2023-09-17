@@ -1,6 +1,8 @@
 package com.blogschool.blogs.controller;
 
 
+import com.blogschool.blogs.dto.ApprovalRequestDTO;
+import com.blogschool.blogs.dto.BlogPostDTO;
 import com.blogschool.blogs.entity.ApprovalRequestEntity;
 import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.model.ResponseObject;
@@ -20,13 +22,14 @@ public class ApprovalRequestController {
     @Autowired
     private ApprovalRequestService approvalRequestService;
 
+
     @PutMapping("/manageBlog/approve/{postId}")
     public ResponseEntity<ResponseObject> approveBlog(
             @PathVariable Long postId,
-            @RequestParam Long reviewId,
-            @RequestParam String command
-    ) {
+            @RequestBody ApprovalRequestDTO approvalRequestDTO
+            ) {
 
-        return approvalRequestService.approveBlogPost(postId, reviewId, command);
+        return approvalRequestService.approveBlogPost(postId, approvalRequestDTO);
     }
+
 }
