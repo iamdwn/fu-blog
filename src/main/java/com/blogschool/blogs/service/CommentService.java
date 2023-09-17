@@ -1,8 +1,9 @@
 package com.blogschool.blogs.service;
 
+import com.blogschool.blogs.dto.CommentDTO;
 import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.CommentEntity;
-import com.blogschool.blogs.entity.ResponeObject;
+import com.blogschool.blogs.entity.ResponseObject;
 import com.blogschool.blogs.entity.UserEntity;
 import com.blogschool.blogs.repository.BlogPostRepository;
 import com.blogschool.blogs.repository.CommentRepository;
@@ -12,12 +13,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class CommentService {
+
     private final CommentRepository commentRepository;
     private final BlogPostRepository blogPostRepository;
     private final UserRepository userRepository;
@@ -29,32 +31,54 @@ public class CommentService {
         this.userRepository = userRepository;
     }
 
-    public ResponseEntity<ResponeObject> viewComment(Long postId) {
+    public ResponseEntity<ResponseObject> viewComment(Long postId) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         if (blogPostEntity.isPresent()) {
             List<CommentEntity> list = commentRepository.findByPostComment(blogPostEntity.get());
-            return list.size() > 0 ?
-                    ResponseEntity.status(HttpStatus.OK)
-                            .body(new ResponeObject("ok", "comment of postId: " + postId, list)) :
-                    ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body(new ResponeObject("failed", "no comment found of postId: " + postId, ""));
+            if (list.size() > 0) {
+                List<CommentDTO> dtoList = new ArrayList<>();
+                for (CommentEntity entity : list) {
+                    CommentDTO dto = new CommentDTO(entity.getCommentId(), entity.getContent(), entity.getPostComment().getPostId(), entity.getUserComment().getUserId());
+                    dtoList.add(dto);
+                }
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "comment of postId: " + postId, dtoList));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseObject("failed", "no comment found of postId: " + postId, ""));
+            }
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponeObject("failed", "post doesn't exists", ""));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("failed", "post doesn't exists", ""));
         }
     }
 
-    public ResponseEntity<ResponeObject> insertComment(Date createdDate, String content, Long postId, Long userId) {
-        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
-        Optional<UserEntity> userEntity = userRepository.findById(userId);
-        if (blogPostEntity.isPresent() && userEntity.isPresent()) {
+    public ResponseEntity<ResponseObject> insertComment(/*String content, Long postId, Long userId*/CommentDTO commentDTO) {
+//        BlogPostEntity blogPostEntity = commentEntity.getPostComment();
+//        UserEntity userEntity = commentEntity.getUserComment();
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(commentDTO.getPostId());
+        Optional<UserEntity> userEntity = userRepository.findById(commentDTO.getUserId());
+        if (/*blogPostEntity != null && userEntity != null*/blogPostEntity.isPresent() && userEntity.isPresent()) {
 //            BlogPostEntity blogPost = blogPostEntity.get();
 //            UserEntity user = userEntity.get();
-            CommentEntity commentEntity = new CommentEntity(content, createdDate, userEntity.get(), blogPostEntity.get());
+            CommentEntity commentEntity = new CommentEntity(commentDTO.getContent(), userEntity.get(), blogPostEntity.get());
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponeObject("ok", "comment have been inserted", commentRepository.save(commentEntity)));
+                    .body(new ResponseObject("ok", "comment have been inserted" + commentRepository.save(commentEntity), commentDTO));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponeObject("failed", "post or user doesn't exists", ""));
+                    .body(new ResponseObject("failed", "post or user doesn't exists", ""));
+        }
+    }
+
+    public ResponseEntity<ResponseObject> updateComment(Long commentId, CommentDTO commentDTO) {
+        Optional<CommentEntity> commentEntity = commentRepository.findById(commentId);
+        if (commentEntity.isPresent()) {
+            CommentEntity updateComment = commentEntity.get();
+            updateComment.setContent(commentDTO.getContent());
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "update successfully", commentRepository.save(updateComment)));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseObject("failed", "comment doesn't exists", ""));
         }
     }
 }

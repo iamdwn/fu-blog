@@ -4,7 +4,9 @@ import com.blogschool.blogs.entity.BlogPostEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
-//    BlogPostEntity findBlogPostById(Long Id);
+    List<BlogPostEntity> findByIsApproved(Boolean isApproved);
 }

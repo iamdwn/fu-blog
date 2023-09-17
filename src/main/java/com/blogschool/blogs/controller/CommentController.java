@@ -1,15 +1,14 @@
 package com.blogschool.blogs.controller;
 
-import com.blogschool.blogs.entity.ResponeObject;
+import com.blogschool.blogs.dto.CommentDTO;
+import com.blogschool.blogs.entity.ResponseObject;
 import com.blogschool.blogs.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-
 @RestController
-@RequestMapping("/comment")
+@RequestMapping("/api/blogPosts/comment")
 public class CommentController {
     private final CommentService commentService;
 
@@ -19,17 +18,21 @@ public class CommentController {
     }
 
     @GetMapping("/view")
-    public ResponseEntity<ResponeObject> viewComment(@RequestParam Long postId) {
-        return commentService.viewComment(postId);
+    public ResponseEntity<ResponseObject> viewComment(@RequestParam Long postId) {
+        return commentService.viewComment(postId)/*viewComment(postId)*/;
     }
 
     @PostMapping("/insert")
-    public ResponseEntity<ResponeObject> insertComment(
-            @RequestParam Date createdDate,
-            @RequestParam String content,
-            @RequestParam Long postId,
-            @RequestParam Long userId
+    public ResponseEntity<ResponseObject> insertComment(@RequestBody CommentDTO commentDTO
+//            @RequestParam String content,
+//            @RequestParam Long postId,
+//            @RequestParam Long userId
     ) {
-        return commentService.insertComment(createdDate, content, postId, userId);
+        return commentService.insertComment(/*content, postId, userId*/commentDTO);
+    }
+
+    @PutMapping("/view/{commentId}")
+    public ResponseEntity<ResponseObject> updateComment(@PathVariable Long commentId, @RequestBody CommentDTO commentDTO) {
+        return commentService.updateComment(commentId, commentDTO);
     }
 }

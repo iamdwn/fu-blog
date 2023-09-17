@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Optional;
 
@@ -20,7 +23,7 @@ public class CommentEntity {
 
     @Column
     @CreatedDate
-    private Date createdDate;
+    private Date createdDate = new Date();
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -71,9 +74,8 @@ public class CommentEntity {
     public CommentEntity() {
     }
 
-    public CommentEntity(String content, Date createdDate, UserEntity userComment, BlogPostEntity postComment) {
+    public CommentEntity(String content, UserEntity userComment, BlogPostEntity postComment) {
         this.content = content;
-        this.createdDate = createdDate;
         this.userComment = userComment;
         this.postComment = postComment;
     }
