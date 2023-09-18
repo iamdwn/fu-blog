@@ -32,4 +32,10 @@ public class ApprovalRequestController {
         return approvalRequestService.approveBlogPost(postId, approvalRequestDTO);
     }
 
+
+    @GetMapping("/manageBlog/viewApprovalRequest")
+    public ResponseEntity<ResponseObject> getAllRequest() {
+        return approvalRequestService.getAllApprovalRequest();
+    }
+
 }
