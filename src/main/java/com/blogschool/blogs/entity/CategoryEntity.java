@@ -1,11 +1,17 @@
 package com.blogschool.blogs.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "Category")
 public class CategoryEntity {
 
@@ -20,34 +26,7 @@ public class CategoryEntity {
     private List<BlogPostEntity> blogPosts = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name = "create_by")
-    private UserEntity category;
+    @JoinColumn(name = "parentCategoryId")
+    private CategoryEntity parentCategory;
 
-    public UserEntity getCategory() {
-        return category;
-    }
-
-    public void setCategory(UserEntity category) {
-        this.category = category;
-    }
-
-    public Long getCategoryId() {
-        return Id;
-    }
-
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public List<BlogPostEntity> getBlogPosts() {
-        return blogPosts;
-    }
-
-    public void setBlogPosts(List<BlogPostEntity> blogPosts) {
-        this.blogPosts = blogPosts;
-    }
 }

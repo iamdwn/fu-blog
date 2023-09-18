@@ -44,9 +44,10 @@ public class UserService {
                 hashedPassword,
                 userDTO.getEmail(),
                 userDTO.getFullName(),
-                "USER",
                 true
         );
         userRepository.save(user);
+        userRepository.findByUsername(user.getUsername());
+
     }
 }

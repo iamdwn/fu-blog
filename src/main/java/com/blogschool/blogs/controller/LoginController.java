@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/")
+@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
 public class LoginController {
 
     @Autowired
@@ -39,4 +40,5 @@ public class LoginController {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
 }

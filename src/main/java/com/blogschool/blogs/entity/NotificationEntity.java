@@ -1,11 +1,17 @@
 package com.blogschool.blogs.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.util.Date;
 
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "Notification")
 public class NotificationEntity {
 
@@ -18,6 +24,9 @@ public class NotificationEntity {
     private String content;
 
     @Column
+    private Boolean isRead;
+
+    @Column
     @CreatedDate
     private Date createdDate;
 
@@ -25,31 +34,4 @@ public class NotificationEntity {
     @JoinColumn(name = "user_id")
     private UserEntity notification;
 
-    public Long getNotificationId() {
-        return notificationId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public UserEntity getNotification() {
-        return notification;
-    }
-
-    public void setNotification(UserEntity notification) {
-        this.notification = notification;
-    }
 }
