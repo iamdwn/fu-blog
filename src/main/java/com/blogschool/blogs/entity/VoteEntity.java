@@ -18,13 +18,13 @@ public class VoteEntity {
     private Long voteValue; // 1 for upvote, -1 for downvote
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private UserEntity userVote;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "post_id")
+    @JsonIgnore
     private BlogPostEntity postVote;
 
     public Long getVoteId() {

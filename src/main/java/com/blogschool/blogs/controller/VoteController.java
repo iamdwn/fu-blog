@@ -1,14 +1,14 @@
 package com.blogschool.blogs.controller;
 
 import com.blogschool.blogs.dto.VoteDTO;
-import com.blogschool.blogs.model.ResponseObject;
+import com.blogschool.blogs.entity.ResponseObject;
 import com.blogschool.blogs.service.VoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/blogPosts")
+@RequestMapping("/api/blogPosts/vote")
 public class VoteController {
     private final VoteService voteService;
 
@@ -17,21 +17,22 @@ public class VoteController {
         this.voteService = voteService;
     }
 
-    @GetMapping("/viewVote/{postId}")
-    public ResponseEntity<ResponseObject> viewVote(@PathVariable Long postId)
-    {
-
-        return voteService.viewVotes(postId);
+    @GetMapping("/view")
+    public ResponseEntity<ResponseObject> viewVote(@RequestParam Long postId) {
+        return voteService.viewVote(postId);
     }
 
-
-    @PostMapping("/insertVote/{postId}")
-    public ResponseEntity<ResponseObject> insertVote(
-            @PathVariable Long postId,
-            @RequestBody VoteDTO voteDTO
+    @PostMapping("/insert")
+    public ResponseEntity<ResponseObject> insertVote(@RequestBody VoteDTO voteDTO
+//            @RequestParam Long voteValue,
+//            @RequestParam Long postId,
+//            @RequestParam Long userId
     ) {
-
-        return voteService.insertVotes(postId, voteDTO);
+        return voteService.upsertVote(voteDTO);
     }
 
+//    @PutMapping("/view/{voteId}")
+//    public ResponseEntity<ResponseObject> updateVote(@PathVariable Long voteId, @RequestBody VoteDTO voteDTO) {
+//        return voteService.updateVote(voteId, voteDTO);
+//    }
 }
