@@ -1,0 +1,31 @@
+Manifest-Version: 1.0
+Main-Class: com.blogschool.blogs.BlogsApplication
+Class-Path: spring-jdbc-6.0.11.jar byte-buddy-1.14.6.jar spring-aop-6.0.
+ 11.jar spring-boot-starter-jdbc-3.1.3.jar hibernate-core-6.2.7.Final.ja
+ r spring-expression-6.0.11.jar spring-core-6.0.11.jar spring-boot-start
+ er-logging-3.1.3.jar spring-boot-starter-3.1.3.jar slf4j-api-2.0.7.jar 
+ jakarta.xml.bind-api-4.0.0.jar tomcat-embed-websocket-10.1.12.jar logba
+ ck-classic-1.4.11.jar tomcat-embed-core-10.1.12.jar log4j-api-2.20.0.ja
+ r micrometer-commons-1.11.3.jar spring-boot-starter-web-3.1.3.jar jacks
+ on-datatype-jdk8-2.15.2.jar spring-boot-starter-aop-3.1.3.jar spring-bo
+ ot-starter-validation-3.1.3.jar spring-boot-starter-data-jpa-3.1.3.jar 
+ mysql-connector-j-8.0.33.jar logback-core-1.4.11.jar spring-context-6.0
+ .11.jar aspectjweaver-1.9.20.jar spring-aspects-6.0.11.jar jakarta.pers
+ istence-api-3.1.0.jar antlr4-runtime-4.10.1.jar micrometer-observation-
+ 1.11.3.jar spring-web-6.0.11.jar jaxb-core-4.0.3.jar spring-beans-6.0.1
+ 1.jar spring-boot-3.1.3.jar jackson-databind-2.15.2.jar jakarta.activat
+ ion-api-2.1.2.jar spring-boot-starter-json-3.1.3.jar spring-boot-starte
+ r-tomcat-3.1.3.jar snakeyaml-1.33.jar jakarta.transaction-api-2.0.1.jar
+  spring-data-commons-3.1.3.jar hibernate-commons-annotations-6.0.6.Fina
+ l.jar spring-boot-autoconfigure-3.1.3.jar spring-data-jpa-3.1.3.jar spr
+ ing-webmvc-6.0.11.jar jandex-3.0.5.jar log4j-to-slf4j-2.20.0.jar jackso
+ n-datatype-jsr310-2.15.2.jar classmate-1.5.1.jar hibernate-validator-8.
+ 0.1.Final.jar spring-boot-configuration-processor-3.1.3.jar spring-tx-6
+ .0.11.jar HikariCP-5.0.1.jar jakarta.validation-api-3.0.2.jar jakarta.i
+ nject-api-2.0.1.jar jul-to-slf4j-2.0.7.jar tomcat-embed-el-10.1.12.jar 
+ lombok-1.18.28.jar jackson-core-2.15.2.jar spring-jcl-6.0.11.jar jackso
+ n-module-parameter-names-2.15.2.jar txw2-4.0.3.jar istack-commons-runti
+ me-4.1.2.jar jakarta.annotation-api-2.1.1.jar spring-orm-6.0.11.jar spr
+ ing-boot-devtools-3.1.3.jar jaxb-runtime-4.0.3.jar jboss-logging-3.5.3.
+ Final.jar angus-activation-2.0.1.jar jackson-annotations-2.15.2.jar
+

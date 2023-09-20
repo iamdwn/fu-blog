@@ -9,20 +9,17 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Follow")
-public class FollowEntity {
-
+@Table(name = "PostTag")
+public class PostTagEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
-    private Long Id;
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "follower_Id")
-    private UserEntity follower;
+    @JoinColumn(name = "post_id")
+    private BlogPostEntity post;
 
     @ManyToOne
-    @JoinColumn(name = "following_Id")
-    private UserEntity following;
-
+    @JoinColumn(name = "tag_id")
+    private TagEntity tag;
 }

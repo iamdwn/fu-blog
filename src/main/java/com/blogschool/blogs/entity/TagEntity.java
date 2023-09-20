@@ -1,11 +1,19 @@
 package com.blogschool.blogs.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "Tag")
 public class TagEntity {
     @Id
@@ -16,29 +24,14 @@ public class TagEntity {
     @Column
     private String tagName;
 
-    @ManyToMany
-    @JoinTable(name = "PostTag",
-            joinColumns = @JoinColumn(name = "tag_id"),
-            inverseJoinColumns = @JoinColumn(name = "post_id"))
-    private List<BlogPostEntity> blogPosts = new ArrayList<>();
+    @OneToMany(mappedBy = "tag")
+    private Set<PostTagEntity> postTags = new HashSet<>();
 
-    public Long getTagId() {
-        return Id;
-    }
+//    @ManyToMany
+//    @JoinTable(name = "PostTag",
+//            joinColumns = @JoinColumn(name = "tag_id"),
+//            inverseJoinColumns = @JoinColumn(name = "post_id"))
+//    private Set<BlogPostEntity> blogPosts = new HashSet<>();
 
-    public String getTagName() {
-        return tagName;
-    }
 
-    public void setTagName(String tagName) {
-        this.tagName = tagName;
-    }
-
-    public List<BlogPostEntity> getBlogPosts() {
-        return blogPosts;
-    }
-
-    public void setBlogPosts(List<BlogPostEntity> blogPosts) {
-        this.blogPosts = blogPosts;
-    }
 }
