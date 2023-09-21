@@ -2,6 +2,7 @@ package com.blogschool.blogs.service;
 
 import com.blogschool.blogs.dto.VoteDTO;
 import com.blogschool.blogs.entity.*;
+import com.blogschool.blogs.exception.VoteException;
 import com.blogschool.blogs.repository.BlogPostRepository;
 import com.blogschool.blogs.repository.UserRepository;
 import com.blogschool.blogs.repository.VoteRepository;
@@ -28,25 +29,27 @@ public class VoteService {
         this.userRepository = userRepository;
     }
 
-    public ResponseEntity<ResponseObject> viewVote(Long postId) {
+    public Long countVote(Long postId) {
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+        if (blogPostEntity.isPresent()) {
+            Long count = voteRepository.countByPostVote(blogPostEntity.get());
+            return count;
+        } else throw new VoteException("Blog doesn't exists");
+    }
+
+    public List<VoteDTO> viewVote(Long postId) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         if (blogPostEntity.isPresent()) {
             List<VoteEntity> list = voteRepository.findByPostVote(blogPostEntity.get());
-            if (list.size() > 0) {
+            if (!list.isEmpty()) {
                 List<VoteDTO> dtoList = new ArrayList<>();
                 for (VoteEntity entity : list) {
-                    VoteDTO dto = new VoteDTO(entity.getVoteId(), entity.getVoteValue(), entity.getPostVote().getPostId(), entity.getUserVote().getUserId());
+                    VoteDTO dto = new VoteDTO(entity.getId(), entity.getVoteValue(), entity.getPostVote().getId(), entity.getUserVote().getId());
                     dtoList.add(dto);
                 }
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "votes of postId: " + postId, dtoList));
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ResponseObject("not found", "no votes found of postId: " + postId, ""));
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("failed", "blog doesn't exists", ""));
-        }
+                return dtoList;
+            } else throw new VoteException("List empty");
+        } else throw new VoteException("Blog doesn't exists");
     }
 
     public ResponseEntity<ResponseObject> upsertVote(VoteDTO voteDTO) {
@@ -71,16 +74,4 @@ public class VoteService {
         }
     }
 
-//    public ResponseEntity<ResponseObject> updateVote(Long voteId, VoteDTO voteDTO) {
-//        Optional<VoteEntity> voteEntity = voteRepository.findById(voteId);
-//        if (voteEntity.isPresent()) {
-//            VoteEntity updateVote = voteEntity.get();
-//            updateVote.setVoteValue(voteDTO.getVoteValue());
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(new ResponseObject("ok", "update vote successfully", voteRepository.save(updateVote)));
-//        } else {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(new ResponseObject("failed", "vote doesn't exists", ""));
-//        }
-//    }
 }

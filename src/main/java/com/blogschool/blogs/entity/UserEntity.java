@@ -33,10 +33,10 @@ public class UserEntity {
 
 
     @Column
-    private  Boolean status;
+    private Boolean status;
 
     @Column
-    private  Boolean isVerify;
+    private Boolean isVerify;
 
 
     @OneToMany(mappedBy = "authors")
@@ -70,9 +70,9 @@ public class UserEntity {
 
     @ManyToMany
     @JoinTable(name = "user_role",
-        joinColumns = @JoinColumn(name = "Users_Id"),
-        inverseJoinColumns = @JoinColumn(name = "Roles_Id"))
-        private Set<RoleEntity> roles = new HashSet<>();
+            joinColumns = @JoinColumn(name = "Users_Id"),
+            inverseJoinColumns = @JoinColumn(name = "Roles_Id"))
+    private Set<RoleEntity> roles = new HashSet<>();
 //    @OneToMany(mappedBy = "user")
 //    private Set<UserRoleEntity>  userRoles = new HashSet<>();
 

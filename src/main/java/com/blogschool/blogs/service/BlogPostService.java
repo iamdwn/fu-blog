@@ -5,6 +5,7 @@ import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.CategoryEntity;
 import com.blogschool.blogs.entity.ResponseObject;
 import com.blogschool.blogs.entity.UserEntity;
+import com.blogschool.blogs.exception.BlogPostException;
 import com.blogschool.blogs.repository.BlogPostRepository;
 import com.blogschool.blogs.repository.CategoryRepository;
 import com.blogschool.blogs.repository.UserRepository;
@@ -42,27 +43,39 @@ public class BlogPostService {
 //        }
 //    }
 
-    public ResponseEntity<ResponseObject> findBlogByCategory(String name) {
+    public List<BlogPostDTO> findBlogByCategory(String name) {
         Optional<CategoryEntity> category = categoryRepository.findByCategoryName(name);
-        if (category != null) {
+        if (category.isPresent()) {
             List<BlogPostEntity> list = category.get().getBlogPosts();
             if (!list.isEmpty()) {
-                List<BlogPostEntity> postEntityList = new ArrayList<>();
+                List<BlogPostDTO> dtoList = new ArrayList<>();
                 for (BlogPostEntity blogPost : list) {
-                    if (blogPost.getApproved() == true) {
-                        postEntityList.add(blogPost);
+                    if (blogPost.getApproved() == true && blogPost.getStatus() == true) {
+                        BlogPostDTO dto = new BlogPostDTO(blogPost.getTypePost(), blogPost.getTitle(), blogPost.getContent(), blogPost.getCategory().getCategoryName(), blogPost.getAuthors().getId());
+                        dtoList.add(dto);
                     }
                 }
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "found", postEntityList));
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ResponseObject("failed", "cannot found any blog with category", ""));
+                if (!dtoList.isEmpty()) {
+                    return dtoList;
+                } else throw new BlogPostException("Blog post doesn't exists");
+            } else throw new BlogPostException("Cannot found any blog post with category");
+        } else throw new BlogPostException("Category doesn't exists");
+    }
+
+    public List<BlogPostDTO> findBlogByTitle(String title) {
+        List<BlogPostEntity> list = blogPostRepository.findByTitleContaining(title);
+        if (!list.isEmpty()) {
+            List<BlogPostDTO> dtoList = new ArrayList<>();
+            for (BlogPostEntity blogPost : list) {
+                if (blogPost.getApproved() == true && blogPost.getStatus() == true) {
+                    BlogPostDTO dto = new BlogPostDTO(blogPost.getTypePost(), blogPost.getTitle(), blogPost.getContent(), blogPost.getCategory().getCategoryName(), blogPost.getAuthors().getId());
+                    dtoList.add(dto);
+                }
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseObject("failed", "category not exists", ""));
-        }
+            if (!dtoList.isEmpty()) {
+                return dtoList;
+            } else throw new BlogPostException("Blog post doesn't exists");
+        } else throw new BlogPostException("Cannot found any blog post with this title");
     }
 
     public BlogPostEntity insertBlogPost(BlogPostDTO blogPostDTO) {
@@ -71,13 +84,7 @@ public class BlogPostService {
         if (userEntity.isPresent() && categoryEntity.isPresent()) {
             BlogPostEntity blogPostEntity = new BlogPostEntity
                     (blogPostDTO.getTypePost(), blogPostDTO.getTitle(), blogPostDTO.getContent(), categoryEntity.get(), userEntity.get());
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(new ResponseObject("ok", "post has inserted", blogPostRepository.save(blogPostEntity)));
             return blogPostRepository.save(blogPostEntity);
-        } else {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(new ResponseObject("failed", "user or category doesn't exists", ""));
-            return null;
-        }
+        } else throw new BlogPostException("User or Category doesn't exists");
     }
 }

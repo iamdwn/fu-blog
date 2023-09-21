@@ -11,8 +11,6 @@ import java.util.*;
 
 @Entity
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "BlogPost")
 public class BlogPostEntity {
 
@@ -31,7 +29,7 @@ public class BlogPostEntity {
 
     @Column
     @CreatedDate
-    private Date createdDate;
+    private Date createdDate = new Date();
 
 
     @Column
@@ -42,10 +40,10 @@ public class BlogPostEntity {
     private Long approvedBy;
 
     @Column
-    private  Boolean status;
+    private Boolean status = true;
 
     @Column
-    private Boolean isApproved;
+    private Boolean isApproved = false;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -75,5 +73,134 @@ public class BlogPostEntity {
 //    private Set<TagEntity> tags = new HashSet<>();
 
 
+    public Long getId() {
+        return Id;
+    }
 
+    public void setId(Long id) {
+        Id = id;
+    }
+
+    public String getTypePost() {
+        return typePost;
+    }
+
+    public void setTypePost(String typePost) {
+        this.typePost = typePost;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Date modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
+    public Long getApprovedBy() {
+        return approvedBy;
+    }
+
+    public void setApprovedBy(Long approvedBy) {
+        this.approvedBy = approvedBy;
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
+
+    public Boolean getApproved() {
+        return isApproved;
+    }
+
+    public void setApproved(Boolean approved) {
+        isApproved = approved;
+    }
+
+    public CategoryEntity getCategory() {
+        return category;
+    }
+
+    public void setCategory(CategoryEntity category) {
+        this.category = category;
+    }
+
+    public UserEntity getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(UserEntity authors) {
+        this.authors = authors;
+    }
+
+    public Set<VoteEntity> getVotes() {
+        return votes;
+    }
+
+    public void setVotes(Set<VoteEntity> votes) {
+        this.votes = votes;
+    }
+
+    public Set<ApprovalRequestEntity> getApprovalRequests() {
+        return approvalRequests;
+    }
+
+    public void setApprovalRequests(Set<ApprovalRequestEntity> approvalRequests) {
+        this.approvalRequests = approvalRequests;
+    }
+
+    public Set<CommentEntity> getPostComments() {
+        return postComments;
+    }
+
+    public void setPostComments(Set<CommentEntity> postComments) {
+        this.postComments = postComments;
+    }
+
+    public Set<PostTagEntity> getPostTags() {
+        return postTags;
+    }
+
+    public void setPostTags(Set<PostTagEntity> postTags) {
+        this.postTags = postTags;
+    }
+
+    public BlogPostEntity() {
+    }
+
+    public BlogPostEntity(String typePost, String title, String content, CategoryEntity category, UserEntity authors) {
+        this.typePost = typePost;
+        this.title = title;
+        this.content = content;
+        this.category = category;
+        this.authors = authors;
+    }
 }

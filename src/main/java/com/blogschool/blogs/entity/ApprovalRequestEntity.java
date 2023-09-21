@@ -7,7 +7,6 @@ import lombok.*;
 @Getter
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "ApprovalRequest")
 public class ApprovalRequestEntity {
@@ -31,7 +30,9 @@ public class ApprovalRequestEntity {
     @JoinColumn(name = "post_id")
     private BlogPostEntity blogPost;
 
-
-
+    public ApprovalRequestEntity(BlogPostEntity blogPost) {
+        this.request = blogPost.getAuthors();
+        this.blogPost = blogPost;
+    }
 }
 

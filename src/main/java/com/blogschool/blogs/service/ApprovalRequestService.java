@@ -4,6 +4,7 @@ import com.blogschool.blogs.entity.ApprovalRequestEntity;
 import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.ResponseObject;
 import com.blogschool.blogs.entity.UserEntity;
+import com.blogschool.blogs.exception.ApprovalRequestException;
 import com.blogschool.blogs.repository.ApprovalRequestRepository;
 import com.blogschool.blogs.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,15 +37,8 @@ public class ApprovalRequestService {
     }
 
     //    public ResponseEntity<ResponseObject> insertApprovalRequest()
-    public ResponseEntity<ResponseObject> insertApprovalRequest(Long userId, BlogPostEntity blogPostEntity) {
-        Optional<UserEntity> userEntity = userRepository.findById(userId);
-        if (userEntity.isPresent() && blogPostEntity != null) {
-            ApprovalRequestEntity approvalRequestEntity = new ApprovalRequestEntity(userEntity.get(), blogPostEntity);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "post have been waiting approve", approvalRequestRepository.save(approvalRequestEntity)));
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseObject("failed", "user or blogpost doesn't exists", ""));
-        }
+    public void insertApprovalRequest(BlogPostEntity blogPostEntity) {
+        ApprovalRequestEntity approvalRequestEntity = new ApprovalRequestEntity(blogPostEntity);
+        approvalRequestRepository.save(approvalRequestEntity);
     }
 }

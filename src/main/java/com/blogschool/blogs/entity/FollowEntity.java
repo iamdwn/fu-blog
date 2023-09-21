@@ -1,12 +1,12 @@
 package com.blogschool.blogs.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Follow")
@@ -25,4 +25,8 @@ public class FollowEntity {
     @JoinColumn(name = "following_Id")
     private UserEntity following;
 
+    public FollowEntity(UserEntity follower, UserEntity following) {
+        this.follower = follower;
+        this.following = following;
+    }
 }

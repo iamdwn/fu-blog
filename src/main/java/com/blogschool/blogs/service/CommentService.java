@@ -5,9 +5,11 @@ import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.CommentEntity;
 import com.blogschool.blogs.entity.ResponseObject;
 import com.blogschool.blogs.entity.UserEntity;
+import com.blogschool.blogs.exception.CommentException;
 import com.blogschool.blogs.repository.BlogPostRepository;
 import com.blogschool.blogs.repository.CommentRepository;
 import com.blogschool.blogs.repository.UserRepository;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,54 +33,60 @@ public class CommentService {
         this.userRepository = userRepository;
     }
 
-    public ResponseEntity<ResponseObject> viewComment(Long postId) {
+    public void deleteComment(CommentDTO commentDTO) {
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(commentDTO.getPostId());
+        Optional<UserEntity> userEntity = userRepository.findById(commentDTO.getUserId());
+        if (blogPostEntity.isPresent() && userEntity.isPresent()) {
+            Optional<CommentEntity> commentEntity = commentRepository.findById(commentDTO.getCommentId());
+            if (commentEntity.isPresent()) {
+                commentRepository.delete(commentEntity.get());
+            } else throw new CommentException("Comment doesn't exists");
+
+        } else throw new CommentException("User or Blog doesn't exists");
+    }
+
+    public List<CommentDTO> viewComment(Long postId) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         if (blogPostEntity.isPresent()) {
             List<CommentEntity> list = commentRepository.findByPostComment(blogPostEntity.get());
-            if (list.size() > 0) {
+            if (!list.isEmpty()) {
                 List<CommentDTO> dtoList = new ArrayList<>();
                 for (CommentEntity entity : list) {
-                    CommentDTO dto = new CommentDTO(entity.getCommentId(), entity.getContent(), entity.getPostComment().getPostId(), entity.getUserComment().getUserId());
+                    CommentDTO dto = new CommentDTO(entity.getId(), entity.getContent(), entity.getPostComment().getId(), entity.getUserComment().getId());
                     dtoList.add(dto);
                 }
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "comment of postId: " + postId, dtoList));
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ResponseObject("failed", "no comment found of postId: " + postId, ""));
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("failed", "post doesn't exists", ""));
-        }
+                return dtoList;
+            } else throw new CommentException("Comment doesn't exists");
+        } else throw new CommentException("Blog doesn't exists");
     }
 
-    public ResponseEntity<ResponseObject> insertComment(/*String content, Long postId, Long userId*/CommentDTO commentDTO) {
-//        BlogPostEntity blogPostEntity = commentEntity.getPostComment();
-//        UserEntity userEntity = commentEntity.getUserComment();
+    public void insertComment(CommentDTO commentDTO) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(commentDTO.getPostId());
         Optional<UserEntity> userEntity = userRepository.findById(commentDTO.getUserId());
-        if (/*blogPostEntity != null && userEntity != null*/blogPostEntity.isPresent() && userEntity.isPresent()) {
-//            BlogPostEntity blogPost = blogPostEntity.get();
-//            UserEntity user = userEntity.get();
+        if (blogPostEntity.isPresent() && userEntity.isPresent()) {
             CommentEntity commentEntity = new CommentEntity(commentDTO.getContent(), userEntity.get(), blogPostEntity.get());
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "comment have been inserted" + commentRepository.save(commentEntity), commentDTO));
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseObject("failed", "post or user doesn't exists", ""));
-        }
+            commentRepository.save(commentEntity);
+        } else throw new CommentException("Blog or User doesn't exists");
     }
 
-    public ResponseEntity<ResponseObject> updateComment(Long commentId, CommentDTO commentDTO) {
-        Optional<CommentEntity> commentEntity = commentRepository.findById(commentId);
+    public void updateComment(CommentDTO commentDTO) {
+        Optional<CommentEntity> commentEntity = commentRepository.findById(commentDTO.getCommentId());
         if (commentEntity.isPresent()) {
-            CommentEntity updateComment = commentEntity.get();
-            updateComment.setContent(commentDTO.getContent());
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "update successfully", commentRepository.save(updateComment)));
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseObject("failed", "comment doesn't exists", ""));
-        }
+            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(commentDTO.getPostId());
+            Optional<UserEntity> userEntity = userRepository.findById(commentDTO.getUserId());
+            if (blogPostEntity.isPresent() && userEntity.isPresent()) {
+                CommentEntity updateComment = commentEntity.get();
+                updateComment.setContent(commentDTO.getContent());
+                commentRepository.save(updateComment);
+            } else throw new CommentException("Blog or User doesn't exists");
+        } else throw new CommentException("Comment doesn't exists");
+    }
+
+    public Long countComment(Long postId) {
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+        if (blogPostEntity.isPresent()) {
+            Long count = commentRepository.countByPostComment(blogPostEntity.get());
+            return count;
+        } else throw new CommentException("Blog doesn't exists");
     }
 }

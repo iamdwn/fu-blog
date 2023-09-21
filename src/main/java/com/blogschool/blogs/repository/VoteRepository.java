@@ -13,4 +13,6 @@ public interface VoteRepository extends JpaRepository<VoteEntity, Long> {
     List<VoteEntity> findByPostVote(BlogPostEntity blogPostEntity);
 
     VoteEntity findByUserVoteAndPostVote(UserEntity userEntity, BlogPostEntity blogPostEntity);
+
+    Long countByPostVote(BlogPostEntity blogPostEntity);
 }
