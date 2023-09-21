@@ -31,7 +31,6 @@ public class UserEntity {
     @Column
     private String fullName;
 
-
     @Column
     private Boolean status;
 
