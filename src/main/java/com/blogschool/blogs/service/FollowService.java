@@ -32,7 +32,7 @@ public class FollowService {
             if (followEntity == null) {
                 followEntity = new FollowEntity(userFollower.get(), userFollowing.get());
                 followRepository.save(followEntity);
-            } else throw new FollowException("Follow cannot duplicate");
+            } else throw new FollowException("You already follow this user");
         } else throw new FollowException("User doesn't exists");
     }
 
@@ -75,7 +75,7 @@ public class FollowService {
             FollowEntity followEntity = followRepository.findByFollowerAndFollowing(userFollower.get(), userFollowing.get());
             if (followEntity != null) {
                 followRepository.delete(followEntity);
-            } else throw new FollowException("Follow doesn't exists");
+            } else throw new FollowException("You hasn't follow this user");
         } else throw new FollowException("User doesn't exists");
     }
 

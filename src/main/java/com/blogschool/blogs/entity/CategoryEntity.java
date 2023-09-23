@@ -1,15 +1,15 @@
 package com.blogschool.blogs.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Category")
@@ -24,6 +24,7 @@ public class CategoryEntity {
 
     @OneToMany(mappedBy = "category")
     private List<BlogPostEntity> blogPosts = new ArrayList<>();
+
 
     @ManyToOne
     @JoinColumn(name = "parentCategoryId")
