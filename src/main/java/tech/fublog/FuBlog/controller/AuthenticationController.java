@@ -7,7 +7,7 @@ import tech.fublog.FuBlog.auth.AuthenticationReponse;
 import tech.fublog.FuBlog.auth.AuthenticationRequest;
 import tech.fublog.FuBlog.auth.MessageResponse;
 import tech.fublog.FuBlog.auth.SignupRequest;
-import tech.fublog.FuBlog.entity.BlogPostEntity;
+import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.repository.RoleRepository;
@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import tech.fublog.FuBlog.service.JwtService;
 import tech.fublog.FuBlog.service.UserServiceImpl;
 
 import java.util.HashSet;
@@ -32,6 +33,8 @@ import java.util.Set;
 //@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
 @CrossOrigin(origins = "*")
 public class AuthenticationController {
+    @Autowired
+    private JwtService jwtService;
 
 
     private final AuthenticationService authenticationService;
@@ -52,7 +55,6 @@ public class AuthenticationController {
     public List<UserEntity> getAllUser(){
         return  userService.getAllUser();
     }
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest authenticationRequest){
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -132,5 +134,27 @@ public class AuthenticationController {
         userRepository.save(user);
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(signUpRequest.getEmail(), signUpRequest.getPassword());
         return ResponseEntity.ok(authenticationService.authenticate(authenticationRequest));
+    }
+    @GetMapping("/api/token")
+    public UserDTO InfoUser(@RequestHeader("Authorization") String token) {
+
+        String username = jwtService.extractToken(token.substring(7));
+        Optional<UserEntity> user = userRepository.findByUsername(username);
+//        AuthenticationReponse authenticationReponse = new AuthenticationReponse();
+//        authenticationReponse.setFullname(user.get().getFullName());
+//        authenticationReponse.setPicture(user.get().getPicture());
+//        authenticationReponse.setEmail(user.get().getEmail());
+//        authenticationReponse.setId(user.get().getId());
+//        authenticationReponse.setPassword(user.get().getHashedpassword());
+
+//        return authenticationReponse;
+        UserDTO userDTO = new UserDTO();
+        userDTO.setFullname(user.get().getFullName());
+        userDTO.setPicture(user.get().getPicture());
+        userDTO.setEmail(user.get().getEmail());
+        userDTO.setId(user.get().getId());
+        userDTO.setPassword(user.get().getHashedpassword());
+        return userDTO;
+
     }
 }

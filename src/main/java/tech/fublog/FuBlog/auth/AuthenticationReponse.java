@@ -13,9 +13,22 @@ public class AuthenticationReponse {
 
     private String token;
     private String refreshToken;
-    private String fullname;
-    private String password;
-    private String email;
-    private Long id;
-    private String picture;
+//    private String fullname;
+//    private String password;
+//    private String email;
+//    private Long id;
+//    private String picture;
+
+//    public AuthenticationReponse(String token, String refreshToken) {
+//        this.token = token;
+//        this.refreshToken = refreshToken;
+//    }
+//
+//    public AuthenticationReponse(String fullname, String password, String email, Long id, String picture) {
+//        this.fullname = fullname;
+//        this.password = password;
+//        this.email = email;
+//        this.id = id;
+//        this.picture = picture;
+//    }
 }
