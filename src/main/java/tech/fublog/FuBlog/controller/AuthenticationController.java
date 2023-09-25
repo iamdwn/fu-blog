@@ -135,7 +135,7 @@ public class AuthenticationController {
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(signUpRequest.getEmail(), signUpRequest.getPassword());
         return ResponseEntity.ok(authenticationService.authenticate(authenticationRequest));
     }
-    @GetMapping("/api/token")
+    @GetMapping("/getUserInfo")
     public UserDTO InfoUser(@RequestHeader("Authorization") String token) {
 
         String username = jwtService.extractToken(token.substring(7));

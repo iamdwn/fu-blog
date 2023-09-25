@@ -57,10 +57,10 @@ public class JwtService {
         String[] parts = token.split("\\.");
         JSONObject header = new JSONObject(decode(parts[0]));
         JSONObject payload = new JSONObject(decode(parts[1]));
-        System.out.println(header);
-        System.out.println(payload);
+//        System.out.println(header);
+//        System.out.println(payload);
         String signature = decode(parts[2]);
-        System.out.println(signature);
+//        System.out.println(signature);
         boolean exp = payload.getLong("exp") > (System.currentTimeMillis() / 1000);
         if (exp) {
             return payload.getString("user");
