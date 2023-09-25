@@ -1,3 +1,33 @@
 Manifest-Version: 1.0
-Main-Class: com.blogschool.blogs.BlogsApplication
+Main-Class: tech.fublog.FuBlog.FuBlogApplication
+Class-Path: jakarta.inject-api-2.0.0.jar spring-tx-6.0.4.jar spring-data
+ -jpa-3.0.1.jar spring-boot-starter-logging-3.0.2.jar log4j-to-slf4j-2.1
+ 9.0.jar spring-security-core-6.0.1.jar hibernate-validator-8.0.0.Final.
+ jar jul-to-slf4j-2.0.6.jar tomcat-embed-core-10.1.5.jar spring-data-com
+ mons-3.0.1.jar spring-security-config-6.0.1.jar micrometer-commons-1.10
+ .3.jar spring-context-6.0.4.jar byte-buddy-1.12.22.jar angus-activation
+ -1.0.0.jar spring-boot-starter-aop-3.0.2.jar jaxb-runtime-4.0.1.jar spr
+ ing-orm-6.0.4.jar spring-webmvc-6.0.4.jar jandex-2.4.2.Final.jar aspect
+ jweaver-1.9.19.jar tomcat-embed-el-10.1.5.jar spring-boot-starter-json-
+ 3.0.2.jar java-jwt-3.19.2.jar mysql-connector-j-8.0.32.jar jackson-data
+ type-jdk8-2.14.1.jar jakarta.xml.bind-api-4.0.0.jar jakarta.transaction
+ -api-2.0.1.jar spring-boot-starter-web-3.0.2.jar spring-core-6.0.4.jar 
+ spring-boot-starter-3.0.2.jar spring-boot-starter-jdbc-3.0.2.jar jackso
+ n-module-parameter-names-2.14.1.jar jakarta.activation-api-2.1.1.jar ja
+ ckson-datatype-jsr310-2.14.1.jar spring-aspects-6.0.4.jar log4j-api-2.1
+ 9.0.jar spring-web-6.0.4.jar spring-beans-6.0.4.jar spring-boot-starter
+ -security-3.0.2.jar logback-core-1.4.5.jar hibernate-core-6.1.6.Final.j
+ ar tomcat-embed-websocket-10.1.5.jar antlr4-runtime-4.10.1.jar spring-s
+ ecurity-crypto-6.0.1.jar jakarta.persistence-api-3.1.0.jar slf4j-api-2.
+ 0.6.jar logback-classic-1.4.5.jar spring-boot-3.0.2.jar spring-boot-sta
+ rter-tomcat-3.0.2.jar jakarta.validation-api-3.0.2.jar jboss-logging-3.
+ 5.0.Final.jar istack-commons-runtime-4.1.1.jar spring-expression-6.0.4.
+ jar jaxb-core-4.0.1.jar classmate-1.5.1.jar snakeyaml-1.33.jar spring-b
+ oot-devtools-3.0.2.jar spring-boot-starter-data-jpa-3.0.2.jar micromete
+ r-observation-1.10.3.jar HikariCP-5.0.1.jar jakarta.annotation-api-2.1.
+ 1.jar spring-jcl-6.0.4.jar txw2-4.0.1.jar jackson-core-2.14.1.jar jacks
+ on-annotations-2.14.1.jar spring-boot-autoconfigure-3.0.2.jar lombok-1.
+ 18.24.jar hibernate-commons-annotations-6.0.2.Final.jar jackson-databin
+ d-2.14.1.jar spring-jdbc-6.0.4.jar spring-aop-6.0.4.jar spring-security
+ -web-6.0.1.jar
 
