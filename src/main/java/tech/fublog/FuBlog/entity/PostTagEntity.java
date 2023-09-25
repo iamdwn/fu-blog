@@ -1,4 +1,4 @@
-package tech.fublog.FuBlog.entity;
+package com.blogschool.blogs.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

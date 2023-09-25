@@ -1,15 +1,13 @@
-package tech.fublog.FuBlog.entity;
+package com.blogschool.blogs.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Setter
 @Getter
 @Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "ApprovalRequest")
 public class ApprovalRequestEntity {
 
@@ -26,16 +24,21 @@ public class ApprovalRequestEntity {
     private UserEntity request;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "review_id")
+    @JsonIgnore
     private UserEntity review;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "post_id")
+    @JsonIgnore
     private BlogPostEntity blogPost;
 
+    public ApprovalRequestEntity() {
+    }
 
-
+    public ApprovalRequestEntity(UserEntity request, BlogPostEntity blogPost) {
+        this.request = request;
+        this.blogPost = blogPost;
+    }
 }
 

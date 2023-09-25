@@ -1,14 +1,17 @@
-package tech.fublog.FuBlog.dto;
+package com.blogschool.blogs.dto;
 
+import lombok.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryDTO {
-    private int parent_category_id;
-    private String name;
+    private Long categoryId;
+    private String categoryName;
+    //    private Long parentCategoryId;
+    private List<CategoryDTO> subcategory;
 }

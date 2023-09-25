@@ -1,6 +1,5 @@
 package com.blogschool.blogs.entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,29 +7,31 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "UserAward")
-public class UserAwardEntity {
+@Table(name = "Notification")
+public class NotificationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column
+    private Long notificationId;
+
+    @Column(columnDefinition = "LONGTEXT")
+    private String content;
+
+    @Column
+    private Boolean isRead;
 
     @Column
     @CreatedDate
-    private Date achievementDate;
+    private Date createdDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserEntity user;
+    private UserEntity notification;
 
-    @ManyToOne
-    @JoinColumn(name = "award_id")
-    private AwardEntity award;
 }
