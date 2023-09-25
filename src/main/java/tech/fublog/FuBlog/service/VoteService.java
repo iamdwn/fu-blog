@@ -1,11 +1,11 @@
-package tech.fublog.FuBlog.service;
+package com.blogschool.blogs.service;
 
-import tech.fublog.FuBlog.dto.VoteDTO;
-import tech.fublog.FuBlog.entity.*;
-import tech.fublog.FuBlog.exception.VoteException;
-import tech.fublog.FuBlog.repository.BlogPostRepository;
-import tech.fublog.FuBlog.repository.UserRepository;
-import tech.fublog.FuBlog.repository.VoteRepository;
+import com.blogschool.blogs.dto.VoteDTO;
+import com.blogschool.blogs.entity.*;
+import com.blogschool.blogs.exception.VoteException;
+import com.blogschool.blogs.repository.BlogPostRepository;
+import com.blogschool.blogs.repository.UserRepository;
+import com.blogschool.blogs.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +37,7 @@ public class VoteService {
         } else throw new VoteException("Blog doesn't exists");
     }
 
-    public List<VoteDTO> viewVotes(Long postId) {
+    public List<VoteDTO> viewVote(Long postId) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         if (blogPostEntity.isPresent()) {
             List<VoteEntity> list = voteRepository.findByPostVote(blogPostEntity.get());
@@ -66,8 +66,6 @@ public class VoteService {
                 voteEntity.setVoteValue(voteDTO.getVoteValue());
                 return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok", "vote have been updated", voteRepository.save(voteEntity)));
             } else {
-                Double point = userEntity.get().getPoint();
-                userEntity.get().setPoint(point + 0.5);
                 voteEntity = new VoteEntity(voteDTO.getVoteValue(), userEntity.get(), blogPostEntity.get());
                 return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok", "vote have been inserted", voteRepository.save(voteEntity)));
             }

@@ -1,10 +1,11 @@
-package tech.fublog.FuBlog.controller;
+package com.blogschool.blogs.controller;
 
-import tech.fublog.FuBlog.dto.CommentDTO;
-import tech.fublog.FuBlog.entity.CommentEntity;
-import tech.fublog.FuBlog.entity.ResponseObject;
-import tech.fublog.FuBlog.exception.CommentException;
-import tech.fublog.FuBlog.service.CommentService;
+import com.blogschool.blogs.dto.CommentDTO;
+import com.blogschool.blogs.dto.ResponseCommentDTO;
+import com.blogschool.blogs.entity.CommentEntity;
+import com.blogschool.blogs.entity.ResponseObject;
+import com.blogschool.blogs.exception.CommentException;
+import com.blogschool.blogs.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/auth/blogPosts/comment")
+@RequestMapping("/api/blogPosts/comment")
 public class CommentController {
     private final CommentService commentService;
 
@@ -38,7 +39,7 @@ public class CommentController {
     @GetMapping("/view/{postId}")
     public ResponseEntity<ResponseObject> viewComment(@PathVariable Long postId) {
         try {
-            List<CommentDTO> dtoList = commentService.viewComment(postId);
+            List<ResponseCommentDTO> dtoList = commentService.viewComment(postId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", dtoList));
         } catch (CommentException ex) {

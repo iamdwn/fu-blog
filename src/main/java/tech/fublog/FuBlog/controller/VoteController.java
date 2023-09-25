@@ -37,7 +37,7 @@ public class VoteController {
     @GetMapping("/count/{postId}")
     public ResponseEntity<ResponseObject> countVote(@PathVariable Long postId) {
         try {
-            Long count = voteService.countVote(postId);
+            int count = voteService.countVote(postId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", count));
         } catch (VoteException ex) {
@@ -49,7 +49,18 @@ public class VoteController {
 
     @PostMapping("/insert")
     public ResponseEntity<ResponseObject> insertVote(@RequestBody VoteDTO voteDTO) {
-        return voteService.upsertVote(voteDTO);
+        try {
+            VoteDTO dto = voteService.insertVote(voteDTO);
+            if (dto != null)
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "Vote have been inserted", dto));
+            else
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "Vote have been deleted", ""));
+        } catch (VoteException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
     }
-
 }
