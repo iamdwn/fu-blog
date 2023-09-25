@@ -1,4 +1,4 @@
-package com.blogschool.blogs.exception;
+package tech.fublog.FuBlog.exception;
 
 public class ApprovalRequestException extends RuntimeException {
     public ApprovalRequestException(String message) {

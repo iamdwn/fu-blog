@@ -1,4 +1,4 @@
-package com.blogschool.blogs.dto;
+package tech.fublog.FuBlog.dto;
 
 
 import lombok.AllArgsConstructor;

@@ -1,9 +1,9 @@
-package com.blogschool.blogs.controller;
+package tech.fublog.FuBlog.controller;
 
-import com.blogschool.blogs.dto.CategoryDTO;
-import com.blogschool.blogs.entity.ResponseObject;
-import com.blogschool.blogs.exception.CategoryException;
-import com.blogschool.blogs.service.CategoryService;
+import tech.fublog.FuBlog.dto.CategoryDTO;
+import tech.fublog.FuBlog.entity.ResponseObject;
+import tech.fublog.FuBlog.exception.CategoryException;
+import tech.fublog.FuBlog.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/blogPosts/category")
+@RequestMapping("/api/v1/auth/blogPosts/category")
 public class CategoryController {
     private final CategoryService categoryService;
 

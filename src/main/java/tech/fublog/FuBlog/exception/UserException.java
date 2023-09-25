@@ -1,4 +1,4 @@
-package com.blogschool.blogs.exception;
+package tech.fublog.FuBlog.exception;
 
 public class UserException extends RuntimeException {
     public UserException(String message) {

@@ -1,15 +1,17 @@
 package tech.fublog.FuBlog.entity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @Entity
 @Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Vote")
+@Table(name = "Votes")
 public class VoteEntity {
 
     @Id
@@ -21,11 +23,18 @@ public class VoteEntity {
     private Long voteValue; // 1 for upvote, -1 for downvote
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id")
     private UserEntity userVote;
 
     @ManyToOne
+//    @JsonIgnore
     @JoinColumn(name = "post_id")
     private BlogPostEntity postVote;
 
+    public VoteEntity(Long voteValue, UserEntity userVote, BlogPostEntity postVote) {
+        this.voteValue = voteValue;
+        this.userVote = userVote;
+        this.postVote = postVote;
+    }
 }

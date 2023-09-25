@@ -10,5 +10,6 @@ import lombok.*;
 public class VoteDTO {
     private Long voteId;
     private Long voteValue;
+    private Long postId;
     private Long userId;
 }

@@ -1,4 +1,4 @@
-package com.blogschool.blogs.exception;
+package tech.fublog.FuBlog.exception;
 
 public class VoteException extends RuntimeException{
     public VoteException(String message){

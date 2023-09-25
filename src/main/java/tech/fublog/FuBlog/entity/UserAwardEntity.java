@@ -1,4 +1,4 @@
-package com.blogschool.blogs.entity;
+package tech.fublog.FuBlog.entity;
 
 
 import jakarta.persistence.*;

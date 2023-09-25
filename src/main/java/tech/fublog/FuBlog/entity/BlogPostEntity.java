@@ -57,7 +57,7 @@ public class BlogPostEntity {
     private CategoryEntity category;
 
     @ManyToOne
-//    @JsonIgnore
+    @JsonIgnore
     @JoinColumn(name = "author_id")
     private UserEntity authors;
 

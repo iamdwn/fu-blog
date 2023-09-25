@@ -1,8 +1,8 @@
-package com.blogschool.blogs.repository;
+package tech.fublog.FuBlog.repository;
 
-import com.blogschool.blogs.entity.BlogPostEntity;
-import com.blogschool.blogs.entity.CommentEntity;
-import com.blogschool.blogs.entity.UserEntity;
+import tech.fublog.FuBlog.entity.BlogPostEntity;
+import tech.fublog.FuBlog.entity.CommentEntity;
+import tech.fublog.FuBlog.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
