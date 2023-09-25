@@ -33,10 +33,10 @@ public class BlogPostController {
 //                .body(new ResponseObject("ok", "list here", blogPostService.findByApproved()));
 //    }
 
-    @GetMapping("/search/category/{category}")
-    ResponseEntity<ResponseObject> findBlogByCategory(@PathVariable String category) {
+    @GetMapping("/search/category/{category}/{parentCategoryId}")
+    ResponseEntity<ResponseObject> findBlogByCategory(@PathVariable String category, @PathVariable Long parentCategoryId) {
         try {
-            List<BlogPostDTO> dtoList = blogPostService.findBlogByCategory(category);
+            List<BlogPostDTO> dtoList = blogPostService.findBlogByCategory(category, parentCategoryId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", dtoList));
         } catch (BlogPostException ex) {
@@ -71,4 +71,18 @@ public class BlogPostController {
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
+
+//    @PutMapping("/update")
+//    ResponseEntity<ResponseObject> updateBlogPost(@RequestBody BlogPostDTO blogPostDTO) {
+//        try {
+//            BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(blogPostDTO);
+//            approvalRequestService.insertApprovalRequest(blogPostEntity);
+//            return ResponseEntity.status(HttpStatus.OK)
+//                    .body(new ResponseObject("ok", "post is waiting approve", ""));
+//        } catch (BlogPostException ex) {
+//            System.out.println(ex.getMessage());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+//        }
+//    }
 }

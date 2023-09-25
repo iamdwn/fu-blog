@@ -25,7 +25,6 @@ public class CategoryEntity {
     @OneToMany(mappedBy = "category")
     private List<BlogPostEntity> blogPosts = new ArrayList<>();
 
-
     @ManyToOne
     @JoinColumn(name = "parentCategoryId")
     private CategoryEntity parentCategory;

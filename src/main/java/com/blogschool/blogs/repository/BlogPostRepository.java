@@ -10,5 +10,5 @@ import java.util.List;
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
     List<BlogPostEntity> findByIsApproved(Boolean isApproved);
 
-    List<BlogPostEntity> findByTitleContaining(String title);
+    List<BlogPostEntity> findByTitleLike(String title);
 }

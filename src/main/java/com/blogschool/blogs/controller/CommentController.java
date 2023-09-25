@@ -1,6 +1,7 @@
 package com.blogschool.blogs.controller;
 
 import com.blogschool.blogs.dto.CommentDTO;
+import com.blogschool.blogs.dto.ResponseCommentDTO;
 import com.blogschool.blogs.entity.CommentEntity;
 import com.blogschool.blogs.entity.ResponseObject;
 import com.blogschool.blogs.exception.CommentException;
@@ -38,7 +39,7 @@ public class CommentController {
     @GetMapping("/view/{postId}")
     public ResponseEntity<ResponseObject> viewComment(@PathVariable Long postId) {
         try {
-            List<CommentDTO> dtoList = commentService.viewComment(postId);
+            List<ResponseCommentDTO> dtoList = commentService.viewComment(postId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", dtoList));
         } catch (CommentException ex) {

@@ -1,5 +1,6 @@
 package com.blogschool.blogs.service;
 
+import com.blogschool.blogs.dto.ApprovalRequestDTO;
 import com.blogschool.blogs.entity.ApprovalRequestEntity;
 import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.ResponseObject;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,13 +29,15 @@ public class ApprovalRequestService {
         this.userRepository = userRepository;
     }
 
-    public ResponseEntity<ResponseObject> getAllApprovalRequest() {
-        List<ApprovalRequestEntity> requestEntityList = approvalRequestRepository.findAll();
-        return requestEntityList.size() > 0 ?
-                ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "list exists", requestEntityList)) :
-                ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ResponseObject("not found", "list empty", requestEntityList));
+    public List<ApprovalRequestDTO> getAllApprovalRequest() {
+        List<ApprovalRequestEntity> list = approvalRequestRepository.findAll();
+        List<ApprovalRequestDTO> dtoList = new ArrayList<>();
+        for (ApprovalRequestEntity entity : list) {
+            ApprovalRequestDTO dto =
+                    new ApprovalRequestDTO(entity.isApproved(), entity.getBlogPost().getId(), entity.getRequest().getId(), /*entity.getReview().getId()*/null);
+            dtoList.add(dto);
+        }
+        return dtoList;
     }
 
     //    public ResponseEntity<ResponseObject> insertApprovalRequest()

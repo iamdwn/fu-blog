@@ -9,9 +9,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryDTO {
+public class ResponseCategoryDTO {
     private Long categoryId;
     private String categoryName;
     //    private Long parentCategoryId;
-    private List<CategoryDTO> subcategory;
+    private List<ResponseCategoryDTO> subCategory;
 }

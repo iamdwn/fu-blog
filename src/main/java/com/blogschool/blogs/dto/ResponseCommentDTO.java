@@ -1,17 +1,19 @@
 package com.blogschool.blogs.dto;
 
 import lombok.*;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Data
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentDTO {
+public class ResponseCommentDTO {
     private Long commentId;
     private Long parentCommentId;
     private String content;
     private Long postId;
     private Long userId;
+    private List<ResponseCommentDTO> subComment;
 }

@@ -1,6 +1,6 @@
 package com.blogschool.blogs.service;
 
-import com.blogschool.blogs.dto.CategoryDTO;
+import com.blogschool.blogs.dto.ResponseCategoryDTO;
 import com.blogschool.blogs.entity.CategoryEntity;
 import com.blogschool.blogs.exception.CategoryException;
 import com.blogschool.blogs.repository.CategoryRepository;
@@ -19,29 +19,29 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<CategoryDTO> getAllCategory() {
+    public List<ResponseCategoryDTO> getAllCategory() {
         List<CategoryEntity> list = categoryRepository.findByParentCategoryIsNull();
         if (!list.isEmpty()) {
-            List<CategoryDTO> result = new ArrayList<>();
+            List<ResponseCategoryDTO> dtoList = new ArrayList<>();
             for (CategoryEntity entity : list) {
-                CategoryDTO categoryDTO = convertToDTO(entity);
-                result.add(categoryDTO);
+                ResponseCategoryDTO dto = convertToDTO(entity);
+                dtoList.add(dto);
             }
-            return result;
+            return dtoList;
         } else throw new CategoryException("Nothing here");
     }
 
-    private CategoryDTO convertToDTO(CategoryEntity categoryEntity) {
-        CategoryDTO categoryDTO = new CategoryDTO();
-        categoryDTO.setCategoryId(categoryEntity.getId());
-        categoryDTO.setCategoryName(categoryEntity.getCategoryName());
+    private ResponseCategoryDTO convertToDTO(CategoryEntity categoryEntity) {
+        ResponseCategoryDTO responseCategoryDTO = new ResponseCategoryDTO();
+        responseCategoryDTO.setCategoryId(categoryEntity.getId());
+        responseCategoryDTO.setCategoryName(categoryEntity.getCategoryName());
         List<CategoryEntity> subCategory = categoryRepository.findByParentCategory(categoryEntity);
-        List<CategoryDTO> subcategoryDTO = new ArrayList<>();
+        List<ResponseCategoryDTO> subcategoryDTOResponse = new ArrayList<>();
         for (CategoryEntity sub : subCategory) {
-            CategoryDTO subCategoryDTOs = convertToDTO(sub);
-            subcategoryDTO.add(subCategoryDTOs);
+            ResponseCategoryDTO subResponseCategoryDTOs = convertToDTO(sub);
+            subcategoryDTOResponse.add(subResponseCategoryDTOs);
         }
-        categoryDTO.setSubcategory(subcategoryDTO);
-        return categoryDTO;
+        responseCategoryDTO.setSubCategory(subcategoryDTOResponse);
+        return responseCategoryDTO;
     }
 }
