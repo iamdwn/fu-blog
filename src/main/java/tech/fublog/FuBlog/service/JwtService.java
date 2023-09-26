@@ -2,7 +2,7 @@ package tech.fublog.FuBlog.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.google.gson.JsonObject;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,12 +12,17 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
-import java.security.Key;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +39,7 @@ public class JwtService {
 //                .withClaim("fullname",user.getFullName())
 //                .withClaim("email",user.getEmail())
 //                .withClaim("picture", user.getPicture())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 3600 * 24 * 30))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 3600 * 1000))
                 .withClaim("roles", authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
     }
@@ -48,29 +53,59 @@ public class JwtService {
 //                .withClaim("fullname",user.getFullName())
 //                .withClaim("email",user.getEmail())
 //                .withClaim("picture", user.getPicture())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 70 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 30L * 24 * 3600 * 1000))
                 .withClaim("roles", authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
     }
 
     public String extractToken(String token) {
         String[] parts = token.split("\\.");
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Invalid Token format");
+        }
         JSONObject header = new JSONObject(decode(parts[0]));
         JSONObject payload = new JSONObject(decode(parts[1]));
 //        System.out.println(header);
 //        System.out.println(payload);
-        String signature = decode(parts[2]);
+//        String signature = decode(parts[2]);
+        String signature = parts[2];
 //        System.out.println(signature);
+        String headerAndPayloadHashed = hmacSha256(parts[0] + "." + parts[1], Secret_key);
         boolean exp = payload.getLong("exp") > (System.currentTimeMillis() / 1000);
-        if (exp) {
+        if (exp && signature.equals(headerAndPayloadHashed)) {
             return payload.getString("user");
         }
         return null;
     }
 
+
     private static String decode(String encodedString) {
         return new String(Base64.getUrlDecoder().decode(encodedString));
     }
 
+//    private static String encode(JSONObject obj) {
+//        return encode(obj.toString().getBytes(StandardCharsets.UTF_8));
+//    }
+
+    private static String encode(byte[] bytes) {
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    private String hmacSha256(String data, String secret) {
+        try {
+
+            byte[] hash = secret.getBytes(StandardCharsets.UTF_8);
+            Mac sha256Hmac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secretKey = new SecretKeySpec(hash, "HmacSHA256");
+            sha256Hmac.init(secretKey);
+
+            byte[] signedBytes = sha256Hmac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+            return encode(signedBytes);
+        } catch (NoSuchAlgorithmException | InvalidKeyException ex) {
+//            Logger.getLogger(JWebToken.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+            return null;
+        }
+
+    }
 
 }
