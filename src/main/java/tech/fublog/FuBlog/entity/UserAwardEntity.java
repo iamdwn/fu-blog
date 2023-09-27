@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor

@@ -1,6 +1,5 @@
 package tech.fublog.FuBlog.repository;
 
-
 import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
 import jakarta.persistence.EntityManager;

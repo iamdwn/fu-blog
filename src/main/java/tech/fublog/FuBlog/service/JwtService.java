@@ -20,10 +20,12 @@ public class JwtService {
         Algorithm algorithm = Algorithm.HMAC256(Secret_key.getBytes());
         return JWT.create()
 //                .withSubject(user.getUsername())
+//                .withClaim("id", user.getId())
                 .withClaim("user",user.getUsername())
-                .withClaim("fullname",user.getFullName())
-                .withClaim("email",user.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 50*60*1000))
+//                .withClaim("fullname",user.getFullName())
+//                .withClaim("email",user.getEmail())
+//                .withClaim("picture", user.getPicture())
+                .withExpiresAt(new Date(System.currentTimeMillis() + 3600*24*30))
                 .withClaim("roles", authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
     }
@@ -32,9 +34,11 @@ public class JwtService {
         Algorithm algorithm = Algorithm.HMAC256(Secret_key.getBytes());
         return JWT.create()
 //                .withSubject(user.getUsername())
+//                .withClaim("id", user.getId())
                 .withClaim("user",user.getUsername())
-                .withClaim("fullname",user.getFullName())
-                .withClaim("email",user.getEmail())
+//                .withClaim("fullname",user.getFullName())
+//                .withClaim("email",user.getEmail())
+//                .withClaim("picture", user.getPicture())
                 .withExpiresAt(new Date(System.currentTimeMillis() + 70*60*1000))
                 .withClaim("roles", authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);

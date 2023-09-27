@@ -16,7 +16,9 @@ public class SignupRequest {
 
     private String email;
 
-    private String password;
+    private String password = "1";
+
+    private String picture;
 
     private Set<String> role;
 }

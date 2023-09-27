@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,6 +27,7 @@ public class AwardEntity {
     private String description;
 
     @OneToMany(mappedBy = "award")
+    @JsonIgnore
     private Set<UserAwardEntity> userAwards = new HashSet<>();
 
 //    @ManyToMany

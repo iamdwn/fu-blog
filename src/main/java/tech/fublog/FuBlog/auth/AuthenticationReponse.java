@@ -13,4 +13,9 @@ public class AuthenticationReponse {
 
     private String token;
     private String refreshToken;
+    private String fullname;
+    private String password;
+    private String email;
+    private Long id;
+    private String picture;
 }

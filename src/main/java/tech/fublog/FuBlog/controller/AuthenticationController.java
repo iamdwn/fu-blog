@@ -7,6 +7,7 @@ import tech.fublog.FuBlog.auth.AuthenticationReponse;
 import tech.fublog.FuBlog.auth.AuthenticationRequest;
 import tech.fublog.FuBlog.auth.MessageResponse;
 import tech.fublog.FuBlog.auth.SignupRequest;
+import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.repository.RoleRepository;
@@ -17,8 +18,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import tech.fublog.FuBlog.service.UserServiceImpl;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -41,6 +44,14 @@ public class AuthenticationController {
 
     @Autowired
     PasswordEncoder encoder;
+
+    @Autowired
+    UserServiceImpl userService;
+
+    @GetMapping("/getAllUser")
+    public List<UserEntity> getAllUser(){
+        return  userService.getAllUser();
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest authenticationRequest){
@@ -79,16 +90,47 @@ public class AuthenticationController {
                 signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()),
+                signUpRequest.getPicture(),
                 true
         );
 
-//        Set<String> roles = signUpRequest.getRole();
         Set<RoleEntity> roleEntities = new HashSet<>();
         RoleEntity userRole = roleRepository.findByName("USER");
         roleEntities.add(userRole);
         user.setRoles(roleEntities);
         userRepository.save(user);
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(signUpRequest.getUsername(), signUpRequest.getPassword());
+        return ResponseEntity.ok(authenticationService.authenticate(authenticationRequest));
+    }
+
+    @PostMapping("google")
+    public ResponseEntity<?> loginGoogle(@Valid @RequestBody SignupRequest signUpRequest) {
+
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+        Optional<UserEntity> o_user = userRepository.findByUsername(signUpRequest.getEmail());
+        if (o_user.isPresent()) {
+            String encodedPasswordFromDatabase = o_user.get().getPassword();
+            if (!passwordEncoder.matches(signUpRequest.getPassword(), encodedPasswordFromDatabase)) {
+                return ResponseEntity.badRequest().body(new MessageResponse("Error: Username or password is wrong!"));
+            } else {
+                AuthenticationRequest authenticationRequest = new AuthenticationRequest(signUpRequest.getEmail(), signUpRequest.getPassword());
+                return ResponseEntity.ok(authenticationService.authenticate(authenticationRequest));
+            }
+        }
+        UserEntity user = new UserEntity(signUpRequest.getFullName(),
+                signUpRequest.getEmail(),
+                signUpRequest.getEmail(),
+                encoder.encode(signUpRequest.getPassword()),
+                signUpRequest.getPicture(),
+                true
+        );
+        Set<RoleEntity> roleEntities = new HashSet<>();
+        RoleEntity userRole = roleRepository.findByName("USER");
+        roleEntities.add(userRole);
+        user.setRoles(roleEntities);
+        userRepository.save(user);
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest(signUpRequest.getEmail(), signUpRequest.getPassword());
         return ResponseEntity.ok(authenticationService.authenticate(authenticationRequest));
     }
 }

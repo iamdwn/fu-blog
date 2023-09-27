@@ -1,4 +1,5 @@
 package tech.fublog.FuBlog.entity;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,8 +25,4 @@ public class FollowEntity {
     @JoinColumn(name = "following_Id")
     private UserEntity following;
 
-    public FollowEntity(UserEntity follower, UserEntity following) {
-        this.follower = follower;
-        this.following = following;
-    }
 }

@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.service;
 
+import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.hash.Hashing;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -26,6 +28,7 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private RoleRepository roleRepository;
+
 
     @Autowired
     private Hashing hashing;
@@ -52,5 +55,9 @@ public class UserServiceImpl implements UserService{
         UserEntity user = userRepository.findByUsername(username).get();
         RoleEntity role  = roleRepository.findByName(rolename);
         user.getRoles().add(role);
+    }
+    public List<UserEntity> getAllUser(){
+//        Pageable pageable = PageRequest.of(page,size);
+        return  userRepository.findAll();
     }
 }

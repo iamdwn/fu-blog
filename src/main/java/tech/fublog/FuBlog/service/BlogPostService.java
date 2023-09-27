@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.service;
 
+<<<<<<< HEAD
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.CategoryEntity;
@@ -25,6 +26,7 @@ public class BlogPostService {
     @Autowired
     private CategoryRepository categoryRepository;
 
+<<<<<<< HEAD
     @Autowired
     private UserRepository userRepository;
 
@@ -210,4 +212,49 @@ public class BlogPostService {
         });
     }
 
+=======
+    public List<BlogPostEntity> getAllBlogPost(int page, int size){
+        Pageable pageable = PageRequest.of(page-1,size);
+        return  blogPostRepository.findAll(pageable).get().toList();
+    }
+
+    public List<BlogPostEntity> getAllBlogPostByTitle(String title,int page, int size){
+        Pageable pageable = PageRequest.of(page-1,size);
+        return  blogPostRepository.getBlogPostEntitiesByTitle(title, pageable);
+    }
+
+    public Page<BlogPostEntity> getBlogPostsByCategoryId(Long categoryId,int page, int size) {
+        Pageable pageable = PageRequest.of(page-1,size);
+        Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
+
+        if (!categoryOptional.isPresent()) {
+            return new PageImpl<>(Collections.emptyList());
+        }
+
+        CategoryEntity category = categoryOptional.get();
+        return blogPostRepository.findByCategory(category,pageable);
+    }
+
+    public Page<BlogPostEntity> getSortedBlogPosts(String sortBy, int page, int size) {
+        Pageable pageable = PageRequest.of(page-1,size);
+        Page<BlogPostEntity> sortedBlogPosts;
+
+        if ("newest".equalsIgnoreCase(sortBy)) {
+            sortedBlogPosts = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
+        } else if ("oldest".equalsIgnoreCase(sortBy)) {
+            sortedBlogPosts = blogPostRepository.findAllByOrderByCreatedDateAsc(pageable);
+        } else if ("latestModified".equalsIgnoreCase(sortBy)) {
+            sortedBlogPosts = blogPostRepository.findAllByOrderByModifiedDateDesc(pageable);
+        } else if ("oldestModified".equalsIgnoreCase(sortBy)) {
+            sortedBlogPosts = blogPostRepository.findAllByOrderByModifiedDateAsc(pageable);
+        } else {
+            // Mặc định, sắp xếp theo ngày tạo mới nhất.
+            sortedBlogPosts = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
+        }
+
+        return sortedBlogPosts;
+    }
+
+
+>>>>>>> main
 }

@@ -27,6 +27,11 @@ public class AuthenticationService {
     public AuthenticationReponse authenticate(AuthenticationRequest authenticationRequest){
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
         UserEntity user = userRepository.findByUsername(authenticationRequest.getUsername()).orElseThrow();
+        String fullname = user.getFullName();
+        String password = user.getHashedpassword();
+        String email = user.getEmail();
+        Long id = user.getId();
+        String picture = user.getPicture();
         List<RoleEntity> role = null;
         if(user != null){
             role = roleCustomRepo.getRole(user);
@@ -38,7 +43,19 @@ public class AuthenticationService {
         set.stream().forEach(i -> authorities.add(new SimpleGrantedAuthority(i.getName())));
         var jwtToken = jwtService.generateToken(user, authorities);
         var jwtRefreshToken = jwtService.generateRefreshToken(user, authorities);
-        return AuthenticationReponse.builder().token(jwtToken).refreshToken(jwtRefreshToken).build();
+        AuthenticationReponse authenticationReponse = new AuthenticationReponse();
+        authenticationReponse.setToken(jwtToken);
+        authenticationReponse.setRefreshToken(jwtRefreshToken);
+        authenticationReponse.setFullname(fullname);
+        authenticationReponse.setPicture(picture);
+        authenticationReponse.setEmail(email);
+        authenticationReponse.setId(id);
+        authenticationReponse.setPassword(password);
+
+        return authenticationReponse;
+//        return AuthenticationReponse.builder().token(jwtToken).refreshToken(jwtRefreshToken).build();
+
     }
+
 
 }
