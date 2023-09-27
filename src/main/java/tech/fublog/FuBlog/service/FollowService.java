@@ -41,7 +41,7 @@ public class FollowService {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("success", "followed", ""));
         } else {
-            return ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "Has followed this user", ""));
         }
     }
@@ -54,7 +54,7 @@ public class FollowService {
         if (followRepository
                 .findFollowerIdAndFollowingId(userEntity.get(), followingUserEntity.get()) < 1) {
 
-            return ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "Has not followed this user", ""));
         } else {
 

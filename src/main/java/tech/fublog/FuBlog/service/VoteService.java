@@ -1,11 +1,12 @@
-package com.blogschool.blogs.service;
+package tech.fublog.FuBlog.service;
 
-import com.blogschool.blogs.dto.VoteDTO;
-import com.blogschool.blogs.entity.*;
-import com.blogschool.blogs.exception.VoteException;
-import com.blogschool.blogs.repository.BlogPostRepository;
-import com.blogschool.blogs.repository.UserRepository;
-import com.blogschool.blogs.repository.VoteRepository;
+import tech.fublog.FuBlog.dto.VoteDTO;
+import tech.fublog.FuBlog.entity.*;
+import tech.fublog.FuBlog.exception.VoteException;
+import tech.fublog.FuBlog.model.ResponseObject;
+import tech.fublog.FuBlog.repository.BlogPostRepository;
+import tech.fublog.FuBlog.repository.UserRepository;
+import tech.fublog.FuBlog.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class VoteService {
         } else throw new VoteException("Blog doesn't exists");
     }
 
-    public List<VoteDTO> viewVote(Long postId) {
+    public List<VoteDTO> viewVotes(Long postId) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         if (blogPostEntity.isPresent()) {
             List<VoteEntity> list = voteRepository.findByPostVote(blogPostEntity.get());
@@ -66,6 +67,8 @@ public class VoteService {
                 voteEntity.setVoteValue(voteDTO.getVoteValue());
                 return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok", "vote have been updated", voteRepository.save(voteEntity)));
             } else {
+                Double point = userEntity.get().getPoint();
+                userEntity.get().setPoint(point + 0.5);
                 voteEntity = new VoteEntity(voteDTO.getVoteValue(), userEntity.get(), blogPostEntity.get());
                 return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok", "vote have been inserted", voteRepository.save(voteEntity)));
             }
@@ -73,5 +76,22 @@ public class VoteService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("failed", "user or blogpost doesn't exists", ""));
         }
     }
+
+    public VoteDTO insertVote(VoteDTO voteDTO) {
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(voteDTO.getPostId());
+        Optional<UserEntity> userEntity = userRepository.findById(voteDTO.getUserId());
+        if (blogPostEntity.isPresent() && userEntity.isPresent()) {
+            VoteEntity voteEntity = voteRepository.findByUserVoteAndPostVote(userEntity.get(), blogPostEntity.get());
+            if (voteEntity != null) {
+                voteRepository.delete(voteEntity);
+                return null;
+            } else {
+                voteEntity = new VoteEntity(voteDTO.getVoteValue(), userEntity.get(), blogPostEntity.get());
+                voteRepository.save(voteEntity);
+                return voteDTO;
+            }
+        } else throw new VoteException("User or Blog doesn't exists");
+    }
+
 
 }

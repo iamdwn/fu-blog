@@ -1,6 +1,6 @@
-package com.blogschool.blogs.repository;
+package tech.fublog.FuBlog.repository;
 
-import com.blogschool.blogs.entity.CategoryEntity;
+import tech.fublog.FuBlog.entity.CategoryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

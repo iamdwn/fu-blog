@@ -1,6 +1,9 @@
 package tech.fublog.FuBlog.service;
 
-<<<<<<< HEAD
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.CategoryEntity;
@@ -14,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
@@ -26,7 +30,6 @@ public class BlogPostService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-<<<<<<< HEAD
     @Autowired
     private UserRepository userRepository;
 
@@ -44,7 +47,8 @@ public class BlogPostService {
                             blogPostEntity.get(i).getContent(),
                             blogPostEntity.get(i).getCategory().getId(),
                             blogPostEntity.get(i).getAuthors().getId(),
-                            blogPostEntity.get(i).getCreatedDate());
+                            blogPostEntity.get(i).getCreatedDate(),
+                            blogPostEntity.get(i).getViews());
 
                     blogPostList.add(blogPost);
                 }
@@ -59,9 +63,26 @@ public class BlogPostService {
     }
 
 
-    public BlogPostEntity getBlogPostById(Long postId) {
+    public BlogPostEntity getBlogById(Long postId) {
 
         return blogPostRepository.findById(postId).orElse(null);
+    }
+
+    public ResponseEntity<ResponseObject> getBlogPostById(Long postId) {
+
+        BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
+
+        if (blogPostEntity != null) {
+            blogPostEntity.setViews(blogPostEntity.getViews());
+
+            blogPostRepository.save(blogPostEntity);
+
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("found", "post found", blogPostEntity));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ResponseObject("not found", "post not found", ""));
     }
 
 
@@ -71,7 +92,7 @@ public class BlogPostService {
 
         if (blogPostEntity.isPresent()
                 && blogPostEntity.get().getStatus()) {
-            BlogPostEntity blogPost = this.getBlogPostById(postId);
+            BlogPostEntity blogPost = this.getBlogById(postId);
 
             blogPost.setStatus(false);
 
@@ -128,7 +149,7 @@ public class BlogPostService {
                 && categoryEntity.isPresent()
                 && userEntity.isPresent()) {
 
-            BlogPostEntity blogPost = this.getBlogPostById(postId);
+            BlogPostEntity blogPost = this.getBlogById(postId);
 
             CategoryEntity category = categoryEntity.get();
 //            UserEntity authors = userEntity.get();
@@ -156,20 +177,21 @@ public class BlogPostService {
 
     public ResponseEntity<ResponseObject> findBlogByCategory(String name) {
 
-        CategoryEntity categoryEntity = categoryRepository.findByCategoryName(name);
+        Optional<CategoryEntity> categoryEntity = categoryRepository.findByCategoryName(name);
         List<BlogPostDTO> blogPostList = new ArrayList<>();
 
         if (categoryEntity != null) {
 
-            for (int i = 0; i < categoryEntity.getBlogPosts().size(); i++) {
-                if (categoryEntity.getBlogPosts().get(i).getStatus() != null
-                        && categoryEntity.getBlogPosts().get(i).getStatus()) {
-                    BlogPostDTO blogPost = new BlogPostDTO(categoryEntity.getBlogPosts().get(i).getTypePost(),
-                            categoryEntity.getBlogPosts().get(i).getTitle(),
-                            categoryEntity.getBlogPosts().get(i).getContent(),
-                            categoryEntity.getBlogPosts().get(i).getCategory().getId(),
-                            categoryEntity.getBlogPosts().get(i).getAuthors().getId(),
-                            categoryEntity.getBlogPosts().get(i).getCreatedDate());
+            for (int i = 0; i < categoryEntity.get().getBlogPosts().size(); i++) {
+                if (categoryEntity.get().getBlogPosts().get(i).getStatus() != null
+                        && categoryEntity.get().getBlogPosts().get(i).getStatus()) {
+                    BlogPostDTO blogPost = new BlogPostDTO(categoryEntity.get().getBlogPosts().get(i).getTypePost(),
+                            categoryEntity.get().getBlogPosts().get(i).getTitle(),
+                            categoryEntity.get().getBlogPosts().get(i).getContent(),
+                            categoryEntity.get().getBlogPosts().get(i).getCategory().getId(),
+                            categoryEntity.get().getBlogPosts().get(i).getAuthors().getId(),
+                            categoryEntity.get().getBlogPosts().get(i).getCreatedDate(),
+                            categoryEntity.get().getBlogPosts().get(i).getViews());
 
                     blogPostList.add(blogPost);
                 }
@@ -192,7 +214,7 @@ public class BlogPostService {
     }
 
 
-    //sort theo thứ tự bài BlogPost mới nằm đầu tiên (giảm dần theo postId)
+    //sort theo thứ tự bài BlogPost mới nằm đầu tiên (giảm dần theo NGÀY)
     public void sort(List<BlogPostDTO> blogPostList) {
 
         Collections.sort(blogPostList, new Comparator<BlogPostDTO>() {
@@ -212,7 +234,6 @@ public class BlogPostService {
         });
     }
 
-=======
     public List<BlogPostEntity> getAllBlogPost(int page, int size){
         Pageable pageable = PageRequest.of(page-1,size);
         return  blogPostRepository.findAll(pageable).get().toList();
@@ -223,7 +244,7 @@ public class BlogPostService {
         return  blogPostRepository.getBlogPostEntitiesByTitle(title, pageable);
     }
 
-    public Page<BlogPostEntity> getBlogPostsByCategoryId(Long categoryId,int page, int size) {
+    public Page<BlogPostEntity> getBlogPostsByCategoryId(Long categoryId, int page, int size) {
         Pageable pageable = PageRequest.of(page-1,size);
         Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
 
@@ -255,6 +276,4 @@ public class BlogPostService {
         return sortedBlogPosts;
     }
 
-
->>>>>>> main
 }

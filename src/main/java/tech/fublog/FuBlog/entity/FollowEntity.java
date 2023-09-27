@@ -25,4 +25,8 @@ public class FollowEntity {
     @JoinColumn(name = "following_Id")
     private UserEntity following;
 
+    public FollowEntity(UserEntity follower, UserEntity following) {
+        this.follower = follower;
+        this.following = following;
+    }
 }

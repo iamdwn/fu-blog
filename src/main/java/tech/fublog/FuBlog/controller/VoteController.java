@@ -1,8 +1,8 @@
 package tech.fublog.FuBlog.controller;
 
 import tech.fublog.FuBlog.dto.VoteDTO;
-import tech.fublog.FuBlog.entity.ResponseObject;
 import tech.fublog.FuBlog.exception.VoteException;
+import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.VoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth/blogPosts/vote")
-public class VoteController {
+public class VoteController{
     private final VoteService voteService;
 
     @Autowired
@@ -37,7 +37,7 @@ public class VoteController {
     @GetMapping("/count/{postId}")
     public ResponseEntity<ResponseObject> countVote(@PathVariable Long postId) {
         try {
-            int count = voteService.countVote(postId);
+            Long count = voteService.countVote(postId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", count));
         } catch (VoteException ex) {

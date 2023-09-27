@@ -19,6 +19,7 @@ public class BlogPostDTO {
     private String content;
     private Long category;
     private Long authors;
+    private Long views;     //click
 
 //    @CreatedDate
 //    @Temporal(TemporalType.TIMESTAMP)
@@ -36,12 +37,14 @@ public class BlogPostDTO {
                        String content,
                        Long category,
                        Long authors,
-                       Date createdDate) {
+                       Date createdDate,
+                       Long views) {
         this.typePost = typePost;
         this.title = title;
         this.content = content;
         this.category = category;
         this.authors = authors;
         this.createdDate = createdDate;
+        this.views = views;
     }
 }

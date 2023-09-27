@@ -14,4 +14,11 @@ public class CommentDTO {
     private String content;
     private Long postId;
     private Long userId;
+
+    public CommentDTO(Long commentId,  String content, Long postId, Long userId) {
+        this.commentId = commentId;
+        this.content = content;
+        this.postId = postId;
+        this.userId = userId;
+    }
 }

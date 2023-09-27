@@ -1,9 +1,9 @@
-package com.blogschool.blogs.service;
+package tech.fublog.FuBlog.service;
 
-import com.blogschool.blogs.dto.ResponseCategoryDTO;
-import com.blogschool.blogs.entity.CategoryEntity;
-import com.blogschool.blogs.exception.CategoryException;
-import com.blogschool.blogs.repository.CategoryRepository;
+import tech.fublog.FuBlog.dto.ResponseCategoryDTO;
+import tech.fublog.FuBlog.entity.CategoryEntity;
+import tech.fublog.FuBlog.exception.CategoryException;
+import tech.fublog.FuBlog.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

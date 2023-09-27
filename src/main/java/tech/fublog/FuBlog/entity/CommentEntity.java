@@ -44,4 +44,10 @@ public class CommentEntity {
         this.postComment = postComment;
         this.parentComment = parentComment;
     }
+
+    public CommentEntity(String content, UserEntity userComment, BlogPostEntity postComment) {
+        this.content = content;
+        this.userComment = userComment;
+        this.postComment = postComment;
+    }
 }

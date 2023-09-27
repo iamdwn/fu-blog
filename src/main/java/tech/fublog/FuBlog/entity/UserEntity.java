@@ -45,6 +45,9 @@ public class UserEntity implements UserDetails {
     @Column
     private  Boolean isVerify;
 
+    @Column
+    private Double point;
+
 
     @OneToMany(mappedBy = "authors")
     @JsonIgnore

@@ -1,6 +1,6 @@
 package tech.fublog.FuBlog.controller;
 
-<<<<<<< HEAD
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,27 +15,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/v1/auth/blogPosts")
 //    @CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
 @CrossOrigin(origins = "*")
-public class BlogPostController {
+public class  BlogPostController {
 
     @Autowired
-<<<<<<< HEAD
     private BlogPostService blogPostService;
 
     @Autowired
     private ApprovalRequestService approvalRequestService;
 
 
-
-
-    @GetMapping("/viewBlog")
+    @GetMapping("/viewAllBlogs")
 //    @PreAuthorize("hasAuthority('USER')")
 //    @PreAuthorize("hasRole('USER')")
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     ResponseEntity<ResponseObject> getAllBlogPost() {
 
         return blogPostService.getAllBlogPosts();
@@ -49,7 +48,6 @@ public class BlogPostController {
     }
 
 
-
     @PostMapping("/writeBlog")
 //    @PreAuthorize("isAuthenticated()")
 //    @PreAuthorize("hasRole('USER')")
@@ -58,15 +56,14 @@ public class BlogPostController {
             @RequestBody BlogPostDTO blogPostDTO) {
 //            String user = SecurityContextHolder.getContext().getAuthentication().getName();
 
-            BlogPostEntity blogPostEntity = blogPostService.createBlogPost(blogPostDTO);
-            if (blogPostEntity != null) {
-                return approvalRequestService.createApprovalRequestById(blogPostEntity);
-            }
+        BlogPostEntity blogPostEntity = blogPostService.createBlogPost(blogPostDTO);
+        if (blogPostEntity != null) {
+            return approvalRequestService.createApprovalRequestById(blogPostEntity);
+        }
 
 
         return null;
     }
-
 
 
     @PutMapping("/editBlog/{postId}")
@@ -82,6 +79,12 @@ public class BlogPostController {
     @GetMapping("/search/{category}")
     ResponseEntity<ResponseObject> findBlogByCategory(@PathVariable String category) {
         return blogPostService.findBlogByCategory(category);
+    }
+
+    @GetMapping("/viewBlog/{postId}")
+    ResponseEntity<ResponseObject> getBlogPostById(@PathVariable Long postId) {
+
+        return blogPostService.getBlogPostById(postId);
     }
 
 
@@ -118,4 +121,3 @@ public class BlogPostController {
         return ResponseEntity.ok(sortedBlogPosts);
     }
 }
->>>>>>> main

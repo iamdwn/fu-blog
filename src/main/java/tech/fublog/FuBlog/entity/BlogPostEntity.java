@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,6 +51,9 @@ public class BlogPostEntity {
 
     @Column
     private Boolean isApproved;
+
+    @Column
+    private Long views;
 
     @ManyToOne
 //    @JsonIgnore
