@@ -1,10 +1,12 @@
 package tech.fublog.FuBlog.service;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
+import tech.fublog.FuBlog.dto.SortDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
@@ -34,6 +36,7 @@ public class BlogPostService {
     private UserRepository userRepository;
 
 
+    @JsonView(BlogPostDTO.class)
     public ResponseEntity<ResponseObject> getAllBlogPosts() {
         List<BlogPostEntity> blogPostEntity = blogPostRepository.findAll();
         List<BlogPostDTO> blogPostList = new ArrayList<>();
@@ -256,9 +259,9 @@ public class BlogPostService {
         return blogPostRepository.findByCategory(category,pageable);
     }
 
-    public Page<BlogPostEntity> getSortedBlogPosts(String sortBy, int page, int size) {
+    public Page<SortDTO> getSortedBlogPosts(String sortBy, int page, int size) {
         Pageable pageable = PageRequest.of(page-1,size);
-        Page<BlogPostEntity> sortedBlogPosts;
+        Page<SortDTO> sortedBlogPosts;
 
         if ("newest".equalsIgnoreCase(sortBy)) {
             sortedBlogPosts = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
@@ -269,7 +272,7 @@ public class BlogPostService {
         } else if ("oldestModified".equalsIgnoreCase(sortBy)) {
             sortedBlogPosts = blogPostRepository.findAllByOrderByModifiedDateAsc(pageable);
         } else if ("mostViewed".equalsIgnoreCase(sortBy)) {
-            sortedBlogPosts = blogPostRepository.findAllByOrderByViewsDesc(pageable);
+            return blogPostRepository.findAllByOrderByViewsDesc(pageable);
         } else {
             // Mặc định, sắp xếp theo ngày tạo mới nhất.
             sortedBlogPosts = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);

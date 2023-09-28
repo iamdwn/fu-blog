@@ -9,9 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Data
@@ -53,6 +51,9 @@ public class BlogPostEntity {
     private Boolean isApproved;
 
     @Column
+    private String image;
+
+    @Column
     private Long views;
 
     @ManyToOne
@@ -70,7 +71,8 @@ public class BlogPostEntity {
 //    private UserEntity authorsModified;
 
     @OneToMany(mappedBy = "postVote")
-    private Set<VoteEntity> votes = new HashSet<>();
+//    private Set<VoteEntity> votes = new HashSet<>();
+    private List<VoteEntity> votes = new ArrayList<>();
 
     @OneToMany(mappedBy = "blogPost")
     @JsonIgnore
@@ -78,7 +80,8 @@ public class BlogPostEntity {
 
     @OneToMany(mappedBy = "postComment")
 //    @JsonIgnore
-    private Set<CommentEntity> postComments = new HashSet<>();
+//    private Set<CommentEntity> postComments = new HashSet<>();
+    private List<CommentEntity> postComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
 //    @JsonIgnore

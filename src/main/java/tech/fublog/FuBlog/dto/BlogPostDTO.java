@@ -14,11 +14,17 @@ import java.util.Date;
 @NoArgsConstructor
 //@AllArgsConstructor
 public class BlogPostDTO {
+
     private String typePost;
+
     private String title;
+
     private String content;
+
     private Long category;
+
     private Long authors;
+
     private Long views;     //click
 
 //    @CreatedDate

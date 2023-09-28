@@ -6,6 +6,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
+import tech.fublog.FuBlog.dto.SortDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.ApprovalRequestService;
@@ -109,10 +110,10 @@ public class  BlogPostController {
     }
 
     @GetMapping("/sorted/{page}/{size}")
-    public ResponseEntity<Page<BlogPostEntity>> getSortedBlogPosts(
+    public ResponseEntity<Page<SortDTO>> getSortedBlogPosts(
             @RequestParam(name = "sortBy", defaultValue = "newest") String sortBy,
             @PathVariable int page, @PathVariable int size) {
-        Page<BlogPostEntity> sortedBlogPosts = blogPostService.getSortedBlogPosts(sortBy, page, size);
+        Page<SortDTO> sortedBlogPosts = blogPostService.getSortedBlogPosts(sortBy, page, size);
 
         if (sortedBlogPosts.isEmpty()) {
             return ResponseEntity.notFound().build();

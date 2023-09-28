@@ -28,7 +28,7 @@ public class VoteEntity {
     private UserEntity userVote;
 
     @ManyToOne
-//    @JsonIgnore
+    @JsonIgnore
     @JoinColumn(name = "post_id")
     private BlogPostEntity postVote;
 
