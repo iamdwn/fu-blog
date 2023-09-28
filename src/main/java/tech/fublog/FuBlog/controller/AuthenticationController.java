@@ -140,7 +140,7 @@ public class AuthenticationController {
 
     @GetMapping("/refreshToken")
     public ResponseEntity<?> getNewToken(@RequestHeader("Authorization") String refreshToken) {
-        String username = jwtService.extractToken(refreshToken.substring(7));
+        String username = jwtService.extractTokenToGetUsername(refreshToken.substring(7));
 //        Optional<UserEntity> user = userRepository.findByUsername(username);
         if (username != null) {
             UserEntity user = userRepository.findByUsername(username).orElseThrow();
@@ -167,14 +167,16 @@ public class AuthenticationController {
 
     @GetMapping("/getUserInfo")
     public UserDTO InfoUser(@RequestHeader("Authorization") String token) {
-        String username = jwtService.extractToken(token.substring(7));
+        String username = jwtService.extractTokenToGetUsername(token.substring(7));
+        List<String> roles = jwtService.extractTokenToGetRole(token.substring(7));
         Optional<UserEntity> user = userRepository.findByUsername(username);
         UserDTO userDTO = new UserDTO();
         userDTO.setFullname(user.get().getFullName());
         userDTO.setPicture(user.get().getPicture());
         userDTO.setEmail(user.get().getEmail());
         userDTO.setId(user.get().getId());
-        userDTO.setPassword(user.get().getHashedpassword());
+        userDTO.setRole(roles);
+//        userDTO.setPassword(user.get().getHashedpassword());
         return userDTO;
 
     }

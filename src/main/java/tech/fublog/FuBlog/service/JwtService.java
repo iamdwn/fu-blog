@@ -6,6 +6,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import tech.fublog.FuBlog.entity.UserEntity;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,9 +19,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -58,7 +57,7 @@ public class JwtService {
                 .sign(algorithm);
     }
 
-    public String extractToken(String token) {
+    public String extractTokenToGetUsername(String token) {
         String[] parts = token.split("\\.");
         if (parts.length != 3) {
             throw new IllegalArgumentException("Invalid Token format");
@@ -74,6 +73,30 @@ public class JwtService {
         boolean exp = payload.getLong("exp") > (System.currentTimeMillis() / 1000);
         if (exp && signature.equals(headerAndPayloadHashed)) {
             return payload.getString("user");
+        }
+        return null;
+    }
+    public List<String> extractTokenToGetRole(String token) {
+        String[] parts = token.split("\\.");
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Invalid Token format");
+        }
+        JSONObject header = new JSONObject(decode(parts[0]));
+        JSONObject payload = new JSONObject(decode(parts[1]));
+//        System.out.println(header);
+//        System.out.println(payload);
+//        String signature = decode(parts[2]);
+        String signature = parts[2];
+//        System.out.println(signature);
+        String headerAndPayloadHashed = hmacSha256(parts[0] + "." + parts[1], Secret_key);
+        boolean exp = payload.getLong("exp") > (System.currentTimeMillis() / 1000);
+        if (exp && signature.equals(headerAndPayloadHashed)) {
+            JSONArray rolesArray = payload.getJSONArray("roles");
+            List<String> roles = new ArrayList<>();
+            for (int i = 0; i < rolesArray.length(); i++) {
+                roles.add(rolesArray.getString(i));
+            }
+            return roles;
         }
         return null;
     }
