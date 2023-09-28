@@ -268,6 +268,8 @@ public class BlogPostService {
             sortedBlogPosts = blogPostRepository.findAllByOrderByModifiedDateDesc(pageable);
         } else if ("oldestModified".equalsIgnoreCase(sortBy)) {
             sortedBlogPosts = blogPostRepository.findAllByOrderByModifiedDateAsc(pageable);
+        } else if ("mostViewed".equalsIgnoreCase(sortBy)) {
+            sortedBlogPosts = blogPostRepository.findAllByOrderByViewsDesc(pageable);
         } else {
             // Mặc định, sắp xếp theo ngày tạo mới nhất.
             sortedBlogPosts = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);

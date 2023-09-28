@@ -77,11 +77,11 @@ public class BlogPostEntity {
     private Set<ApprovalRequestEntity> approvalRequests = new HashSet<>();
 
     @OneToMany(mappedBy = "postComment")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<CommentEntity> postComments = new HashSet<>();
 
     @OneToMany(mappedBy = "post")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<PostTagEntity> postTags = new HashSet<>();
 
 //    @ManyToMany(mappedBy = "blogPosts")

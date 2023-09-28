@@ -5,7 +5,7 @@ public class UserInfoDTO {
 
     private Double point;
 
-    private String imagePath;
+    private String picture;
 
 
     public String getName() {
@@ -16,12 +16,12 @@ public class UserInfoDTO {
         this.name = name;
     }
 
-    public String getImagePath() {
-        return imagePath;
+    public String getPicture() {
+        return picture;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public void setPicture(String imagePath) {
+        this.picture = imagePath;
     }
 
     public Double getPoint() {
@@ -38,6 +38,6 @@ public class UserInfoDTO {
     public UserInfoDTO(String name, String imagePath, Double point) {
         this.name = name;
         this.point = point;
-        this.imagePath = imagePath;
+        this.picture = imagePath;
     }
 }
