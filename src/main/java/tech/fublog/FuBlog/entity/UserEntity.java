@@ -48,7 +48,7 @@ public class UserEntity implements UserDetails {
 
     @OneToMany(mappedBy = "authors")
     @JsonIgnore
-    private Set<BlogPostEntity> blogAuthors = new HashSet<>();
+    private List<BlogPostEntity> blogAuthors = new ArrayList<>();
 //    @OneToMany(mappedBy = "authorsModified")
 //    private Set<BlogPostEntity> blogAuthorsModified = new HashSet<>();
 
@@ -57,31 +57,31 @@ public class UserEntity implements UserDetails {
 
     @OneToMany(mappedBy = "review")
     @JsonIgnore
-    private Set<ApprovalRequestEntity> reviewed = new HashSet<>();
+    private List<ApprovalRequestEntity> reviewed = new ArrayList<>();
 
     @OneToMany(mappedBy = "userComment")
     @JsonIgnore
-    private Set<CommentEntity> comments = new HashSet<>();
+    private List<CommentEntity> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "userVote")
     @JsonIgnore
-    private Set<VoteEntity> votes = new HashSet<>();
+    private List<VoteEntity> votes = new ArrayList<>();
 
     @OneToMany(mappedBy = "notification")
     @JsonIgnore
-    private Set<NotificationEntity> notificationList = new HashSet<>();
+    private List<NotificationEntity> notificationList = new ArrayList<>();
 
     @OneToMany(mappedBy = "following")
     @JsonIgnore
-    private Set<FollowEntity> followingList = new HashSet<>();
+    private List<FollowEntity> followingList = new ArrayList<>();
 
     @OneToMany(mappedBy = "follower")
     @JsonIgnore
-    private Set<FollowEntity> followersList = new HashSet<>();
+    private List<FollowEntity> followersList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
-    private Set<UserAwardEntity> userAwards = new HashSet<>();
+    private List<UserAwardEntity> userAwards = new ArrayList<>();
 
 
     @ManyToMany
@@ -89,6 +89,12 @@ public class UserEntity implements UserDetails {
     joinColumns = @JoinColumn(name = "Users_Id"),
     inverseJoinColumns = @JoinColumn(name = "Roles_Id"))
     private Set<RoleEntity> roles = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "bookmark",
+            joinColumns = @JoinColumn(name = "users_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id"))
+    private List<BlogPostEntity> blogPosts = new ArrayList<>();
 
     public UserEntity(String fullName, String username, String email, String hashedpassword, String picture, Boolean status) {
         this.fullName = fullName;

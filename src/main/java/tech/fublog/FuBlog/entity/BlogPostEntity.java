@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Data
@@ -64,19 +62,22 @@ public class BlogPostEntity {
 
     @OneToMany(mappedBy = "postVote")
     @JsonIgnore
-    private Set<VoteEntity> votes = new HashSet<>();
+    private List<VoteEntity> votes = new ArrayList<>();
 
     @OneToMany(mappedBy = "blogPost")
     @JsonIgnore
-    private Set<ApprovalRequestEntity> approvalRequests = new HashSet<>();
+    private List<ApprovalRequestEntity> approvalRequests = new ArrayList<>();
 
     @OneToMany(mappedBy = "postComment")
     @JsonIgnore
-    private Set<CommentEntity> postComments = new HashSet<>();
+    private List<CommentEntity> postComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
     @JsonIgnore
-    private Set<PostTagEntity> postTags = new HashSet<>();
+    private List<PostTagEntity> postTags = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "blogPosts")
+    private List<UserEntity> users = new ArrayList<>();
 
 //    @ManyToMany(mappedBy = "blogPosts")
 //    private Set<TagEntity> tags = new HashSet<>();
