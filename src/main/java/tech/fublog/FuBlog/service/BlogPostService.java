@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.View;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -36,7 +37,6 @@ public class BlogPostService {
     private UserRepository userRepository;
 
 
-    @JsonView(BlogPostDTO.class)
     public ResponseEntity<ResponseObject> getAllBlogPosts() {
         List<BlogPostEntity> blogPostEntity = blogPostRepository.findAll();
         List<BlogPostDTO> blogPostList = new ArrayList<>();

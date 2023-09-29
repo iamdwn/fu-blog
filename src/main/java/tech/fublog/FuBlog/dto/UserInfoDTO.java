@@ -3,10 +3,8 @@ package tech.fublog.FuBlog.dto;
 public class UserInfoDTO {
     private String name;
 
-    private Double point;
-
     private String picture;
-
+    private Double point;
 
     public String getName() {
         return name;
@@ -20,8 +18,8 @@ public class UserInfoDTO {
         return picture;
     }
 
-    public void setPicture(String imagePath) {
-        this.picture = imagePath;
+    public void setPicture(String picture) {
+        this.picture = picture  ;
     }
 
     public Double getPoint() {
@@ -35,9 +33,9 @@ public class UserInfoDTO {
     public UserInfoDTO() {
     }
 
-    public UserInfoDTO(String name, String imagePath, Double point) {
+    public UserInfoDTO(String name, String picture, Double point) {
         this.name = name;
+        this.picture = picture;
         this.point = point;
-        this.picture = imagePath;
     }
 }
