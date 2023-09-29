@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.time.LocalDateTime;
 import java.util.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -40,7 +40,6 @@ public class BlogPostEntity {
     @LastModifiedDate
     private Date modifiedDate;
 
-
     @Column
     private Long approvedBy;
 
@@ -50,19 +49,11 @@ public class BlogPostEntity {
     @Column
     private Boolean isApproved;
 
-    @Column
-    private String image;
-
-    @Column
-    private Long views;
-
     @ManyToOne
-//    @JsonIgnore
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "author_id")
     private UserEntity authors;
 
@@ -71,38 +62,27 @@ public class BlogPostEntity {
 //    private UserEntity authorsModified;
 
     @OneToMany(mappedBy = "postVote")
-//    private Set<VoteEntity> votes = new HashSet<>();
+    @JsonIgnore
     private List<VoteEntity> votes = new ArrayList<>();
 
     @OneToMany(mappedBy = "blogPost")
     @JsonIgnore
-    private Set<ApprovalRequestEntity> approvalRequests = new HashSet<>();
+    private List<ApprovalRequestEntity> approvalRequests = new ArrayList<>();
 
     @OneToMany(mappedBy = "postComment")
-//    @JsonIgnore
-//    private Set<CommentEntity> postComments = new HashSet<>();
+    @JsonIgnore
     private List<CommentEntity> postComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
-//    @JsonIgnore
-    private Set<PostTagEntity> postTags = new HashSet<>();
+    @JsonIgnore
+    private List<PostTagEntity> postTags = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "blogPosts")
+    private List<UserEntity> users = new ArrayList<>();
 
 //    @ManyToMany(mappedBy = "blogPosts")
 //    private Set<TagEntity> tags = new HashSet<>();
 
 
-    public BlogPostEntity(String typePost, String title, String content, Date createdDate, Date modifiedDate,
-                          Long approvedBy, Boolean status, Boolean isApproved,
-                          CategoryEntity category, UserEntity authors) {
-        this.typePost = typePost;
-        this.title = title;
-        this.content = content;
-        this.createdDate = createdDate;
-        this.modifiedDate = modifiedDate;
-        this.approvedBy = approvedBy;
-        this.status = status;
-        this.isApproved = isApproved;
-        this.category = category;
-        this.authors = authors;
-    }
+
 }
