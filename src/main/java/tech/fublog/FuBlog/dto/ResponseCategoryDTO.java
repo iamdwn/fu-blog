@@ -1,4 +1,4 @@
-package tech.fublog.FuBlog.dto;
+package com.blogschool.blogs.dto;
 
 import lombok.*;
 

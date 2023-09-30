@@ -37,7 +37,7 @@ public class VoteController{
     @GetMapping("/count/{postId}")
     public ResponseEntity<ResponseObject> countVote(@PathVariable Long postId) {
         try {
-            Long count = voteService.countVote(postId);
+            int count = voteService.countVote(postId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", count));
         } catch (VoteException ex) {
