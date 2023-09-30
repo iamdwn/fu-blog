@@ -1,6 +1,7 @@
 package tech.fublog.FuBlog.controller;
 
 import tech.fublog.FuBlog.dto.CommentDTO;
+import tech.fublog.FuBlog.dto.ResponseCommentDTO;
 import tech.fublog.FuBlog.entity.CommentEntity;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.exception.CommentException;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/auth/blogPosts/comment")
+@RequestMapping("/api/blogPosts/comment")
 public class CommentController {
     private final CommentService commentService;
 
@@ -38,7 +39,7 @@ public class CommentController {
     @GetMapping("/view/{postId}")
     public ResponseEntity<ResponseObject> viewComment(@PathVariable Long postId) {
         try {
-            List<CommentDTO> dtoList = commentService.viewComment(postId);
+            List<ResponseCommentDTO> dtoList = commentService.viewComment(postId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", dtoList));
         } catch (CommentException ex) {

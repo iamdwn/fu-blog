@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/auth/blogPosts/category")
 public class CategoryController {
@@ -21,7 +23,7 @@ public class CategoryController {
 
     @GetMapping("/view")
     public ResponseEntity<ResponseObject> getAll() {
-//        List<CategoryDTO> dtoList = categoryService.getAllCategory();
+//        List<ResponseCategoryDTO> dtoList = categoryService.getAllCategory();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseObject("ok", "found", categoryService.getAllCategory()));
     }

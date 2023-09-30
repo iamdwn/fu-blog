@@ -51,7 +51,7 @@ public class UserEntity implements UserDetails {
 
     @OneToMany(mappedBy = "authors")
     @JsonIgnore
-    private List<BlogPostEntity> blogAuthors = new ArrayList<>();
+    private Set<BlogPostEntity> blogAuthors = new HashSet<>();
 //    @OneToMany(mappedBy = "authorsModified")
 //    private Set<BlogPostEntity> blogAuthorsModified = new HashSet<>();
 
@@ -60,31 +60,31 @@ public class UserEntity implements UserDetails {
 
     @OneToMany(mappedBy = "review")
     @JsonIgnore
-    private List<ApprovalRequestEntity> reviewed = new ArrayList<>();
+    private Set<ApprovalRequestEntity> reviewed = new HashSet<>();
 
     @OneToMany(mappedBy = "userComment")
     @JsonIgnore
-    private List<CommentEntity> comments = new ArrayList<>();
+    private Set<CommentEntity> comments = new HashSet<>();
 
     @OneToMany(mappedBy = "userVote")
     @JsonIgnore
-    private List<VoteEntity> votes = new ArrayList<>();
+    private Set<VoteEntity> votes = new HashSet<>();
 
     @OneToMany(mappedBy = "notification")
     @JsonIgnore
-    private List<NotificationEntity> notificationList = new ArrayList<>();
+    private Set<NotificationEntity> notificationList = new HashSet<>();
 
     @OneToMany(mappedBy = "following")
     @JsonIgnore
-    private List<FollowEntity> followingList = new ArrayList<>();
+    private Set<FollowEntity> followingList = new HashSet<>();
 
     @OneToMany(mappedBy = "follower")
     @JsonIgnore
-    private List<FollowEntity> followersList = new ArrayList<>();
+    private Set<FollowEntity> followersList = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
-    private List<UserAwardEntity> userAwards = new ArrayList<>();
+    private Set<UserAwardEntity> userAwards = new HashSet<>();
 
 
     @ManyToMany

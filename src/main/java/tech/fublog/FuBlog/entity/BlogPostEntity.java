@@ -40,7 +40,6 @@ public class BlogPostEntity {
     @LastModifiedDate
     private Date modifiedDate;
 
-
     @Column
     private Long approvedBy;
 

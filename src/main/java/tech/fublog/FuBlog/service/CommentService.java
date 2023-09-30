@@ -44,14 +44,14 @@ public class CommentService {
         } else throw new CommentException("User or Blog doesn't exists");
     }
 
-    public List<CommentDTO> viewComment(Long postId) {
+    public List<ResponseCommentDTO> viewComment(Long postId) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         if (blogPostEntity.isPresent()) {
             List<CommentEntity> list = commentRepository.findByPostComment(blogPostEntity.get());
             if (!list.isEmpty()) {
-                List<CommentDTO> dtoList = new ArrayList<>();
+                List<ResponseCommentDTO> dtoList = new ArrayList<>();
                 for (CommentEntity entity : list) {
-                    CommentDTO dto = new CommentDTO(entity.getId(), entity.getContent(), entity.getPostComment().getId(), entity.getUserComment().getId());
+                    ResponseCommentDTO dto = convertToDTO(entity);
                     dtoList.add(dto);
                 }
                 return dtoList;
