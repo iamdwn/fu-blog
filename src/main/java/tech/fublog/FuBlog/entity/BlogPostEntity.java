@@ -76,7 +76,7 @@ public class BlogPostEntity {
 
     @OneToMany(mappedBy = "blogPost")
     @JsonIgnore
-    private Set<ApprovalRequestEntity> approvalRequests = new HashSet<>();
+    private List<ApprovalRequestEntity> approvalRequests = new ArrayList<>();
 
     @OneToMany(mappedBy = "postComment")
 //    @JsonIgnore
@@ -85,7 +85,7 @@ public class BlogPostEntity {
 
     @OneToMany(mappedBy = "post")
 //    @JsonIgnore
-    private Set<PostTagEntity> postTags = new HashSet<>();
+    private List<PostTagEntity> postTags = new ArrayList<>();
 
 //    @ManyToMany(mappedBy = "blogPosts")
 //    private Set<TagEntity> tags = new HashSet<>();
