@@ -1,6 +1,7 @@
 package tech.fublog.FuBlog.service;
 
 import tech.fublog.FuBlog.dto.CommentDTO;
+import tech.fublog.FuBlog.dto.ResponseCommentDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.CommentEntity;
 import tech.fublog.FuBlog.model.ResponseObject;
@@ -83,7 +84,7 @@ public class CommentService {
         if (blogPostEntity.isPresent() && userEntity.isPresent()) {
             Double point = userEntity.get().getPoint();
             userEntity.get().setPoint(point + 0.5);
-            CommentEntity commentEntity = new CommentEntity(commentDTO.getContent(), userEntity.get(), blogPostEntity.get());
+//            CommentEntity commentEntity = new CommentEntity(commentDTO.getContent(), userEntity.get(), blogPostEntity.get());
             CommentEntity commentEntity = new CommentEntity(commentDTO.getContent(), userEntity.get(), blogPostEntity.get(), parentComment);
             commentRepository.save(commentEntity);
         } else throw new CommentException("Blog or User doesn't exists");

@@ -35,9 +35,11 @@ public class BlogPostEntity {
     @CreatedDate
     private Date createdDate;
 
+
     @Column
     @LastModifiedDate
     private Date modifiedDate;
+
 
     @Column
     private Long approvedBy;

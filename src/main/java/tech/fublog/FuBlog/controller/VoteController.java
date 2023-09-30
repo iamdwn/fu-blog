@@ -24,7 +24,7 @@ public class VoteController{
     @GetMapping("/view/{postId}")
     public ResponseEntity<ResponseObject> viewVote(@PathVariable Long postId) {
         try {
-            List<VoteDTO> dtoList = voteService.viewVotes(postId);
+            List<VoteDTO> dtoList = voteService.viewVote(postId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", dtoList));
         } catch (VoteException ex) {
