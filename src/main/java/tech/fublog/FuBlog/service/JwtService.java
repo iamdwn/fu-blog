@@ -25,7 +25,7 @@ public class JwtService {
 //                .withClaim("fullname",user.getFullName())
 //                .withClaim("email",user.getEmail())
 //                .withClaim("picture", user.getPicture())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 3600*24*30))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 3600*1000))
                 .withClaim("roles", authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
     }
@@ -39,7 +39,7 @@ public class JwtService {
 //                .withClaim("fullname",user.getFullName())
 //                .withClaim("email",user.getEmail())
 //                .withClaim("picture", user.getPicture())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 70*60*1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 30L*3600*24*1000))
                 .withClaim("roles", authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
     }
