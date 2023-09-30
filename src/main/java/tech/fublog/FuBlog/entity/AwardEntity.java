@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -30,7 +28,7 @@ public class AwardEntity {
 
     @OneToMany(mappedBy = "award")
     @JsonIgnore
-    private List<UserAwardEntity> userAwards = new ArrayList<>();
+    private Set<UserAwardEntity> userAwards = new HashSet<>();
 
 //    @ManyToMany
 //    @JoinTable(name = "UserAward",
