@@ -55,6 +55,9 @@ public class BlogPostEntity {
     @Column
     private Long views;
 
+    @Column
+    private Boolean pinned;
+
     @ManyToOne
 //    @JsonIgnore
     @JoinColumn(name = "category_id")
@@ -92,7 +95,7 @@ public class BlogPostEntity {
 
     public BlogPostEntity(String typePost, String title, String content, Date createdDate, Date modifiedDate,
                           Long approvedBy, Boolean status, Boolean isApproved,
-                          CategoryEntity category, UserEntity authors) {
+                          CategoryEntity category, UserEntity authors, Boolean pinned) {
         this.typePost = typePost;
         this.title = title;
         this.content = content;
@@ -103,5 +106,6 @@ public class BlogPostEntity {
         this.isApproved = isApproved;
         this.category = category;
         this.authors = authors;
+        this.pinned = pinned;
     }
 }

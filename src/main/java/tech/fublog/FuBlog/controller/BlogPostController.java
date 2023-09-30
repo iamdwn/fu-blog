@@ -88,6 +88,16 @@ public class  BlogPostController {
         return blogPostService.getBlogPostById(postId);
     }
 
+    @GetMapping("getPinnedBlog")
+    public ResponseEntity<ResponseObject> getPinnedBlog(){
+        return  blogPostService.getPinnedBlog();
+    }
+
+    @PostMapping("pinBlogAction/{postId}")
+    public ResponseEntity<ResponseObject> pinBlog(@PathVariable Long postId){
+        return  blogPostService.pinBlogAction(postId);
+    }
+
 
     @GetMapping("getAllBlog/{page}/{size}")
     public List<BlogPostEntity> getAllBlog(@PathVariable int page, @PathVariable int size){
@@ -121,4 +131,5 @@ public class  BlogPostController {
 
         return ResponseEntity.ok(sortedBlogPosts);
     }
+
 }

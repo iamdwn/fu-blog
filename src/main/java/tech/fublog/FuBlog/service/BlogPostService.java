@@ -134,7 +134,7 @@ public class BlogPostService {
 
 //            //tạo và save bài BlogPost mới
             BlogPostEntity newBlogPost = new BlogPostEntity(typePost, title, content, createdDate, null,
-                    null, true, false, category, authors);
+                    null, true, false, category, authors, false);
             return blogPostRepository.save(newBlogPost);
         }
 
@@ -237,18 +237,54 @@ public class BlogPostService {
         });
     }
 
-    public List<BlogPostEntity> getAllBlogPost(int page, int size){
-        Pageable pageable = PageRequest.of(page-1,size);
-        return  blogPostRepository.findAll(pageable).get().toList();
+    public ResponseEntity<ResponseObject> getPinnedBlog() {
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findByPinnedIsTrue();
+
+        return !blogPostEntity.isEmpty() ? ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", blogPostEntity))
+
+                : ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ResponseObject("failed", "not found", ""));
     }
 
-    public List<BlogPostEntity> getAllBlogPostByTitle(String title,int page, int size){
-        Pageable pageable = PageRequest.of(page-1,size);
-        return  blogPostRepository.getBlogPostEntitiesByTitle(title, pageable);
+    public ResponseEntity<ResponseObject> pinBlogAction(Long postId) {
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findByPinnedIsTrue();
+        Optional<BlogPostEntity> blogPost = blogPostRepository.findById(postId);
+
+        if (blogPostEntity.isPresent()) {
+
+            blogPostEntity.get().setPinned(false);
+
+            blogPostRepository.save(blogPostEntity.get());
+
+            if (blogPostEntity.get().getId().equals(postId)) {
+
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "unpinned successfull", ""));
+            }
+        }
+
+        blogPost.get().setPinned(true);
+
+        blogPostRepository.save(blogPost.get());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "pinned successfull", ""));
+    }
+
+
+    public List<BlogPostEntity> getAllBlogPost(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return blogPostRepository.findAll(pageable).get().toList();
+    }
+
+    public List<BlogPostEntity> getAllBlogPostByTitle(String title, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return blogPostRepository.getBlogPostEntitiesByTitle(title, pageable);
     }
 
     public Page<BlogPostEntity> getBlogPostsByCategoryId(Long categoryId, int page, int size) {
-        Pageable pageable = PageRequest.of(page-1,size);
+        Pageable pageable = PageRequest.of(page - 1, size);
         Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
 
         if (!categoryOptional.isPresent()) {
@@ -256,11 +292,11 @@ public class BlogPostService {
         }
 
         CategoryEntity category = categoryOptional.get();
-        return blogPostRepository.findByCategory(category,pageable);
+        return blogPostRepository.findByCategory(category, pageable);
     }
 
     public Page<SortDTO> getSortedBlogPosts(String sortBy, int page, int size) {
-        Pageable pageable = PageRequest.of(page-1,size);
+        Pageable pageable = PageRequest.of(page - 1, size);
         Page<SortDTO> sortedBlogPosts;
 
         if ("newest".equalsIgnoreCase(sortBy)) {

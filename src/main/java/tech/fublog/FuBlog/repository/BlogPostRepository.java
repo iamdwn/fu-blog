@@ -13,12 +13,15 @@ import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.CategoryEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
     List<BlogPostEntity> findByIsApproved(Boolean isApproved);
 
     List<BlogPostEntity> findByTitleLike(String title);
+
+    Optional<BlogPostEntity> findByPinnedIsTrue();
 
     public List<BlogPostEntity> getBlogPostEntitiesByTitle(String title, Pageable pageable);
 //    List<BlogPostEntity> findAllByCategory(Long id);
