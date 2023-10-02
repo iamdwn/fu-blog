@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -20,7 +17,7 @@ public class AwardEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long Id;
 
     @Column
     private String name;
@@ -38,5 +35,17 @@ public class AwardEntity {
 //            inverseJoinColumns = @JoinColumn(name = "user_id"))
 //    private List<UserEntity> users = new ArrayList<>();
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(Id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        AwardEntity award = (AwardEntity) obj;
+        return Objects.equals(Id, award.getId());
+    }
 
 }

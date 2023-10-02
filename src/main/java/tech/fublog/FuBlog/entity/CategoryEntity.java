@@ -2,15 +2,14 @@ package tech.fublog.FuBlog.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
-//@Data
+@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Category")
@@ -25,49 +24,23 @@ public class CategoryEntity {
 
     @OneToMany(mappedBy = "category")
     @JsonIgnore
-    private List<BlogPostEntity> blogPosts = new ArrayList<>();
+    private Set<BlogPostEntity> blogPosts = new HashSet<>();
 
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "parentCategoryId")
     private CategoryEntity parentCategory;
 
-    public Long getId() {
-        return Id;
+    @Override
+    public int hashCode() {
+        return Objects.hash(Id);
     }
 
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public List<BlogPostEntity> getBlogPosts() {
-        return blogPosts;
-    }
-
-    public CategoryEntity getParentCategory() {
-        return parentCategory;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public void setBlogPosts(List<BlogPostEntity> blogPosts) {
-        this.blogPosts = blogPosts;
-    }
-
-    public void setParentCategory(CategoryEntity parentCategory) {
-        this.parentCategory = parentCategory;
-    }
-
-    public CategoryEntity(String categoryName, CategoryEntity parentCategory) {
-        this.categoryName = categoryName;
-        this.parentCategory = parentCategory;
-    }
-
-    public CategoryEntity(String categoryName, List<BlogPostEntity> blogPosts, CategoryEntity parentCategory) {
-        this.categoryName = categoryName;
-        this.blogPosts = blogPosts;
-        this.parentCategory = parentCategory;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        CategoryEntity category = (CategoryEntity) obj;
+        return Objects.equals(Id, category.getId());
     }
 }

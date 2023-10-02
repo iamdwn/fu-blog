@@ -6,10 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Data
@@ -29,11 +26,22 @@ public class TagEntity {
     @JsonIgnore
     private List<PostTagEntity> postTags = new ArrayList<>();
 
-//    @ManyToMany
+    //    @ManyToMany
 //    @JoinTable(name = "PostTag",
 //            joinColumns = @JoinColumn(name = "tag_id"),
 //            inverseJoinColumns = @JoinColumn(name = "post_id"))
 //    private Set<BlogPostEntity> blogPosts = new HashSet<>();
+    @Override
+    public int hashCode() {
+        return Objects.hash(Id);
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        TagEntity tag = (TagEntity) obj;
+        return Objects.equals(Id, tag.getId());
+    }
 
 }

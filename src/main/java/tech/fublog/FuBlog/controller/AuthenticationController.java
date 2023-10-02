@@ -9,7 +9,6 @@ import tech.fublog.FuBlog.auth.AuthenticationRequest;
 import tech.fublog.FuBlog.auth.MessageResponse;
 import tech.fublog.FuBlog.auth.SignupRequest;
 import tech.fublog.FuBlog.dto.UserDTO;
-import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.repository.RoleCustomRepo;
@@ -22,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tech.fublog.FuBlog.service.JwtService;
-import tech.fublog.FuBlog.service.UserServiceImpl;
+import tech.fublog.FuBlog.service.UserService;
 
 import java.util.*;
 
@@ -49,7 +48,7 @@ public class AuthenticationController {
     PasswordEncoder encoder;
 
     @Autowired
-    UserServiceImpl userService;
+    UserService userService;
 
     @Autowired
     RoleCustomRepo roleCustomRepo;

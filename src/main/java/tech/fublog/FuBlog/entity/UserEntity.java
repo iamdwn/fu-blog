@@ -17,7 +17,7 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "Users")
+@Table(name = "User")
 public class UserEntity implements UserDetails {
 
     @Id
@@ -48,10 +48,16 @@ public class UserEntity implements UserDetails {
     @Column
     private Double point;
 
+    @ManyToMany
+    @JoinTable(name = "user_mark_post",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id"))
+    private Set<BlogPostEntity> markPosts = new HashSet<>();
+
 
     @OneToMany(mappedBy = "authors")
     @JsonIgnore
-    private List<BlogPostEntity> blogAuthors = new ArrayList<>();
+    private Set<BlogPostEntity> blogAuthors = new HashSet<>();
 //    @OneToMany(mappedBy = "authorsModified")
 //    private Set<BlogPostEntity> blogAuthorsModified = new HashSet<>();
 
@@ -60,37 +66,37 @@ public class UserEntity implements UserDetails {
 
     @OneToMany(mappedBy = "review")
     @JsonIgnore
-    private List<ApprovalRequestEntity> reviewed = new ArrayList<>();
+    private Set<ApprovalRequestEntity> reviewed = new HashSet<>();
 
     @OneToMany(mappedBy = "userComment")
     @JsonIgnore
-    private List<CommentEntity> comments = new ArrayList<>();
+    private Set<CommentEntity> comments = new HashSet<>();
 
     @OneToMany(mappedBy = "userVote")
     @JsonIgnore
-    private List<VoteEntity> votes = new ArrayList<>();
+    private Set<VoteEntity> votes = new HashSet<>();
 
     @OneToMany(mappedBy = "notification")
     @JsonIgnore
-    private List<NotificationEntity> notificationList = new ArrayList<>();
+    private Set<NotificationEntity> notificationList = new HashSet<>();
 
     @OneToMany(mappedBy = "following")
     @JsonIgnore
-    private List<FollowEntity> followingList = new ArrayList<>();
+    private Set<FollowEntity> followingList = new HashSet<>();
 
     @OneToMany(mappedBy = "follower")
     @JsonIgnore
-    private List<FollowEntity> followersList = new ArrayList<>();
+    private Set<FollowEntity> followersList = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
-    private List<UserAwardEntity> userAwards = new ArrayList<>();
+    private Set<UserAwardEntity> userAwards = new HashSet<>();
 
 
     @ManyToMany
     @JoinTable(name = "user_role",
-    joinColumns = @JoinColumn(name = "Users_Id"),
-    inverseJoinColumns = @JoinColumn(name = "Roles_Id"))
+            joinColumns = @JoinColumn(name = "Users_Id"),
+            inverseJoinColumns = @JoinColumn(name = "Roles_Id"))
     private Set<RoleEntity> roles = new HashSet<>();
 
     public UserEntity(String fullName, String username, String email, String hashedpassword, String picture, Boolean status) {
@@ -149,5 +155,18 @@ public class UserEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        UserEntity user = (UserEntity) obj;
+        return Objects.equals(id, user.getId()) &&
+                Objects.equals(username, user.getUsername());
     }
 }

@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FollowDTO {
-    private Long follower;
-    private Long following;
+public class CategoryDTO {
+    private String categoryName;
+    private Long parentCategoryId;
 }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Data
 @AllArgsConstructor
@@ -31,4 +32,17 @@ public class UserAwardEntity {
     @ManyToOne
     @JoinColumn(name = "award_id")
     private AwardEntity award;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        UserAwardEntity userAward = (UserAwardEntity) obj;
+        return Objects.equals(id, userAward.getId());
+    }
 }

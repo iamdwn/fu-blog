@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -14,7 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "Roles")
+@Table(name = "Role")
 public class RoleEntity {
 
     @Id
@@ -34,4 +35,18 @@ public class RoleEntity {
     public RoleEntity(String name) {
         this.name = name;
     }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        RoleEntity role = (RoleEntity) obj;
+        return Objects.equals(id, role.getId()) &&
+                Objects.equals(name, role.getName());
+    }
+
 }
