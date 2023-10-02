@@ -1,53 +1,54 @@
-//package com.blogschool.blogs.service;
-//
-//import com.blogschool.blogs.dto.UserDTO;
-//import com.blogschool.blogs.entity.UserEntity;
-//import com.blogschool.blogs.exception.UserException;
-//import com.blogschool.blogs.hash.Hashing;
-//import com.blogschool.blogs.repository.UserRepository;
-//import lombok.AllArgsConstructor;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.Optional;
-//
-//@Service
-//@AllArgsConstructor
-//public class UserService {
-//
-//    private Hashing hashing;
-//    private UserRepository userRepository;
-//
-//    public UserEntity login(String username, String password) {
-//        Optional<UserEntity> o_user = userRepository.findByUsername(username);
-//        if (o_user.isEmpty()) {
-//            throw new UserException("User is not found");
-//        } else {
-//            String storedPassword = o_user.get().getPassword();
-//            String hashedPassword = hashing.hasdPassword(password);
-//            boolean result = hashedPassword.equals(storedPassword);
-//            if (result) {
-//                return o_user.get();
-//            } else throw new UserException("Password is incorrect");
-//        }
-//    }
-//
-//    public void signUpUser(UserDTO userDTO){
-//        String hashedPassword = hashing.hasdPassword(userDTO.getPassword());
-//        if(userRepository.findByEmail(userDTO.getEmail()).isPresent()){
-//            throw new UserException("Email is exist");
-//        }
-//        if(userRepository.findByUsername(userDTO.getUsername()).isPresent()){
-//            throw new UserException("Username is exist");
-//        }
-//        UserEntity user = new UserEntity(
-//                userDTO.getUsername(),
-//                hashedPassword,
-//                userDTO.getEmail(),
-//                userDTO.getFullName(),
-//                true
-//        );
-//        userRepository.save(user);
-//        userRepository.findByUsername(user.getUsername());
-//
-//    }
-//}
+package com.blogschool.blogs.service;
+
+import com.blogschool.blogs.entity.BlogPostEntity;
+import com.blogschool.blogs.entity.UserEntity;
+import com.blogschool.blogs.exception.UserException;
+import com.blogschool.blogs.repository.BlogPostRepository;
+import com.blogschool.blogs.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+
+@Service
+public class UserService {
+    private final UserRepository userRepository;
+    private final BlogPostRepository blogPostRepository;
+
+    @Autowired
+    public UserService(UserRepository userRepository,
+                       BlogPostRepository blogPostRepository) {
+        this.userRepository = userRepository;
+        this.blogPostRepository = blogPostRepository;
+    }
+
+    public boolean markPost(Long userId, Long postId) {
+        boolean result = false;
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+            if (blogPostEntity.isPresent()) {
+                Set<BlogPostEntity> entitySet;
+                if (userEntity.get().getMarkPosts().isEmpty()) {
+                    entitySet = new HashSet<>();
+                    entitySet.add(blogPostEntity.get());
+                    userEntity.get().setMarkPosts(entitySet);
+                    userRepository.save(userEntity.get());
+                    result = true;
+                } else {
+                    entitySet = userEntity.get().getMarkPosts();
+                    if (entitySet.add(blogPostEntity.get())) {
+                        userEntity.get().setMarkPosts(entitySet);
+                        userRepository.save(userEntity.get());
+                        result = true;
+                    } else throw new UserException("You already mark this post!");
+                }
+            }
+        }
+        return result;
+    }
+
+}

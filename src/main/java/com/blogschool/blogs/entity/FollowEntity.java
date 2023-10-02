@@ -3,6 +3,8 @@ package com.blogschool.blogs.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Objects;
+
 @Entity
 @Data
 @Getter
@@ -28,5 +30,19 @@ public class FollowEntity {
     public FollowEntity(UserEntity follower, UserEntity following) {
         this.follower = follower;
         this.following = following;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(follower, following);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        FollowEntity follow = (FollowEntity) obj;
+        return Objects.equals(follower, follow.getFollower()) &&
+                Objects.equals(following, follow.getFollowing());
     }
 }

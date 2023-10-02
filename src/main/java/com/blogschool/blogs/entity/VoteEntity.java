@@ -3,6 +3,8 @@ package com.blogschool.blogs.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Objects;
+
 
 @Entity
 @Data
@@ -33,5 +35,19 @@ public class VoteEntity {
         this.voteValue = voteValue;
         this.userVote = userVote;
         this.postVote = postVote;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userVote, postVote);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        VoteEntity vote = (VoteEntity) obj;
+        return Objects.equals(userVote, vote.getUserVote()) &&
+                Objects.equals(postVote, vote.getPostVote());
     }
 }

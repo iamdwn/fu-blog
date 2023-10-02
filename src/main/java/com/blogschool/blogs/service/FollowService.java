@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class FollowService {
@@ -39,11 +40,10 @@ public class FollowService {
     public List<FollowDTO> viewFollower(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
-            List<FollowEntity> list = followRepository.findByFollowing(userEntity.get());
-//            Set<FollowEntity> set = userEntity.get().getFollowingList();
-            if (!list.isEmpty()) {
+            Set<FollowEntity> set = userEntity.get().getFollowingList();
+            if (!set.isEmpty()) {
                 List<FollowDTO> dtoList = new ArrayList<>();
-                for (FollowEntity entity : list) {
+                for (FollowEntity entity : set) {
                     FollowDTO dto = new FollowDTO(entity.getFollower().getId(), entity.getFollowing().getId());
                     dtoList.add(dto);
                 }
@@ -55,11 +55,10 @@ public class FollowService {
     public List<FollowDTO> viewFollowing(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
-            List<FollowEntity> list = followRepository.findByFollower(userEntity.get());
-//            Set<FollowEntity> set = userEntity.get().getFollowingList();
-            if (!list.isEmpty()) {
+            Set<FollowEntity> set = userEntity.get().getFollowingList();
+            if (!set.isEmpty()) {
                 List<FollowDTO> dtoList = new ArrayList<>();
-                for (FollowEntity entity : list) {
+                for (FollowEntity entity : set) {
                     FollowDTO dto = new FollowDTO(entity.getFollower().getId(), entity.getFollowing().getId());
                     dtoList.add(dto);
                 }

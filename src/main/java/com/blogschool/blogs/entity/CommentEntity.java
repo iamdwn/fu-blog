@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Data
@@ -16,7 +17,6 @@ import java.util.Date;
 public class CommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Long Id;
 
     @Column(columnDefinition = "LONGTEXT")
@@ -25,6 +25,9 @@ public class CommentEntity {
     @Column
     @CreatedDate
     private Date createdDate = new Date();
+
+    @Column
+    private Boolean status = true;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -43,5 +46,18 @@ public class CommentEntity {
         this.userComment = userComment;
         this.postComment = postComment;
         this.parentComment = parentComment;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        CommentEntity comment = (CommentEntity) obj;
+        return Objects.equals(Id, comment.getId());
     }
 }

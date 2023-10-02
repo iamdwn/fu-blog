@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -20,7 +21,7 @@ public class UserAwardEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long Id;
 
     @Column
     @CreatedDate
@@ -33,4 +34,17 @@ public class UserAwardEntity {
     @ManyToOne
     @JoinColumn(name = "award_id")
     private AwardEntity award;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        UserAwardEntity userAward = (UserAwardEntity) obj;
+        return Objects.equals(Id, userAward.getId());
+    }
 }

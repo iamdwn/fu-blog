@@ -3,6 +3,8 @@ package com.blogschool.blogs.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Objects;
+
 @Setter
 @Getter
 @Entity
@@ -33,6 +35,19 @@ public class ApprovalRequestEntity {
     public ApprovalRequestEntity(BlogPostEntity blogPost) {
         this.request = blogPost.getAuthors();
         this.blogPost = blogPost;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        ApprovalRequestEntity approvalRequest = (ApprovalRequestEntity) obj;
+        return Objects.equals(Id, approvalRequest.getId());
     }
 }
 

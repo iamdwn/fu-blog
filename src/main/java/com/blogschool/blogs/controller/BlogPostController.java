@@ -1,42 +1,52 @@
 package com.blogschool.blogs.controller;
 
 import com.blogschool.blogs.dto.BlogPostDTO;
-import com.blogschool.blogs.entity.ApprovalRequestEntity;
+import com.blogschool.blogs.dto.CategoryDTO;
+import com.blogschool.blogs.dto.ResponseBlogPostDTO;
+import com.blogschool.blogs.dto.ResponseCommentDTO;
 import com.blogschool.blogs.entity.BlogPostEntity;
 import com.blogschool.blogs.entity.ResponseObject;
 import com.blogschool.blogs.exception.BlogPostException;
-import com.blogschool.blogs.service.ApprovalRequestService;
-import com.blogschool.blogs.service.BlogPostService;
+import com.blogschool.blogs.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/blogPosts/blog")
 public class BlogPostController {
     private final BlogPostService blogPostService;
-
     private final ApprovalRequestService approvalRequestService;
+    private final VoteService voteService;
+    private final CommentService commentService;
+    private final PostTagService postTagService;
 
     @Autowired
-    public BlogPostController(BlogPostService blogPostService, ApprovalRequestService approvalRequestService) {
+    public BlogPostController(BlogPostService blogPostService, ApprovalRequestService approvalRequestService, VoteService voteService, CommentService commentService, PostTagService postTagService) {
         this.blogPostService = blogPostService;
         this.approvalRequestService = approvalRequestService;
+        this.voteService = voteService;
+        this.commentService = commentService;
+        this.postTagService = postTagService;
     }
 
-//    @GetMapping("/view")
-//    ResponseEntity<ResponseObject> findByApproved() {
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(new ResponseObject("ok", "list here", blogPostService.findByApproved()));
-//    }
+    @GetMapping("/view")
+    ResponseEntity<ResponseObject> findByApproved(@RequestBody BlogPostDTO blogPostDTO) {
+        Long vote = voteService.countVote(blogPostDTO.getPostId());
+        List<ResponseCommentDTO> comment = commentService.viewComment(blogPostDTO.getPostId());
+        ResponseBlogPostDTO responseBlogPostDTO = blogPostService.viewBlogPost(blogPostDTO.getPostId(), vote, comment);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "list here", responseBlogPostDTO));
+    }
 
-    @GetMapping("/search/category/{category}/{parentCategoryId}")
-    ResponseEntity<ResponseObject> findBlogByCategory(@PathVariable String category, @PathVariable Long parentCategoryId) {
+    @GetMapping("/search/category")
+    ResponseEntity<ResponseObject> findBlogByCategory(@RequestBody CategoryDTO categoryDTO) {
         try {
-            List<BlogPostDTO> dtoList = blogPostService.findBlogByCategory(category, parentCategoryId);
+            Set<BlogPostDTO> dtoList = blogPostService.findBlogByCategory(categoryDTO.getCategoryName(), categoryDTO.getParentCategoryId());
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", dtoList));
         } catch (BlogPostException ex) {
@@ -63,6 +73,7 @@ public class BlogPostController {
         try {
             BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(blogPostDTO);
             approvalRequestService.insertApprovalRequest(blogPostEntity);
+            postTagService.insertPostTag(blogPostDTO.getTagList(), blogPostEntity);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post is waiting approve", ""));
         } catch (BlogPostException ex) {
@@ -72,17 +83,4 @@ public class BlogPostController {
         }
     }
 
-//    @PutMapping("/update")
-//    ResponseEntity<ResponseObject> updateBlogPost(@RequestBody BlogPostDTO blogPostDTO) {
-//        try {
-//            BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(blogPostDTO);
-//            approvalRequestService.insertApprovalRequest(blogPostEntity);
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(new ResponseObject("ok", "post is waiting approve", ""));
-//        } catch (BlogPostException ex) {
-//            System.out.println(ex.getMessage());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-//        }
-//    }
 }

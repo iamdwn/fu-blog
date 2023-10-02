@@ -31,11 +31,11 @@ public class VoteService {
         this.userRepository = userRepository;
     }
 
-    public int countVote(Long postId) {
+    public Long countVote(Long postId) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         if (blogPostEntity.isPresent()) {
             List<VoteEntity> entity = voteRepository.findByPostVote(blogPostEntity.get());
-            int count = 0;
+            Long count = 0L;
             if (!entity.isEmpty()) {
                 for (VoteEntity voteEntity : entity) {
                     if (voteEntity.getVoteValue() == 1) {

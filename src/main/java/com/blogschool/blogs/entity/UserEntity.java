@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -72,8 +73,12 @@ public class UserEntity {
             joinColumns = @JoinColumn(name = "Users_Id"),
             inverseJoinColumns = @JoinColumn(name = "Roles_Id"))
     private Set<RoleEntity> roles = new HashSet<>();
-//    @OneToMany(mappedBy = "user")
-//    private Set<UserRoleEntity>  userRoles = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "user_mark_post",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id"))
+    private Set<BlogPostEntity> markPosts = new HashSet<>();
 
     public UserEntity(String username, String password, String email, String fullName, Boolean status) {
         this.username = username;
@@ -81,5 +86,19 @@ public class UserEntity {
         this.email = email;
         this.fullName = fullName;
         this.status = status;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Id, username);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        UserEntity user = (UserEntity) obj;
+        return Objects.equals(Id, user.getId()) &&
+                Objects.equals(username, user.getUsername());
     }
 }

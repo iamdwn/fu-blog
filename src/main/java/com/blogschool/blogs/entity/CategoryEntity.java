@@ -3,8 +3,7 @@ package com.blogschool.blogs.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Data
@@ -23,10 +22,22 @@ public class CategoryEntity {
     private String categoryName;
 
     @OneToMany(mappedBy = "category")
-    private List<BlogPostEntity> blogPosts = new ArrayList<>();
+    private Set<BlogPostEntity> blogPosts = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "parentCategoryId")
     private CategoryEntity parentCategory;
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(Id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        CategoryEntity category = (CategoryEntity) obj;
+        return Objects.equals(Id, category.getId());
+    }
 }
