@@ -39,7 +39,7 @@ public class CommentController {
     @GetMapping("/view/{postId}")
     public ResponseEntity<ResponseObject> viewComment(@PathVariable Long postId) {
         try {
-            List<ResponseCommentDTO> dtoList = commentService.viewComment(postId);
+            List<CommentDTO> dtoList = commentService.viewComment(postId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", dtoList));
         } catch (CommentException ex) {

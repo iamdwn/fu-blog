@@ -50,8 +50,15 @@ public class CommentEntity {
     }
 
     public CommentEntity(String content, UserEntity userComment, BlogPostEntity postComment) {
+
+    @ManyToOne
+    @JoinColumn(name = "parent_comment_id")
+    private CommentEntity parentComment;
+
+    public CommentEntity(String content, UserEntity userComment, BlogPostEntity postComment, CommentEntity parentComment) {
         this.content = content;
         this.userComment = userComment;
         this.postComment = postComment;
+        this.parentComment = parentComment;
     }
 }
