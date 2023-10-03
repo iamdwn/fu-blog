@@ -88,7 +88,7 @@ public class UserService {
         }
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseObject("found", "list found",
+                .body(new tech.fublog.FuBlog.model.ResponseObject("found", "list found",
                         highestPointUser));
     }
 

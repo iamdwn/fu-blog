@@ -3,7 +3,6 @@ package tech.fublog.FuBlog.controller;
 import org.springframework.data.domain.Page;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.SortDTO;
-import tech.fublog.FuBlog.dto.request.RequestBlogPostDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.ApprovalRequestService;
@@ -12,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.dto.CategoryDTO;
-import tech.fublog.FuBlog.dto.response.ResponseBlogPostDTO;
-import tech.fublog.FuBlog.dto.response.ResponseCommentDTO;
+import tech.fublog.FuBlog.dto.ResponseBlogPostDTO;
+import tech.fublog.FuBlog.dto.ResponseCommentDTO;
 import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.service.*;
 import org.springframework.http.HttpStatus;
@@ -26,12 +25,18 @@ import java.util.Set;
 @RequestMapping("/api/v1/auth/blogPosts")
 //    @CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
 @CrossOrigin(origins = "*")
-public class BlogPostController {
+public class  BlogPostController {
     private final BlogPostService blogPostService;
     private final ApprovalRequestService approvalRequestService;
     private final VoteService voteService;
     private final CommentService commentService;
     private final PostTagService postTagService;
+
+//    @Autowired
+//    private BlogPostService blogPostService;
+//
+//    @Autowired
+//    private ApprovalRequestService approvalRequestService;
 
     @Autowired
     public BlogPostController(BlogPostService blogPostService, ApprovalRequestService approvalRequestService, VoteService voteService, CommentService commentService, PostTagService postTagService) {
@@ -42,17 +47,45 @@ public class BlogPostController {
         this.postTagService = postTagService;
     }
 
+//    @GetMapping("/viewAllBlogs")
+////    @PreAuthorize("hasAuthority('USER')")
+////    @PreAuthorize("hasRole('USER')")
+////    @PreAuthorize("isAuthenticated()")
+//    ResponseEntity<ResponseObject> getAllBlogPost() {
+//
+//        return blogPostService.getAllBlogPosts();
+//    }
+
+
     @DeleteMapping("/deleteBlog/{postId}")
     public ResponseEntity<ResponseObject> deleteBlog(@PathVariable Long postId) {
+
         return blogPostService.deleteBlogPost(postId);
     }
 
+
+//    @PostMapping("/writeBlog")
+//    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("hasRole('USER')")
+//    @PreAuthorize("hasAuthority('WRITE_BLOG')")
+//    ResponseEntity<ResponseObject> insertBlogPost(
+//            @RequestBody BlogPostDTO blogPostDTO) {
+////            String user = SecurityContextHolder.getContext().getAuthentication().getName();
+//
+//        BlogPostEntity blogPostEntity = blogPostService.createBlogPost(blogPostDTO);
+//        if (blogPostEntity != null) {
+//            return approvalRequestService.createApprovalRequestById(blogPostEntity);
+//        }
+//
+//
+//        return null;
+//    }
     @PostMapping("/insert")
-    ResponseEntity<ResponseObject> insertBlogPost(@RequestBody RequestBlogPostDTO requestBlogPostDTO) {
+    ResponseEntity<ResponseObject> insertBlogPost(@RequestBody BlogPostDTO blogPostDTO) {
         try {
-            BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(requestBlogPostDTO);
+            BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(blogPostDTO);
             approvalRequestService.insertApprovalRequest(blogPostEntity);
-            postTagService.insertPostTag(requestBlogPostDTO.getTagList(), blogPostEntity);
+            postTagService.insertPostTag(blogPostDTO.getTagList(), blogPostEntity);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post is waiting approve", ""));
         } catch (BlogPostException ex) {
@@ -64,10 +97,11 @@ public class BlogPostController {
 
     @PutMapping("/editBlog/{postId}")
     public ResponseEntity<ResponseObject> updateBlog(
-            @RequestBody RequestBlogPostDTO requestBlogPostDTO
+            @PathVariable Long postId,
+            @RequestBody BlogPostDTO blogPostDTO
     ) {
 
-        return blogPostService.updateBlogPost(requestBlogPostDTO);
+        return blogPostService.updateBlogPost(postId, blogPostDTO);
     }
 
 
@@ -104,17 +138,18 @@ public class BlogPostController {
     }
 
     @GetMapping("/sorted/{page}/{size}")
-    public ResponseEntity<Page<SortDTO>> getSortedBlogPosts(
+    public ResponseEntity<Page<BlogPostEntity>> getSortedBlogPosts(
             @RequestParam(name = "sortBy", defaultValue = "newest") String sortBy,
             @PathVariable int page, @PathVariable int size) {
-        Page<SortDTO> sortedBlogPosts = blogPostService.getSortedBlogPosts(sortBy, page, size);
+        Page<BlogPostEntity> blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
 
-        if (sortedBlogPosts.isEmpty()) {
+        if (blogPostEntities.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(sortedBlogPosts);
+        return ResponseEntity.ok(blogPostEntities);
     }
+
 
 
     @GetMapping("/view")

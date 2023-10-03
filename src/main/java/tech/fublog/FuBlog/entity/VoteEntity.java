@@ -3,6 +3,7 @@ package tech.fublog.FuBlog.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Objects;
 
@@ -13,7 +14,8 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Votes")
+@Table(name = "Vote")
+@EntityListeners(AuditingEntityListener.class)
 public class VoteEntity {
 
     @Id

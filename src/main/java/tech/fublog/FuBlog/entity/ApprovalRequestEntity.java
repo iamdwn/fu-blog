@@ -2,6 +2,7 @@ package tech.fublog.FuBlog.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Objects;
 
@@ -11,6 +12,7 @@ import java.util.Objects;
 @Data
 @NoArgsConstructor
 @Table(name = "ApprovalRequest")
+@EntityListeners(AuditingEntityListener.class)
 public class ApprovalRequestEntity {
 
     @Id

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +19,7 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @Table(name = "User")
+@EntityListeners(AuditingEntityListener.class)
 public class UserEntity implements UserDetails {
 
     @Id
@@ -76,7 +78,7 @@ public class UserEntity implements UserDetails {
     @JsonIgnore
     private Set<VoteEntity> votes = new HashSet<>();
 
-    @OneToMany(mappedBy = "notification")
+    @OneToMany(mappedBy = "userId")
     @JsonIgnore
     private Set<NotificationEntity> notificationList = new HashSet<>();
 
@@ -99,14 +101,16 @@ public class UserEntity implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "Roles_Id"))
     private Set<RoleEntity> roles = new HashSet<>();
 
-    public UserEntity(String fullName, String username, String email, String hashedpassword, String picture, Boolean status) {
+    public UserEntity(String fullName, String username, String email, String hashedpassword, String picture, Boolean status,Boolean isVerify) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.hashedpassword = hashedpassword;
         this.picture = picture;
         this.status = status;
+        this.isVerify = isVerify;
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -16,4 +16,5 @@ public class ApprovalRequestDTO {
     private Long postId;
 //    private Long requestId;
     private Long reviewId;
+    private String command;
 }

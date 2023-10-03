@@ -1,6 +1,7 @@
 package tech.fublog.FuBlog.repository;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.jpa.repository.Query;
 import tech.fublog.FuBlog.dto.SortDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,11 +26,12 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
     Page<BlogPostEntity> findByCategory(CategoryEntity category, Pageable pageable);
 
-    Page<SortDTO> findAllByOrderByCreatedDateDesc(Pageable pageable);
-    Page<SortDTO> findAllByOrderByCreatedDateAsc(Pageable pageable);
-    Page<SortDTO> findAllByOrderByModifiedDateDesc(Pageable pageable);
-    Page<SortDTO> findAllByOrderByModifiedDateAsc(Pageable pageable);
-//    Page<BlogPostEntity> findAllByOrderByViewsDesc(Pageable pageable);
-    Page<SortDTO> findAllByOrderByViewsDesc(Pageable pageable);
+//    @Query("SELECT e FROM BlogPostEntity e ORDER BY e.createdDate DESC")
+    Page<BlogPostEntity> findAllByOrderByCreatedDateDesc(Pageable pageable);
+    Page<BlogPostEntity> findAllByOrderByCreatedDateAsc(Pageable pageable);
+    Page<BlogPostEntity> findAllByOrderByModifiedDateDesc(Pageable pageable);
+    Page<BlogPostEntity> findAllByOrderByModifiedDateAsc(Pageable pageable);
+//    Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
+    Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
 
 }

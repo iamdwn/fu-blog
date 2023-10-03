@@ -25,17 +25,17 @@ public class PushNotificationService {
         this.notificationStorageRepository = notificationStorageRepository;
     }
 
-    private List<NotificationEntity> getNotifs(String userID) {
-//        var notifs = notificationStorageRepository.findByUserToIdAndDeliveredFalse(userID);
-//        notifs.forEach(x -> x.setDelivered(true));
-//        notificationStorageRepository.saveAll(notifs);
-//        return notifs;
-        return null;
+    private List<NotificationEntity> getNotifs(Long userID) {
+        var notifs = notificationStorageRepository.findByUserIdAndIsDeliveredFalse(userID);
+        notifs.forEach(x -> x.setDelivered(true));
+        notificationStorageRepository.saveAll(notifs);
+        return notifs;
+//        return null;
     }
 
-    public Flux<ServerSentEvent<List<NotificationEntity>>> getNotificationsByUserToID(String userID) {
+    public Flux<ServerSentEvent<List<NotificationEntity>>> getNotificationsByUserToID(Long userID) {
 
-        if (userID != null && !userID.isBlank()) {
+        if (userID != null && userID != 0) {
             return Flux.interval(Duration.ofSeconds(1))
                     .publishOn(Schedulers.boundedElastic())
                     .map(sequence -> ServerSentEvent.<List<NotificationEntity>>builder().id(String.valueOf(sequence))

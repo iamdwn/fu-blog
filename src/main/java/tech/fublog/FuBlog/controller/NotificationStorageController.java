@@ -18,15 +18,15 @@ public class NotificationStorageController {
         this.notifService = notifService;
     }
 
-//    @GetMapping("/{userID}")
-//    public ResponseEntity<List<NotificationEntity>> getNotificationsByUserID(@PathVariable String userID) {
-//        return ResponseEntity.ok(notifService.getNotificationsByUserID(userID));
-//    }
+    @GetMapping("/{userID}")
+    public ResponseEntity<List<NotificationEntity>> getNotificationsByUserID(@PathVariable Long userID) {
+        return ResponseEntity.ok(notifService.getNotificationsByUserID(userID));
+    }
 
-//    @PatchMapping("/read/{notifID}")
-//    public ResponseEntity changeNotifStatusToRead(@PathVariable String notifID) {
-//        return ResponseEntity.ok(notifService.changeNotifStatusToRead(notifID));
-//    }
+    @PatchMapping("/read/{notifID}")
+    public ResponseEntity changeNotifStatusToRead(@PathVariable String notifID) {
+        return ResponseEntity.ok(notifService.changeNotifStatusToRead(notifID));
+    }
 
 
 }

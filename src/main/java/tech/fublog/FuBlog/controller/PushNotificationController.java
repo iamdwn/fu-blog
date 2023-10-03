@@ -25,7 +25,7 @@ public class PushNotificationController {
     }
 
     @GetMapping("/{userID}")
-    public Flux<ServerSentEvent<List<NotificationEntity>>> streamLastMessage(@PathVariable String userID) {
+    public Flux<ServerSentEvent<List<NotificationEntity>>> streamLastMessage(@PathVariable Long userID) {
         return service.getNotificationsByUserToID(userID);
     }
 
