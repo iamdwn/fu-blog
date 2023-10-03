@@ -4,12 +4,16 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.util.Objects;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Follow")
+@EntityListeners(AuditingEntityListener.class)
 public class FollowEntity {
 
     @Id
@@ -28,5 +32,19 @@ public class FollowEntity {
     public FollowEntity(UserEntity follower, UserEntity following) {
         this.follower = follower;
         this.following = following;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(follower, following);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        FollowEntity follow = (FollowEntity) obj;
+        return Objects.equals(follower, follow.getFollower()) &&
+                Objects.equals(following, follow.getFollowing());
     }
 }

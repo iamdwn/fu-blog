@@ -3,7 +3,9 @@ package tech.fublog.FuBlog.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,11 +16,12 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Award")
+@EntityListeners(AuditingEntityListener.class)
 public class AwardEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long Id;
 
     @Column
     private String name;
@@ -28,7 +31,7 @@ public class AwardEntity {
 
     @OneToMany(mappedBy = "award")
     @JsonIgnore
-    private Set<UserAwardEntity> userAwards = new HashSet<>();
+    private List<UserAwardEntity> userAwards = new ArrayList<>();
 
 //    @ManyToMany
 //    @JoinTable(name = "UserAward",
@@ -36,5 +39,17 @@ public class AwardEntity {
 //            inverseJoinColumns = @JoinColumn(name = "user_id"))
 //    private List<UserEntity> users = new ArrayList<>();
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(Id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        AwardEntity award = (AwardEntity) obj;
+        return Objects.equals(Id, award.getId());
+    }
 
 }

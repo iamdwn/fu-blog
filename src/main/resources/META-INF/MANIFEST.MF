@@ -11,7 +11,7 @@ Class-Path: jakarta.inject-api-2.0.0.jar spring-tx-6.0.4.jar spring-data
  jweaver-1.9.19.jar tomcat-embed-el-10.1.5.jar spring-boot-starter-json-
  3.0.2.jar java-jwt-3.19.2.jar mysql-connector-j-8.0.32.jar jackson-data
  type-jdk8-2.14.1.jar jakarta.xml.bind-api-4.0.0.jar jakarta.transaction
- -api-2.0.1.jar spring-boot-starter-web-3.0.2.jar spring-core-6.0.4.jar 
+ -api-2.0.1.jar spring-boot-starter-web-3.0.2.jar spring-core-6.0.4.jar
  spring-boot-starter-3.0.2.jar spring-boot-starter-jdbc-3.0.2.jar jackso
  n-module-parameter-names-2.14.1.jar jakarta.activation-api-2.1.1.jar ja
  ckson-datatype-jsr310-2.14.1.jar spring-aspects-6.0.4.jar log4j-api-2.1

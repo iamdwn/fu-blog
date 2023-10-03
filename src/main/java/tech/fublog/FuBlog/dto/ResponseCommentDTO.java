@@ -15,5 +15,6 @@ public class ResponseCommentDTO {
     private String content;
     private Long postId;
     private Long userId;
+    private boolean status;
     private List<ResponseCommentDTO> subComment;
 }

@@ -3,6 +3,9 @@ package tech.fublog.FuBlog.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.util.Objects;
 
 
 @Entity
@@ -11,7 +14,8 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Votes")
+@Table(name = "Vote")
+@EntityListeners(AuditingEntityListener.class)
 public class VoteEntity {
 
     @Id
@@ -36,5 +40,19 @@ public class VoteEntity {
         this.voteValue = voteValue;
         this.userVote = userVote;
         this.postVote = postVote;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userVote, postVote);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        VoteEntity vote = (VoteEntity) obj;
+        return Objects.equals(userVote, vote.getUserVote()) &&
+                Objects.equals(postVote, vote.getPostVote());
     }
 }

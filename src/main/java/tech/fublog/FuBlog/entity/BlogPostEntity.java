@@ -2,20 +2,23 @@ package tech.fublog.FuBlog.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+
 import java.util.*;
 
 @Entity
 @Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "BlogPost")
+@EntityListeners(AuditingEntityListener.class)
 public class BlogPostEntity {
 
     @Id
@@ -33,30 +36,28 @@ public class BlogPostEntity {
 
     @Column
     @CreatedDate
-    private Date createdDate;
+    private Date createdDate = new Date();
 
 
     @Column
     @LastModifiedDate
     private Date modifiedDate;
 
+
     @Column
     private Long approvedBy;
 
     @Column
-    private  Boolean status;
+    private  Boolean status = true;
 
     @Column
-    private Boolean isApproved;
+    private Boolean isApproved  = false;
 
     @Column
     private String image;
 
     @Column
-    private Long views;
-
-    @Column
-    private Boolean pinned;
+    private Long view;
 
     @ManyToOne
 //    @JsonIgnore
@@ -64,33 +65,27 @@ public class BlogPostEntity {
     private CategoryEntity category;
 
     @ManyToOne
-    @JsonIgnore
+//    @JsonIgnore
     @JoinColumn(name = "author_id")
     private UserEntity authors;
 
-//    @ManyToOne
-//    @JoinColumn(name = "authorModified_id")
-//    private UserEntity authorsModified;
-
     @OneToMany(mappedBy = "postVote")
-//    private Set<VoteEntity> votes = new HashSet<>();
-    private List<VoteEntity> votes = new ArrayList<>();
+    private Set<VoteEntity> votes = new HashSet<>();
 
     @OneToMany(mappedBy = "blogPost")
     @JsonIgnore
-    private List<ApprovalRequestEntity> approvalRequests = new ArrayList<>();
+    private Set<ApprovalRequestEntity> approvalRequests = new HashSet<>();
 
     @OneToMany(mappedBy = "postComment")
 //    @JsonIgnore
-//    private Set<CommentEntity> postComments = new HashSet<>();
-    private List<CommentEntity> postComments = new ArrayList<>();
+    private Set<CommentEntity> postComments = new HashSet<>();
 
     @OneToMany(mappedBy = "post")
 //    @JsonIgnore
-    private List<PostTagEntity> postTags = new ArrayList<>();
+    private Set<PostTagEntity> postTags = new HashSet<>();
 
-//    @ManyToMany(mappedBy = "blogPosts")
-//    private Set<TagEntity> tags = new HashSet<>();
+    @ManyToMany(mappedBy = "markPosts")
+    private Set<UserEntity> userMarks = new HashSet<>();
 
 
     public BlogPostEntity(String typePost, String title, String content, Date createdDate, Date modifiedDate,
@@ -107,5 +102,18 @@ public class BlogPostEntity {
         this.category = category;
         this.authors = authors;
         this.pinned = pinned;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        BlogPostEntity blogPost = (BlogPostEntity) obj;
+        return Objects.equals(Id, blogPost.getId());
     }
 }

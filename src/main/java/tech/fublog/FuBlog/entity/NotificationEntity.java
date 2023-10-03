@@ -1,23 +1,24 @@
 package tech.fublog.FuBlog.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 
 @Entity
 @Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Notification")
+@EntityListeners(AuditingEntityListener.class)
 public class NotificationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Long notificationId;
 
     @Column(columnDefinition = "LONGTEXT")
@@ -27,11 +28,17 @@ public class NotificationEntity {
     private Boolean isRead;
 
     @Column
+    private boolean isDelivered;
+
+    @Column
+    private Long postId;
+
+    @Column
     @CreatedDate
     private Date createdDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserEntity notification;
+    private UserEntity userId;
 
 }

@@ -1,6 +1,5 @@
 package tech.fublog.FuBlog.model;
 
-
 public class ResponseObject {
     private String status;
     private String message;

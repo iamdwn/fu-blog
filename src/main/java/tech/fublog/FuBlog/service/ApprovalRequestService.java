@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,13 +31,24 @@ public class ApprovalRequestService {
     private ApprovalRequestRepository approvalRequestRepository;
 
 
-    public ResponseEntity<ResponseObject> getAllApprovalRequest() {
-        List<ApprovalRequestEntity> requestEntityList = approvalRequestRepository.findAll();
-        return requestEntityList.size() > 0 ?
-                ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "list exists", requestEntityList)) :
-                ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ResponseObject("not found", "list empty", requestEntityList));
+//    public ResponseEntity<ResponseObject> getAllApprovalRequest() {
+//        List<ApprovalRequestEntity> requestEntityList = approvalRequestRepository.findAll();
+//        return requestEntityList.size() > 0 ?
+//                ResponseEntity.status(HttpStatus.OK)
+//                        .body(new ResponseObject("ok", "list exists", requestEntityList)) :
+//                ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                        .body(new ResponseObject("not found", "list empty", requestEntityList));
+//    }
+
+    public List<ApprovalRequestDTO> getAllApprovalRequest() {
+        List<ApprovalRequestEntity> list = approvalRequestRepository.findAll();
+        List<ApprovalRequestDTO> dtoList = new ArrayList<>();
+        for (ApprovalRequestEntity entity : list) {
+            ApprovalRequestDTO dto =
+                    new ApprovalRequestDTO(entity.isApproved(), entity.getBlogPost().getId(), entity.getRequest().getId(), /*entity.getReview().getId()*/null, null);
+            dtoList.add(dto);
+        }
+        return dtoList;
     }
 
 
@@ -83,5 +95,13 @@ public class ApprovalRequestService {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ResponseObject("failed", "approved failed", ""));
+
+    }
+
+
+    //    public ResponseEntity<ResponseObject> insertApprovalRequest()
+    public void insertApprovalRequest(BlogPostEntity blogPostEntity) {
+        ApprovalRequestEntity approvalRequestEntity = new ApprovalRequestEntity(blogPostEntity);
+        approvalRequestRepository.save(approvalRequestEntity);
     }
 }

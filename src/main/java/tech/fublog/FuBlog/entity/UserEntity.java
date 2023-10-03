@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +18,8 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "Users")
+@Table(name = "User")
+@EntityListeners(AuditingEntityListener.class)
 public class UserEntity implements UserDetails {
 
     @Id
@@ -48,6 +50,12 @@ public class UserEntity implements UserDetails {
     @Column
     private Double point;
 
+    @ManyToMany
+    @JoinTable(name = "user_mark_post",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id"))
+    private Set<BlogPostEntity> markPosts = new HashSet<>();
+
 
     @OneToMany(mappedBy = "authors")
     @JsonIgnore
@@ -70,7 +78,7 @@ public class UserEntity implements UserDetails {
     @JsonIgnore
     private Set<VoteEntity> votes = new HashSet<>();
 
-    @OneToMany(mappedBy = "notification")
+    @OneToMany(mappedBy = "userId")
     @JsonIgnore
     private Set<NotificationEntity> notificationList = new HashSet<>();
 
@@ -89,18 +97,20 @@ public class UserEntity implements UserDetails {
 
     @ManyToMany
     @JoinTable(name = "user_role",
-    joinColumns = @JoinColumn(name = "Users_Id"),
-    inverseJoinColumns = @JoinColumn(name = "Roles_Id"))
+            joinColumns = @JoinColumn(name = "Users_Id"),
+            inverseJoinColumns = @JoinColumn(name = "Roles_Id"))
     private Set<RoleEntity> roles = new HashSet<>();
 
-    public UserEntity(String fullName, String username, String email, String hashedpassword, String picture, Boolean status) {
+    public UserEntity(String fullName, String username, String email, String hashedpassword, String picture, Boolean status,Boolean isVerify) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.hashedpassword = hashedpassword;
         this.picture = picture;
         this.status = status;
+        this.isVerify = isVerify;
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -149,5 +159,18 @@ public class UserEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        UserEntity user = (UserEntity) obj;
+        return Objects.equals(id, user.getId()) &&
+                Objects.equals(username, user.getUsername());
     }
 }

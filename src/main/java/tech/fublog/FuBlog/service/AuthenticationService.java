@@ -43,17 +43,17 @@ public class AuthenticationService {
         set.stream().forEach(i -> authorities.add(new SimpleGrantedAuthority(i.getName())));
         var jwtToken = jwtService.generateToken(user, authorities);
         var jwtRefreshToken = jwtService.generateRefreshToken(user, authorities);
-        AuthenticationReponse authenticationReponse = new AuthenticationReponse();
-        authenticationReponse.setToken(jwtToken);
-        authenticationReponse.setRefreshToken(jwtRefreshToken);
-        authenticationReponse.setFullname(fullname);
-        authenticationReponse.setPicture(picture);
-        authenticationReponse.setEmail(email);
-        authenticationReponse.setId(id);
-        authenticationReponse.setPassword(password);
-
-        return authenticationReponse;
-//        return AuthenticationReponse.builder().token(jwtToken).refreshToken(jwtRefreshToken).build();
+//        AuthenticationReponse authenticationReponse = new AuthenticationReponse();
+//        authenticationReponse.setToken(jwtToken);
+//        authenticationReponse.setRefreshToken(jwtRefreshToken);
+//        authenticationReponse.setFullname(fullname);
+//        authenticationReponse.setPicture(picture);
+//        authenticationReponse.setEmail(email);
+//        authenticationReponse.setId(id);
+//        authenticationReponse.setPassword(password);
+//
+//        return authenticationReponse;
+        return AuthenticationReponse.builder().token(jwtToken).refreshToken(jwtRefreshToken).build();
 
     }
 

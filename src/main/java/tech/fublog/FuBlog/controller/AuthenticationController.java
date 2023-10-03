@@ -1,15 +1,17 @@
 package tech.fublog.FuBlog.controller;
 
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.auth.AuthenticationReponse;
 import tech.fublog.FuBlog.auth.AuthenticationRequest;
 import tech.fublog.FuBlog.auth.MessageResponse;
 import tech.fublog.FuBlog.auth.SignupRequest;
-import tech.fublog.FuBlog.entity.BlogPostEntity;
+import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
+import tech.fublog.FuBlog.repository.RoleCustomRepo;
 import tech.fublog.FuBlog.repository.RoleRepository;
 import tech.fublog.FuBlog.repository.UserRepository;
 import tech.fublog.FuBlog.service.AuthenticationService;
@@ -18,12 +20,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import tech.fublog.FuBlog.service.UserServiceImpl;
+import tech.fublog.FuBlog.service.JwtService;
+import tech.fublog.FuBlog.service.UserService;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 
 @RestController
@@ -36,6 +36,8 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
+    private final JwtService jwtService;
+
     @Autowired
     UserRepository userRepository;
 
@@ -46,7 +48,10 @@ public class AuthenticationController {
     PasswordEncoder encoder;
 
     @Autowired
-    UserServiceImpl userService;
+    UserService userService;
+
+    @Autowired
+    RoleCustomRepo roleCustomRepo;
 
     @GetMapping("/getAllUser")
     public List<UserEntity> getAllUser(){
@@ -91,6 +96,7 @@ public class AuthenticationController {
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()),
                 signUpRequest.getPicture(),
+                true,
                 true
         );
 
@@ -98,6 +104,7 @@ public class AuthenticationController {
         RoleEntity userRole = roleRepository.findByName("USER");
         roleEntities.add(userRole);
         user.setRoles(roleEntities);
+
         userRepository.save(user);
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(signUpRequest.getUsername(), signUpRequest.getPassword());
         return ResponseEntity.ok(authenticationService.authenticate(authenticationRequest));
@@ -123,6 +130,7 @@ public class AuthenticationController {
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()),
                 signUpRequest.getPicture(),
+                true,
                 true
         );
         Set<RoleEntity> roleEntities = new HashSet<>();
@@ -132,5 +140,56 @@ public class AuthenticationController {
         userRepository.save(user);
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(signUpRequest.getEmail(), signUpRequest.getPassword());
         return ResponseEntity.ok(authenticationService.authenticate(authenticationRequest));
+    }
+    @GetMapping("/getUserInfo")
+    public UserDTO InfoUser(@RequestHeader("Authorization") String token) {
+
+        String username = jwtService.extractTokenToGetUser(token.substring(7));
+        List <String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
+
+        Optional<UserEntity> user = userRepository.findByUsername(username);
+//        AuthenticationReponse authenticationReponse = new AuthenticationReponse();
+//        authenticationReponse.setFullname(user.get().getFullName());
+//        authenticationReponse.setPicture(user.get().getPicture());
+//        authenticationReponse.setEmail(user.get().getEmail());
+//        authenticationReponse.setId(user.get().getId());
+//        authenticationReponse.setPassword(user.get().getHashedpassword());
+
+//        return authenticationReponse;
+        UserDTO userDTO = new UserDTO();
+        userDTO.setFullname(user.get().getFullName());
+        userDTO.setPicture(user.get().getPicture());
+        userDTO.setEmail(user.get().getEmail());
+        userDTO.setId(user.get().getId());
+        userDTO.setPassword(user.get().getHashedpassword());
+        userDTO.setRole(roles);
+        return userDTO;
+
+    }
+    @GetMapping("/refreshToken")
+    public ResponseEntity<?> getNewToken(@RequestHeader("Authorization") String refreshToken) {
+        String username = jwtService.extractTokenToGetUser(refreshToken.substring(7));
+//        Optional<UserEntity> user = userRepository.findByUsername(username);
+        if (username != null) {
+            UserEntity user = userRepository.findByUsername(username).orElseThrow();
+            List<RoleEntity> role = null;
+            if (user != null) {
+                role = roleCustomRepo.getRole(user);
+            }
+            Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            Set<RoleEntity> set = new HashSet<>();
+            role.stream().forEach(c -> set.add(new RoleEntity(c.getName())));
+            user.setRoles(set);
+            set.stream().forEach(i -> authorities.add(new SimpleGrantedAuthority(i.getName())));
+            var jwtToken = jwtService.generateToken(user, authorities);
+//            var jwtRefreshToken = jwtService.generateRefreshToken(user, authorities);
+            AuthenticationReponse authenticationReponse = new AuthenticationReponse();
+            authenticationReponse.setToken(jwtToken);
+            authenticationReponse.setRefreshToken(refreshToken.substring(7));
+//            System.out.println(authenticationReponse);
+            return ResponseEntity.ok(authenticationReponse);
+        }
+        return ResponseEntity.badRequest().body(new MessageResponse("Can not have new token!!1"));
+
     }
 }
