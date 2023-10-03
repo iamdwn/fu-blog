@@ -1,8 +1,8 @@
 package tech.fublog.FuBlog.controller;
 
 import tech.fublog.FuBlog.dto.VoteDTO;
-import tech.fublog.FuBlog.entity.ResponseObject;
 import tech.fublog.FuBlog.exception.VoteException;
+import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.VoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/blogPosts/vote")
-public class VoteController {
+@RequestMapping("/api/v1/auth/blogPosts/vote")
+@CrossOrigin(origins = "*")
+
+public class VoteController{
     private final VoteService voteService;
 
     @Autowired
@@ -63,4 +65,5 @@ public class VoteController {
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
+
 }

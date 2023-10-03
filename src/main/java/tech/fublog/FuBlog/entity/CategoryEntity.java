@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,9 +23,11 @@ public class CategoryEntity {
     private String categoryName;
 
     @OneToMany(mappedBy = "category")
+    @JsonIgnore
     private Set<BlogPostEntity> blogPosts = new HashSet<>();
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "parentCategoryId")
     private CategoryEntity parentCategory;
 

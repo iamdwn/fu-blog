@@ -1,30 +1,44 @@
 package tech.fublog.FuBlog.controller;
 
-import tech.fublog.FuBlog.dto.ApprovalRequestDTO;
-import tech.fublog.FuBlog.entity.ResponseObject;
-import tech.fublog.FuBlog.service.ApprovalRequestService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import tech.fublog.FuBlog.dto.request.RequestApprovalRequestDTO;
+import tech.fublog.FuBlog.dto.response.ResponseApprovalRequestDTO;
+import tech.fublog.FuBlog.model.ResponseObject;
+import tech.fublog.FuBlog.service.ApprovalRequestService;
+import tech.fublog.FuBlog.service.BlogPostService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/blogPosts/approve")
+@RequestMapping("/api/v1/auth/manageApprove")
+@CrossOrigin(origins = "*")
 public class ApprovalRequestController {
+
+    private final BlogPostService blogPostService;
+
     private final ApprovalRequestService approvalRequestService;
 
     @Autowired
-    public ApprovalRequestController(ApprovalRequestService approvalRequestService) {
+    public ApprovalRequestController(BlogPostService blogPostService, ApprovalRequestService approvalRequestService) {
+        this.blogPostService = blogPostService;
         this.approvalRequestService = approvalRequestService;
     }
 
     @RequestMapping("/view")
     public ResponseEntity<ResponseObject> getAllRequest() {
-        List<ApprovalRequestDTO> dtoList = approvalRequestService.getAllApprovalRequest()/*viewComment(postId)*/;
+        List<ResponseApprovalRequestDTO> dtoList = approvalRequestService.getAllApprovalRequest();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseObject("ok", "found", dtoList));
     }
+
+    @PutMapping("/approve")
+    public ResponseEntity<ResponseObject> approveBlog(
+            @RequestBody RequestApprovalRequestDTO requestApprovalRequestDTO) {
+
+        return approvalRequestService.approveBlogPost(requestApprovalRequestDTO);
+    }
+
 }

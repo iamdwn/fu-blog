@@ -2,12 +2,14 @@ package tech.fublog.FuBlog.service;
 
 import tech.fublog.FuBlog.dto.VoteDTO;
 import tech.fublog.FuBlog.entity.*;
-import tech.fublog.FuBlog.entity.VoteEntity;
 import tech.fublog.FuBlog.exception.VoteException;
+import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.repository.BlogPostRepository;
 import tech.fublog.FuBlog.repository.UserRepository;
 import tech.fublog.FuBlog.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
@@ -72,6 +74,8 @@ public class VoteService {
                 voteRepository.delete(voteEntity);
                 return null;
             } else {
+                Double point = userEntity.get().getPoint();
+                userEntity.get().setPoint(point + 0.5);
                 voteEntity = new VoteEntity(voteDTO.getVoteValue(), userEntity.get(), blogPostEntity.get());
                 voteRepository.save(voteEntity);
                 return voteDTO;

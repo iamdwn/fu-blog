@@ -1,40 +1,92 @@
 package tech.fublog.FuBlog.service;
 
+
 import tech.fublog.FuBlog.dto.ApprovalRequestDTO;
+import tech.fublog.FuBlog.dto.request.RequestApprovalRequestDTO;
+import tech.fublog.FuBlog.dto.response.ResponseApprovalRequestDTO;
 import tech.fublog.FuBlog.entity.ApprovalRequestEntity;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
+import tech.fublog.FuBlog.entity.UserEntity;
+import tech.fublog.FuBlog.exception.ApprovalRequestException;
+import tech.fublog.FuBlog.exception.BlogPostException;
+import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.repository.ApprovalRequestRepository;
+import tech.fublog.FuBlog.repository.BlogPostRepository;
 import tech.fublog.FuBlog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ApprovalRequestService {
-    private final ApprovalRequestRepository approvalRequestRepository;
+
+    private final BlogPostRepository blogPostRepository;
 
     private final UserRepository userRepository;
 
+    private final ApprovalRequestRepository approvalRequestRepository;
+
     @Autowired
-    public ApprovalRequestService(ApprovalRequestRepository approvalRequestRepository, UserRepository userRepository) {
-        this.approvalRequestRepository = approvalRequestRepository;
+    public ApprovalRequestService(BlogPostRepository blogPostRepository, UserRepository userRepository, ApprovalRequestRepository approvalRequestRepository) {
+        this.blogPostRepository = blogPostRepository;
         this.userRepository = userRepository;
+        this.approvalRequestRepository = approvalRequestRepository;
     }
 
-    public List<ApprovalRequestDTO> getAllApprovalRequest() {
+    public List<ResponseApprovalRequestDTO> getAllApprovalRequest() {
         List<ApprovalRequestEntity> list = approvalRequestRepository.findAll();
-        List<ApprovalRequestDTO> dtoList = new ArrayList<>();
+        List<ResponseApprovalRequestDTO> dtoList = new ArrayList<>();
         for (ApprovalRequestEntity entity : list) {
-            ApprovalRequestDTO dto =
-                    new ApprovalRequestDTO(entity.isApproved(), entity.getBlogPost().getId(), entity.getRequest().getId(), /*entity.getReview().getId()*/null);
+            ResponseApprovalRequestDTO dto =
+                    new ResponseApprovalRequestDTO(entity.getBlogPost().getId(), entity.getRequest().getId());
             dtoList.add(dto);
         }
         return dtoList;
     }
 
-    //    public ResponseEntity<ResponseObject> insertApprovalRequest()
+
+    public ApprovalRequestEntity getApprovalRequestById(Long postId) {
+
+        return approvalRequestRepository.findById(postId).orElse(null);
+    }
+
+
+    public ResponseEntity<ResponseObject> createApprovalRequestById(BlogPostEntity newBlogPost) {
+        Optional<UserEntity> userEntity = userRepository.findById(newBlogPost.getAuthors().getId());
+
+        ApprovalRequestEntity newApprovalRequest = new ApprovalRequestEntity(newBlogPost.getId(), false, userEntity.get(),
+                null, newBlogPost);
+
+        approvalRequestRepository.save(newApprovalRequest);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "the post is waiting approve", ""));
+    }
+
+
+    public ResponseEntity<ResponseObject> approveBlogPost(RequestApprovalRequestDTO requestApprovalRequestDTO) {
+        Optional<UserEntity> userEntity = userRepository.findById(requestApprovalRequestDTO.getReviewId());
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(requestApprovalRequestDTO.getPostId());
+        if (blogPostEntity.isPresent() && !blogPostEntity.get().getIsApproved()) {
+            ApprovalRequestEntity approvalRequestEntity = approvalRequestRepository.findByBlogPost(blogPostEntity.get());
+            if (approvalRequestEntity != null) {
+                UserEntity reviewer = userEntity.get();
+                approvalRequestEntity.setReview(reviewer);
+                approvalRequestEntity.setApproved(true);
+                approvalRequestRepository.save(approvalRequestEntity);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "approved successful", ""));
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ResponseObject("failed", "approved failed", ""));
+    }
+
     public void insertApprovalRequest(BlogPostEntity blogPostEntity) {
         ApprovalRequestEntity approvalRequestEntity = new ApprovalRequestEntity(blogPostEntity);
         approvalRequestRepository.save(approvalRequestEntity);

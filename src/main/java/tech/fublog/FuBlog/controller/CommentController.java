@@ -1,8 +1,7 @@
 package tech.fublog.FuBlog.controller;
 
-import tech.fublog.FuBlog.dto.CommentDTO;
-import tech.fublog.FuBlog.dto.ResponseCommentDTO;
-import tech.fublog.FuBlog.entity.ResponseObject;
+import tech.fublog.FuBlog.dto.response.ResponseCommentDTO;
+import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.exception.CommentException;
 import tech.fublog.FuBlog.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/blogPosts/comment")
+@RequestMapping("/api/v1/auth/blogPosts/comment")
+@CrossOrigin(origins = "*")
+
 public class CommentController {
     private final CommentService commentService;
 
@@ -23,7 +24,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<ResponseObject> deleteComment(@RequestBody CommentDTO commentDTO) {
+    public ResponseEntity<ResponseObject> deleteComment(@RequestBody ResponseCommentDTO commentDTO) {
         try {
             commentService.deleteComment(commentDTO);
             return ResponseEntity.status(HttpStatus.OK)
@@ -62,7 +63,7 @@ public class CommentController {
     }
 
     @PostMapping("/insert")
-    public ResponseEntity<ResponseObject> insertComment(@RequestBody CommentDTO commentDTO) {
+    public ResponseEntity<ResponseObject> insertComment(@RequestBody ResponseCommentDTO commentDTO) {
         try {
             commentService.insertComment(commentDTO);
             return ResponseEntity.status(HttpStatus.OK)
@@ -74,7 +75,7 @@ public class CommentController {
     }
 
     @PutMapping("/view/update")
-    public ResponseEntity<ResponseObject> updateComment(@RequestBody CommentDTO commentDTO) {
+    public ResponseEntity<ResponseObject> updateComment(@RequestBody ResponseCommentDTO commentDTO) {
         try {
             commentService.updateComment(commentDTO);
             return ResponseEntity.status(HttpStatus.OK)

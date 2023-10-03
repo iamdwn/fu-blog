@@ -1,8 +1,8 @@
 package tech.fublog.FuBlog.controller;
 
 import tech.fublog.FuBlog.dto.PostMarkDTO;
-import tech.fublog.FuBlog.entity.ResponseObject;
 import tech.fublog.FuBlog.exception.UserException;
+import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,5 +33,10 @@ public class UserController {
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
 
+    }
+    @GetMapping("/getActiveUser")
+    public ResponseEntity<ResponseObject> getActiveUser() {
+
+        return userService.getActiveUser();
     }
 }

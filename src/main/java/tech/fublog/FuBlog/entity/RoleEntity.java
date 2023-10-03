@@ -1,9 +1,10 @@
 package tech.fublog.FuBlog.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -11,14 +12,15 @@ import java.util.Set;
 
 @Entity
 @Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "Role")
 public class RoleEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column
     private String name;
@@ -26,11 +28,16 @@ public class RoleEntity {
     @ManyToMany(mappedBy = "roles")
     private Set<UserEntity> user = new HashSet<>();
 
-    //    @OneToMany(mappedBy = "role")
-//    private Set<UserRoleEntity> userRoles = new HashSet<>();
+    public RoleEntity(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+    public RoleEntity(String name) {
+        this.name = name;
+    }
     @Override
     public int hashCode() {
-        return Objects.hash(Id, name);
+        return Objects.hash(id, name);
     }
 
     @Override
@@ -38,7 +45,8 @@ public class RoleEntity {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         RoleEntity role = (RoleEntity) obj;
-        return Objects.equals(Id, role.getId()) &&
+        return Objects.equals(id, role.getId()) &&
                 Objects.equals(name, role.getName());
     }
+
 }

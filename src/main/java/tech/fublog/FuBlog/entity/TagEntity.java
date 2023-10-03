@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +23,8 @@ public class TagEntity {
     private String tagName;
 
     @OneToMany(mappedBy = "tag")
-    private Set<PostTagEntity> postTags = new HashSet<>();
+    @JsonIgnore
+    private List<PostTagEntity> postTags = new ArrayList<>();
 
     //    @ManyToMany
 //    @JoinTable(name = "PostTag",

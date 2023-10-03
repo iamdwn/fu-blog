@@ -19,7 +19,7 @@ public class UserAwardEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column
     @CreatedDate
@@ -35,7 +35,7 @@ public class UserAwardEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id);
+        return Objects.hash(id);
     }
 
     @Override
@@ -43,6 +43,6 @@ public class UserAwardEntity {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         UserAwardEntity userAward = (UserAwardEntity) obj;
-        return Objects.equals(Id, userAward.getId());
+        return Objects.equals(id, userAward.getId());
     }
 }

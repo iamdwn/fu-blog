@@ -1,9 +1,12 @@
 package tech.fublog.FuBlog.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+
+import java.time.LocalDateTime;
 
 import java.util.*;
 
@@ -38,20 +41,29 @@ public class BlogPostEntity {
     @LastModifiedDate
     private Date modifiedDate;
 
+
     @Column
     private Long approvedBy;
 
     @Column
-    private Boolean status = true;
+    private  Boolean status = true;
 
     @Column
-    private Boolean isApproved = false;
+    private Boolean isApproved  = false;
+
+    @Column
+    private String image;
+
+    @Column
+    private Long views;
 
     @ManyToOne
+//    @JsonIgnore
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "author_id")
     private UserEntity authors;
 
@@ -59,12 +71,15 @@ public class BlogPostEntity {
     private Set<VoteEntity> votes = new HashSet<>();
 
     @OneToMany(mappedBy = "blogPost")
+    @JsonIgnore
     private Set<ApprovalRequestEntity> approvalRequests = new HashSet<>();
 
     @OneToMany(mappedBy = "postComment")
+//    @JsonIgnore
     private Set<CommentEntity> postComments = new HashSet<>();
 
     @OneToMany(mappedBy = "post")
+//    @JsonIgnore
     private Set<PostTagEntity> postTags = new HashSet<>();
 
     @ManyToMany(mappedBy = "markPosts")

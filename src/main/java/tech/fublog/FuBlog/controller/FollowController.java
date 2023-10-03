@@ -1,8 +1,8 @@
 package tech.fublog.FuBlog.controller;
 
 import tech.fublog.FuBlog.dto.FollowDTO;
-import tech.fublog.FuBlog.entity.ResponseObject;
 import tech.fublog.FuBlog.exception.FollowException;
+import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.FollowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

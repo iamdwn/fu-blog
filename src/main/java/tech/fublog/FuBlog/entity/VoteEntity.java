@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,10 +25,12 @@ public class VoteEntity {
     private Long voteValue; // 1 for upvote, -1 for downvote
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id")
     private UserEntity userVote;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "post_id")
     private BlogPostEntity postVote;
 

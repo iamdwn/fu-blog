@@ -1,29 +1,22 @@
 package tech.fublog.FuBlog.dto;
 
-import jakarta.persistence.Column;
 import lombok.*;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Set;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class UserDTO {
-
-
-    private String username;
-
-
+    private String fullname;
     private String password;
-
-
     private String email;
-
-
-    private String fullName;
-
-
-    private Long UserRole;
-
+    private Long id;
+    private String picture;
+    private List<String> role;
 
 }

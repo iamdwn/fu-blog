@@ -1,8 +1,7 @@
 package tech.fublog.FuBlog.service;
 
-import tech.fublog.FuBlog.dto.CommentDTO;
-import tech.fublog.FuBlog.dto.ResponseCommentDTO;
-import tech.fublog.FuBlog.entity.*;
+
+import tech.fublog.FuBlog.dto.response.ResponseCommentDTO;
 import tech.fublog.FuBlog.entity.CommentEntity;
 import tech.fublog.FuBlog.exception.CommentException;
 import tech.fublog.FuBlog.repository.BlogPostRepository;
@@ -31,7 +30,7 @@ public class CommentService {
         this.userRepository = userRepository;
     }
 
-    public void deleteComment(CommentDTO commentDTO) {
+    public void deleteComment(ResponseCommentDTO commentDTO) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(commentDTO.getPostId());
         Optional<UserEntity> userEntity = userRepository.findById(commentDTO.getUserId());
         if (blogPostEntity.isPresent() && userEntity.isPresent()) {
@@ -58,7 +57,7 @@ public class CommentService {
         } else throw new CommentException("Blog doesn't exists");
     }
 
-    public void insertComment(CommentDTO commentDTO) {
+    public void insertComment(ResponseCommentDTO commentDTO) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(commentDTO.getPostId());
         Optional<UserEntity> userEntity = userRepository.findById(commentDTO.getUserId());
         CommentEntity parentComment = commentRepository.findParentCommentById(commentDTO.getParentCommentId());
@@ -68,7 +67,7 @@ public class CommentService {
         } else throw new CommentException("Blog or User doesn't exists");
     }
 
-    public void updateComment(CommentDTO commentDTO) {
+    public void updateComment(ResponseCommentDTO commentDTO) {
         Optional<CommentEntity> entity = commentRepository.findById(commentDTO.getCommentId());
         if (entity.isPresent()) {
             entity.get().setContent(commentDTO.getContent());

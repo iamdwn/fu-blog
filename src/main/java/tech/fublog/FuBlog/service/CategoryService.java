@@ -1,6 +1,6 @@
 package tech.fublog.FuBlog.service;
 
-import tech.fublog.FuBlog.dto.ResponseCategoryDTO;
+import tech.fublog.FuBlog.dto.response.ResponseCategoryDTO;
 import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.exception.CategoryException;
 import tech.fublog.FuBlog.repository.CategoryRepository;

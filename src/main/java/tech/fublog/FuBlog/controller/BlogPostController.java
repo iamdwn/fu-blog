@@ -1,24 +1,31 @@
 package tech.fublog.FuBlog.controller;
 
+import org.springframework.data.domain.Page;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
-import tech.fublog.FuBlog.dto.CategoryDTO;
-import tech.fublog.FuBlog.dto.ResponseBlogPostDTO;
-import tech.fublog.FuBlog.dto.ResponseCommentDTO;
+import tech.fublog.FuBlog.dto.SortDTO;
+import tech.fublog.FuBlog.dto.request.RequestBlogPostDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
-import tech.fublog.FuBlog.entity.ResponseObject;
-import tech.fublog.FuBlog.exception.BlogPostException;
-import tech.fublog.FuBlog.service.*;
+import tech.fublog.FuBlog.model.ResponseObject;
+import tech.fublog.FuBlog.service.ApprovalRequestService;
+import tech.fublog.FuBlog.service.BlogPostService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tech.fublog.FuBlog.dto.CategoryDTO;
+import tech.fublog.FuBlog.dto.response.ResponseBlogPostDTO;
+import tech.fublog.FuBlog.dto.response.ResponseCommentDTO;
+import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.service.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Set;
 
+
 @RestController
-@RequestMapping("/api/blogPosts/blog")
+@RequestMapping("/api/v1/auth/blogPosts")
+//    @CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
+@CrossOrigin(origins = "*")
 public class BlogPostController {
     private final BlogPostService blogPostService;
     private final ApprovalRequestService approvalRequestService;
@@ -34,6 +41,81 @@ public class BlogPostController {
         this.commentService = commentService;
         this.postTagService = postTagService;
     }
+
+    @DeleteMapping("/deleteBlog/{postId}")
+    public ResponseEntity<ResponseObject> deleteBlog(@PathVariable Long postId) {
+        return blogPostService.deleteBlogPost(postId);
+    }
+
+    @PostMapping("/insert")
+    ResponseEntity<ResponseObject> insertBlogPost(@RequestBody RequestBlogPostDTO requestBlogPostDTO) {
+        try {
+            BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(requestBlogPostDTO);
+            approvalRequestService.insertApprovalRequest(blogPostEntity);
+            postTagService.insertPostTag(requestBlogPostDTO.getTagList(), blogPostEntity);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post is waiting approve", ""));
+        } catch (BlogPostException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @PutMapping("/editBlog/{postId}")
+    public ResponseEntity<ResponseObject> updateBlog(
+            @RequestBody RequestBlogPostDTO requestBlogPostDTO
+    ) {
+
+        return blogPostService.updateBlogPost(requestBlogPostDTO);
+    }
+
+
+//    @GetMapping("/search/{category}")
+//    ResponseEntity<ResponseObject> findBlogByCategory(@PathVariable String category) {
+//        return blogPostService.findBlogByCategory(category);
+//    }
+
+    @GetMapping("/viewBlog/{postId}")
+    ResponseEntity<ResponseObject> getBlogPostById(@PathVariable Long postId) {
+
+        return blogPostService.getBlogPostById(postId);
+    }
+
+
+    @GetMapping("getAllBlog/{page}/{size}")
+    public List<BlogPostEntity> getAllBlog(@PathVariable int page, @PathVariable int size) {
+        return blogPostService.getAllBlogPost(page, size);
+    }
+
+    @GetMapping("getByTitle/{title}/{page}/{size}")
+    public List<BlogPostEntity> getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
+        return blogPostService.getAllBlogPostByTitle(title, page, size);
+    }
+
+    @GetMapping("/byCategory/{categoryId}/{page}/{size}")
+    public ResponseEntity<Page<BlogPostEntity>> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
+        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+
+        if (blogPosts.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(blogPosts);
+    }
+
+    @GetMapping("/sorted/{page}/{size}")
+    public ResponseEntity<Page<SortDTO>> getSortedBlogPosts(
+            @RequestParam(name = "sortBy", defaultValue = "newest") String sortBy,
+            @PathVariable int page, @PathVariable int size) {
+        Page<SortDTO> sortedBlogPosts = blogPostService.getSortedBlogPosts(sortBy, page, size);
+
+        if (sortedBlogPosts.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(sortedBlogPosts);
+    }
+
 
     @GetMapping("/view")
     ResponseEntity<ResponseObject> findByApproved(@RequestBody BlogPostDTO blogPostDTO) {
@@ -68,20 +150,5 @@ public class BlogPostController {
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
-
-    @PostMapping("/insert")
-    ResponseEntity<ResponseObject> insertBlogPost(@RequestBody BlogPostDTO blogPostDTO) {
-        try {
-            BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(blogPostDTO);
-            approvalRequestService.insertApprovalRequest(blogPostEntity);
-            postTagService.insertPostTag(blogPostDTO.getTagList(), blogPostEntity);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "post is waiting approve", ""));
-        } catch (BlogPostException ex) {
-            System.out.println(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-        }
-    }
-
 }
+

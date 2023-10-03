@@ -49,5 +49,21 @@ public class ApprovalRequestEntity {
         ApprovalRequestEntity approvalRequest = (ApprovalRequestEntity) obj;
         return Objects.equals(Id, approvalRequest.getId());
     }
+
+    public ApprovalRequestEntity(Long id, boolean isApproved, UserEntity request, UserEntity review, BlogPostEntity blogPost) {
+        Id = id;
+        this.isApproved = isApproved;
+        this.request = request;
+        this.review = review;
+        this.blogPost = blogPost;
+    }
+
+//    public ApprovalRequestEntity(Long id, boolean isApproved, UserEntity request, UserEntity review, BlogPostEntity blogPost) {
+//        Id = id;
+//        this.isApproved = isApproved;
+//        this.request = request;
+//        this.review = review;
+//        this.blogPost = blogPost;
+//    }
 }
 
