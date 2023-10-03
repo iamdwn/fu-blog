@@ -3,6 +3,7 @@ package tech.fublog.FuBlog.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.*;
 
@@ -13,6 +14,7 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Category")
+@EntityListeners(AuditingEntityListener.class)
 public class CategoryEntity {
 
     @Id

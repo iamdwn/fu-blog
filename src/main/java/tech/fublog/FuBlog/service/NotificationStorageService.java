@@ -22,25 +22,25 @@ public class NotificationStorageService {
     }
 
 
-    public NotificationEntity getNotificationsByID(String id) {
-        return notifRepository.findById(id).orElseThrow(() -> new RuntimeException("notification not found!"));
+    public NotificationEntity getNotificationsByID(Long id) {
+        return notifRepository.findByNotificationId(id).orElseThrow(() -> new RuntimeException("notification not found!"));
     }
 
-//    public List<NotificationEntity> getNotificationsByUserIDNotRead(String userID) {
-//        return notifRepository.findByUserToIdAndDeliveredFalse(userID);
-//    }
+    public List<NotificationEntity> getNotificationsByUserIDNotRead(Long userID) {
+        return notifRepository.findByUserIdAndIsDeliveredFalse(userID);
+    }
 
 
-//    public List<NotificationEntity> getNotificationsByUserID(String userID) {
-//        return notifRepository.findByUserToNotificationId(userID);
-//    }
+    public List<NotificationEntity> getNotificationsByUserID(Long userID) {
+        return notifRepository.findByUserId(userID);
+    }
 
-//    public Notification changeNotifStatusToRead(String notifID) {
-//        var notif = notifRepository.findById(notifID)
-//                .orElseThrow(() -> new RuntimeException("not found!"));
-//        notif.setRead(true);
-//        return notifRepository.save(notif);
-//    }
+    public NotificationEntity changeNotifStatusToRead(String notifID) {
+        var notif = notifRepository.findById(notifID)
+                .orElseThrow(() -> new RuntimeException("not found!"));
+        notif.setIsRead(true);
+        return notifRepository.save(notif);
+    }
 
     public void clear() {
         notifRepository.deleteAll();

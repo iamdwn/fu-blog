@@ -95,7 +95,7 @@ public class BlogPostService {
         BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
 
         if (blogPostEntity != null) {
-            blogPostEntity.setViews(blogPostEntity.getViews());
+            blogPostEntity.setView(blogPostEntity.getView());
 
             blogPostRepository.save(blogPostEntity);
 
@@ -279,26 +279,26 @@ public class BlogPostService {
         return blogPostRepository.findByCategory(category,pageable);
     }
 
-    public Page<SortDTO> getSortedBlogPosts(String sortBy, int page, int size) {
+    public Page<BlogPostEntity> getSortedBlogPosts(String sortBy, int page, int size) {
         Pageable pageable = PageRequest.of(page-1,size);
-        Page<SortDTO> sortedBlogPosts;
+        Page<BlogPostEntity> blogPostEntities = null;
 
         if ("newest".equalsIgnoreCase(sortBy)) {
-            sortedBlogPosts = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
+            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
         } else if ("oldest".equalsIgnoreCase(sortBy)) {
-            sortedBlogPosts = blogPostRepository.findAllByOrderByCreatedDateAsc(pageable);
+            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateAsc(pageable);
         } else if ("latestModified".equalsIgnoreCase(sortBy)) {
-            sortedBlogPosts = blogPostRepository.findAllByOrderByModifiedDateDesc(pageable);
+//            blogPostEntities = blogPostRepository.findAllByOrderByModifiedDateDesc(pageable);
         } else if ("oldestModified".equalsIgnoreCase(sortBy)) {
-            sortedBlogPosts = blogPostRepository.findAllByOrderByModifiedDateAsc(pageable);
+//            blogPostEntities = blogPostRepository.findAllByOrderByModifiedDateAsc(pageable);
         } else if ("mostViewed".equalsIgnoreCase(sortBy)) {
-            return blogPostRepository.findAllByOrderByViewsDesc(pageable);
+//            return blogPostRepository.findAllByOrderByViewsDesc(pageable);
         } else {
             // Mặc định, sắp xếp theo ngày tạo mới nhất.
-            sortedBlogPosts = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
+            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
         }
 
-        return sortedBlogPosts;
+        return blogPostEntities;
     }
 
 

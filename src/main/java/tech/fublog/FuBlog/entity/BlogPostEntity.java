@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +18,7 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "BlogPost")
+@EntityListeners(AuditingEntityListener.class)
 public class BlogPostEntity {
 
     @Id
@@ -55,7 +57,7 @@ public class BlogPostEntity {
     private String image;
 
     @Column
-    private Long views;
+    private Long view;
 
     @ManyToOne
 //    @JsonIgnore
@@ -63,7 +65,7 @@ public class BlogPostEntity {
     private CategoryEntity category;
 
     @ManyToOne
-    @JsonIgnore
+//    @JsonIgnore
     @JoinColumn(name = "author_id")
     private UserEntity authors;
 
