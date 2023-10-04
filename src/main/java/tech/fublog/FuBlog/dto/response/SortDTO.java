@@ -1,4 +1,4 @@
-package tech.fublog.FuBlog.dto;
+package tech.fublog.FuBlog.dto.response;
 
 import lombok.Data;
 import lombok.Getter;

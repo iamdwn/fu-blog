@@ -1,4 +1,4 @@
-package tech.fublog.FuBlog.dto;
+package tech.fublog.FuBlog.dto.response;
 
 import lombok.*;
 
@@ -15,5 +15,6 @@ public class ResponseCommentDTO {
     private String content;
     private Long postId;
     private Long userId;
+    private boolean status;
     private List<ResponseCommentDTO> subComment;
 }

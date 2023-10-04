@@ -1,8 +1,4 @@
-package tech.fublog.FuBlog.dto;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+package tech.fublog.FuBlog.dto.request;
 
 import lombok.*;
 
@@ -11,10 +7,9 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApprovalRequestDTO {
+public class RequestApprovalRequestDTO {
     private Boolean isApproved;
     private Long postId;
 //    private Long requestId;
     private Long reviewId;
-    private String command;
 }

@@ -1,7 +1,8 @@
 package tech.fublog.FuBlog.service;
 
 
-import tech.fublog.FuBlog.dto.ApprovalRequestDTO;
+import tech.fublog.FuBlog.dto.request.RequestApprovalRequestDTO;
+import tech.fublog.FuBlog.dto.response.ResponseApprovalRequestDTO;
 import tech.fublog.FuBlog.entity.ApprovalRequestEntity;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
@@ -21,31 +22,27 @@ import java.util.Optional;
 @Service
 public class ApprovalRequestService {
 
-    @Autowired
-    private BlogPostRepository blogPostRepository;
+    private final BlogPostRepository blogPostRepository;
+
+    private final UserRepository userRepository;
+
+    private final ApprovalRequestRepository approvalRequestRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    public ApprovalRequestService(BlogPostRepository blogPostRepository, UserRepository userRepository, ApprovalRequestRepository approvalRequestRepository) {
+        this.blogPostRepository = blogPostRepository;
+        this.userRepository = userRepository;
+        this.approvalRequestRepository = approvalRequestRepository;
+    }
 
-    @Autowired
-    private ApprovalRequestRepository approvalRequestRepository;
-
-
-//    public ResponseEntity<ResponseObject> getAllApprovalRequest() {
-//        List<ApprovalRequestEntity> requestEntityList = approvalRequestRepository.findAll();
-//        return requestEntityList.size() > 0 ?
-//                ResponseEntity.status(HttpStatus.OK)
-//                        .body(new ResponseObject("ok", "list exists", requestEntityList)) :
-//                ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                        .body(new ResponseObject("not found", "list empty", requestEntityList));
-//    }
-
-    public List<ApprovalRequestDTO> getAllApprovalRequest() {
+    public List<ResponseApprovalRequestDTO> getAllApprovalRequest() {
         List<ApprovalRequestEntity> list = approvalRequestRepository.findAll();
-        List<ApprovalRequestDTO> dtoList = new ArrayList<>();
+        List<ResponseApprovalRequestDTO> dtoList = new ArrayList<>();
         for (ApprovalRequestEntity entity : list) {
-            ApprovalRequestDTO dto =
-                    new ApprovalRequestDTO(entity.isApproved(), entity.getBlogPost().getId(), entity.getRequest().getId(), /*entity.getReview().getId()*/null, null);
+            ResponseApprovalRequestDTO dto =
+                    new ResponseApprovalRequestDTO(entity.getBlogPost().getId(),
+                            entity.getRequest(),
+                            entity.getReview());
             dtoList.add(dto);
         }
         return dtoList;
@@ -71,35 +68,26 @@ public class ApprovalRequestService {
     }
 
 
-    public ResponseEntity<ResponseObject> approveBlogPost(Long postId, ApprovalRequestDTO approvalRequestDTO) {
-
-        Optional<UserEntity> userEntity = userRepository.findById(approvalRequestDTO.getReviewId());
-        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
-        ApprovalRequestEntity approvalRequestEntity = approvalRequestRepository.findByBlogPost(blogPostEntity.get());
-
-        if (blogPostEntity.isPresent()
-                && !blogPostEntity.get().getIsApproved()) {
-            if (approvalRequestDTO.getCommand().equalsIgnoreCase("approve")) {
-
-                UserEntity reviewer = userEntity.get();
-
-                approvalRequestEntity.setReview(reviewer);
+    public ResponseEntity<ResponseObject> approveBlogPost(RequestApprovalRequestDTO requestApprovalRequestDTO) {
+        Optional<UserEntity> userEntity = userRepository.findById(requestApprovalRequestDTO.getReviewId());
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(requestApprovalRequestDTO.getPostId());
+        if (blogPostEntity.isPresent() && userEntity.isPresent()) {
+            ApprovalRequestEntity approvalRequestEntity = approvalRequestRepository.findByBlogPost(blogPostEntity.get());
+            if (approvalRequestEntity != null) {
+                approvalRequestEntity.setReview(userEntity.get());
                 approvalRequestEntity.setApproved(true);
-
+                blogPostEntity.get().setApprovedBy(userEntity.get().getId());
+                blogPostEntity.get().setIsApproved(true);
+                blogPostRepository.save(blogPostEntity.get());
                 approvalRequestRepository.save(approvalRequestEntity);
-
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "approved successful", ""));
             }
         }
-
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ResponseObject("failed", "approved failed", ""));
-
     }
 
-
-    //    public ResponseEntity<ResponseObject> insertApprovalRequest()
     public void insertApprovalRequest(BlogPostEntity blogPostEntity) {
         ApprovalRequestEntity approvalRequestEntity = new ApprovalRequestEntity(blogPostEntity);
         approvalRequestRepository.save(approvalRequestEntity);

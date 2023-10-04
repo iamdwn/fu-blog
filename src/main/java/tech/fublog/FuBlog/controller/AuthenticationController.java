@@ -157,7 +157,7 @@ public class AuthenticationController {
 
 //        return authenticationReponse;
         UserDTO userDTO = new UserDTO();
-        userDTO.setFullname(user.get().getFullName());
+        userDTO.setFullName(user.get().getFullName());
         userDTO.setPicture(user.get().getPicture());
         userDTO.setEmail(user.get().getEmail());
         userDTO.setId(user.get().getId());

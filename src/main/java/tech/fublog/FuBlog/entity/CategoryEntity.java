@@ -19,7 +19,7 @@ public class CategoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column
     private String categoryName;
@@ -35,7 +35,7 @@ public class CategoryEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id);
+        return Objects.hash(id);
     }
 
     @Override
@@ -43,6 +43,6 @@ public class CategoryEntity {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         CategoryEntity category = (CategoryEntity) obj;
-        return Objects.equals(Id, category.getId());
+        return Objects.equals(id, category.getId());
     }
 }

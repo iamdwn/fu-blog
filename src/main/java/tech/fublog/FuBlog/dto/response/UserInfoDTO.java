@@ -1,8 +1,7 @@
-package tech.fublog.FuBlog.dto;
+package tech.fublog.FuBlog.dto.response;
 
 public class UserInfoDTO {
     private String name;
-
     private String picture;
     private Double point;
 

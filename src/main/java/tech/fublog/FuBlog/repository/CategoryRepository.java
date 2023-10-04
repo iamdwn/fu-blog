@@ -3,6 +3,7 @@ package tech.fublog.FuBlog.repository;
 import tech.fublog.FuBlog.entity.CategoryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import tech.fublog.FuBlog.entity.CommentEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,4 +20,6 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
     List<CategoryEntity> findByParentCategoryIsNull();
 
     Optional<CategoryEntity> findByCategoryNameAndParentCategoryIsNull(String categoryName);
+
+    CategoryEntity findParentCategoryById(Long id);
 }

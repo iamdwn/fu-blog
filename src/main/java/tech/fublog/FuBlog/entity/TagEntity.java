@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Data
@@ -21,14 +19,14 @@ public class TagEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
-    private Long Id;
+    private Long id;
 
     @Column
     private String tagName;
 
     @OneToMany(mappedBy = "tag")
     @JsonIgnore
-    private Set<PostTagEntity> postTags = new HashSet<>();
+    private List<PostTagEntity> postTags = new ArrayList<>();
 
     //    @ManyToMany
 //    @JoinTable(name = "PostTag",
@@ -37,7 +35,7 @@ public class TagEntity {
 //    private Set<BlogPostEntity> blogPosts = new HashSet<>();
     @Override
     public int hashCode() {
-        return Objects.hash(Id);
+        return Objects.hash(id);
     }
 
     @Override
@@ -45,7 +43,7 @@ public class TagEntity {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         TagEntity tag = (TagEntity) obj;
-        return Objects.equals(Id, tag.getId());
+        return Objects.equals(id, tag.getId());
     }
 
 }

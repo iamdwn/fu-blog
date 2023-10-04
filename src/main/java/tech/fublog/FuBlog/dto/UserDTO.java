@@ -2,7 +2,9 @@ package tech.fublog.FuBlog.dto;
 
 import lombok.*;
 import org.springframework.stereotype.Service;
+import tech.fublog.FuBlog.entity.RoleEntity;
 
+import javax.management.relation.Role;
 import java.util.List;
 import java.util.Set;
 
@@ -12,11 +14,12 @@ import java.util.Set;
 @Getter
 @Setter
 public class UserDTO {
-    private String fullname;
+    private String fullName;
     private String password;
     private String email;
     private Long id;
     private String picture;
     private List<String> role;
+
 
 }

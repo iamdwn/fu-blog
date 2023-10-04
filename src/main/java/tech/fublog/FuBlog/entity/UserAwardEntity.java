@@ -35,12 +35,6 @@ public class UserAwardEntity {
     @JoinColumn(name = "award_id")
     private AwardEntity award;
 
-    public UserAwardEntity(Date achievementDate, UserEntity user, AwardEntity award) {
-        this.achievementDate = achievementDate;
-        this.user = user;
-        this.award = award;
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(id);

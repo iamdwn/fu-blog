@@ -1,6 +1,7 @@
 package tech.fublog.FuBlog.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,5 +51,4 @@ public class RoleEntity {
         return Objects.equals(id, role.getId()) &&
                 Objects.equals(name, role.getName());
     }
-
 }

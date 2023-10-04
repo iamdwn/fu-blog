@@ -51,6 +51,7 @@ public class UserEntity implements UserDetails {
     private Double point;
 
     @ManyToMany
+    @JsonIgnore
     @JoinTable(name = "user_mark_post",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "post_id"))
@@ -96,6 +97,7 @@ public class UserEntity implements UserDetails {
 
 
     @ManyToMany
+    @JsonIgnore
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "Users_Id"),
             inverseJoinColumns = @JoinColumn(name = "Roles_Id"))
