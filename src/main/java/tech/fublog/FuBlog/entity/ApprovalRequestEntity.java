@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -23,14 +24,17 @@ public class ApprovalRequestEntity {
     private boolean isApproved;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "request_id")
     private UserEntity request;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "review_id")
     private UserEntity review;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "post_id")
     private BlogPostEntity blogPost;
 

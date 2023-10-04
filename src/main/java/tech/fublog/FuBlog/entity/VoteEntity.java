@@ -20,7 +20,6 @@ public class VoteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Long Id;
 
     @Column

@@ -1,6 +1,7 @@
 package tech.fublog.FuBlog.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,10 +29,12 @@ public class UserAwardEntity {
     private Date achievementDate;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "award_id")
     private AwardEntity award;
 

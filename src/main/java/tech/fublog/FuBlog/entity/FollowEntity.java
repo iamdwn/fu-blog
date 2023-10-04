@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,14 +19,15 @@ public class FollowEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Long Id;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "follower_Id")
     private UserEntity follower;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "following_Id")
     private UserEntity following;
 

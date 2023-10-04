@@ -6,8 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import tech.fublog.FuBlog.dto.BlogPostDTO;
+import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.dto.UserInfoDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
+import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.exception.UserException;
@@ -19,6 +22,7 @@ import tech.fublog.FuBlog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
 import java.util.*;
 
 
@@ -112,28 +116,85 @@ public class UserService {
 
     public boolean markPost(Long userId, Long postId) {
         boolean result = false;
+//        Optional<UserEntity> userEntity = userRepository.findById(userId);
+//        if (userEntity.isPresent()) {
+//            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+//            if (blogPostEntity.isPresent()) {
+//                Set<BlogPostEntity> entitySet;
+//                if (userEntity.get().getMarkPosts().isEmpty()) {
+//                    entitySet = new HashSet<>();
+//                    entitySet.add(blogPostEntity.get());
+//                    userEntity.get().setMarkPosts(entitySet);
+//                    userRepository.save(userEntity.get());
+//                    result = true;
+//                } else {
+//                    entitySet = userEntity.get().getMarkPosts();
+//                    if (entitySet.add(blogPostEntity.get())) {
+//                        userEntity.get().setMarkPosts(entitySet);
+//                        userRepository.save(userEntity.get());
+//                        result = true;
+//                    } else throw new UserException("You already mark this post!");
+//                }
+//            }
+//        }
+        return result;
+    }
+
+    public UserEntity getUserById(Long userId) {
+
+        return userRepository.findById(userId).orElse(null);
+    }
+    public ResponseEntity<ResponseObject> deleteBlogPost(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
-        if (userEntity.isPresent()) {
-            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
-            if (blogPostEntity.isPresent()) {
-                Set<BlogPostEntity> entitySet;
-                if (userEntity.get().getMarkPosts().isEmpty()) {
-                    entitySet = new HashSet<>();
-                    entitySet.add(blogPostEntity.get());
-                    userEntity.get().setMarkPosts(entitySet);
-                    userRepository.save(userEntity.get());
-                    result = true;
-                } else {
-                    entitySet = userEntity.get().getMarkPosts();
-                    if (entitySet.add(blogPostEntity.get())) {
-                        userEntity.get().setMarkPosts(entitySet);
-                        userRepository.save(userEntity.get());
-                        result = true;
-                    } else throw new UserException("You already mark this post!");
-                }
+
+        if (userEntity.isPresent()
+                && userEntity.get().getStatus()) {
+            UserEntity user = this.getUserById(userId);
+
+            user.setStatus(false);
+
+            userRepository.save(user);
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("OK", "Deleted successful", user));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ResponseObject("Not found", "Post not found", ""));
+    }
+    public ResponseEntity<ResponseObject> updateUser(Long userId, UserDTO userDTO) {
+
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if(userEntity.isPresent()){
+            if(userDTO.getRole() != null) {
+                Set<RoleEntity> roleEntities = new HashSet<>();
+
+                RoleEntity userRole = roleRepository.findByName(userDTO.getRole().toUpperCase());
+
+                roleEntities.add(userRole);
+
+                UserEntity user = this.getUserById(userId);
+                user.setFullName(userDTO.getFullname());
+                user.setEmail(userDTO.getEmail());
+                user.setPicture(userDTO.getPicture());
+                user.setRoles(roleEntities);
+                user.setStatus(userDTO.getStatus());
+                userRepository.save(user);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "updated successful", user));
+            }else{
+                UserEntity user = this.getUserById(userId);
+                user.setFullName(userDTO.getFullname());
+                user.setEmail(userDTO.getEmail());
+                user.setPicture(userDTO.getPicture());
+                user.setStatus(userDTO.getStatus());
+                userRepository.save(user);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "updated successful", user));
             }
         }
-        return result;
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ResponseObject("failed", "updated failed", ""));
     }
 
 }

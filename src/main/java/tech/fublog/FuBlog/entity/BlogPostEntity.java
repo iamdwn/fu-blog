@@ -1,6 +1,8 @@
 package tech.fublog.FuBlog.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -60,12 +62,13 @@ public class BlogPostEntity {
     private Long view;
 
     @ManyToOne
-//    @JsonIgnore
+    @JsonIgnore
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
 
     @ManyToOne
-//    @JsonIgnore
+    @JsonIgnore
+//    @JsonIgnoreProperties("blogPosts")
     @JoinColumn(name = "author_id")
     private UserEntity authors;
 
@@ -73,15 +76,12 @@ public class BlogPostEntity {
     private Set<VoteEntity> votes = new HashSet<>();
 
     @OneToMany(mappedBy = "blogPost")
-    @JsonIgnore
     private Set<ApprovalRequestEntity> approvalRequests = new HashSet<>();
 
     @OneToMany(mappedBy = "postComment")
-//    @JsonIgnore
     private Set<CommentEntity> postComments = new HashSet<>();
 
     @OneToMany(mappedBy = "post")
-//    @JsonIgnore
     private Set<PostTagEntity> postTags = new HashSet<>();
 
     @ManyToMany(mappedBy = "markPosts")

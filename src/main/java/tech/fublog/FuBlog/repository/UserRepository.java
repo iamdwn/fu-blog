@@ -19,6 +19,10 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     List<UserEntity> findAllByOrderByPointDesc();
 
+    List<UserEntity> findAllByStatusIsTrue();
+
+    UserEntity findByIdAndStatusIsTrue(Long userId);
+
 
 }
 

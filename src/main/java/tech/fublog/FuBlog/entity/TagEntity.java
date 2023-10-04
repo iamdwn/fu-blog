@@ -18,14 +18,13 @@ import java.util.*;
 public class TagEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Long Id;
 
     @Column
     private String tagName;
 
     @OneToMany(mappedBy = "tag")
-    @JsonIgnore
+//    @JsonIgnore
     private List<PostTagEntity> postTags = new ArrayList<>();
 
     //    @ManyToMany
