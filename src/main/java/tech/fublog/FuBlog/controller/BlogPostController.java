@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.dto.CategoryDTO;
-import tech.fublog.FuBlog.dto.ResponseBlogPostDTO;
-import tech.fublog.FuBlog.dto.ResponseCommentDTO;
+import tech.fublog.FuBlog.dto.response.ResponseBlogPostDTO;
+import tech.fublog.FuBlog.dto.response.ResponseCommentDTO;
 import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.service.*;
 import org.springframework.http.HttpStatus;
@@ -25,7 +25,7 @@ import java.util.Set;
 @RequestMapping("/api/v1/auth/blogPosts")
 //    @CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
 @CrossOrigin(origins = "*")
-public class  BlogPostController {
+public class BlogPostController {
     private final BlogPostService blogPostService;
     private final ApprovalRequestService approvalRequestService;
     private final VoteService voteService;
@@ -64,7 +64,7 @@ public class  BlogPostController {
     }
 
 
-//    @PostMapping("/writeBlog")
+    //    @PostMapping("/writeBlog")
 //    @PreAuthorize("isAuthenticated()")
 //    @PreAuthorize("hasRole('USER')")
 //    @PreAuthorize("hasAuthority('WRITE_BLOG')")
@@ -149,7 +149,6 @@ public class  BlogPostController {
 
         return ResponseEntity.ok(blogPostEntities);
     }
-
 
 
     @GetMapping("/view")

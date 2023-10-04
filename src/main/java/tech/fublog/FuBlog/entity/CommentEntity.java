@@ -20,7 +20,7 @@ import java.util.Objects;
 public class CommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column(columnDefinition = "LONGTEXT")
     private String content;
@@ -55,7 +55,7 @@ public class CommentEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id);
+        return Objects.hash(id);
     }
 
     @Override
@@ -63,6 +63,6 @@ public class CommentEntity {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         CommentEntity comment = (CommentEntity) obj;
-        return Objects.equals(Id, comment.getId());
+        return Objects.equals(id, comment.getId());
     }
 }

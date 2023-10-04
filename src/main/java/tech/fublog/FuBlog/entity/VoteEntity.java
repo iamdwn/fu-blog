@@ -20,8 +20,7 @@ public class VoteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
-    private Long Id;
+    private Long id;
 
     @Column
     private Long voteValue; // 1 for upvote, -1 for downvote

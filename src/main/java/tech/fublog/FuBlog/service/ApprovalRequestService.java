@@ -1,14 +1,11 @@
 package tech.fublog.FuBlog.service;
 
 
-import tech.fublog.FuBlog.dto.ApprovalRequestDTO;
 import tech.fublog.FuBlog.dto.request.RequestApprovalRequestDTO;
 import tech.fublog.FuBlog.dto.response.ResponseApprovalRequestDTO;
 import tech.fublog.FuBlog.entity.ApprovalRequestEntity;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
-import tech.fublog.FuBlog.exception.ApprovalRequestException;
-import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.repository.ApprovalRequestRepository;
 import tech.fublog.FuBlog.repository.BlogPostRepository;
@@ -72,12 +69,14 @@ public class ApprovalRequestService {
     public ResponseEntity<ResponseObject> approveBlogPost(RequestApprovalRequestDTO requestApprovalRequestDTO) {
         Optional<UserEntity> userEntity = userRepository.findById(requestApprovalRequestDTO.getReviewId());
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(requestApprovalRequestDTO.getPostId());
-        if (blogPostEntity.isPresent() && !blogPostEntity.get().getIsApproved()) {
+        if (blogPostEntity.isPresent() && userEntity.isPresent()) {
             ApprovalRequestEntity approvalRequestEntity = approvalRequestRepository.findByBlogPost(blogPostEntity.get());
             if (approvalRequestEntity != null) {
-                UserEntity reviewer = userEntity.get();
-                approvalRequestEntity.setReview(reviewer);
+                approvalRequestEntity.setReview(userEntity.get());
                 approvalRequestEntity.setApproved(true);
+                blogPostEntity.get().setApprovedBy(userEntity.get().getId());
+                blogPostEntity.get().setIsApproved(true);
+                blogPostRepository.save(blogPostEntity.get());
                 approvalRequestRepository.save(approvalRequestEntity);
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "approved successful", ""));

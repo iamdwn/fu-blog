@@ -19,7 +19,7 @@ public class AwardEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column
     private String name;
@@ -39,7 +39,7 @@ public class AwardEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id);
+        return Objects.hash(id);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class AwardEntity {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         AwardEntity award = (AwardEntity) obj;
-        return Objects.equals(Id, award.getId());
+        return Objects.equals(id, award.getId());
     }
 
 }

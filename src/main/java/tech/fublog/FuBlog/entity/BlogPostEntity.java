@@ -7,8 +7,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
-
 import java.util.*;
 
 @Entity
@@ -23,7 +21,7 @@ public class BlogPostEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column
     private String typePost;
@@ -38,11 +36,9 @@ public class BlogPostEntity {
     @CreatedDate
     private Date createdDate = new Date();
 
-
     @Column
     @LastModifiedDate
     private Date modifiedDate;
-
 
     @Column
     private Long approvedBy;
@@ -60,16 +56,17 @@ public class BlogPostEntity {
     private Long view;
 
     @ManyToOne
-//    @JsonIgnore
     @JoinColumn(name = "category_id")
+    @JsonIgnore
     private CategoryEntity category;
 
     @ManyToOne
-//    @JsonIgnore
     @JoinColumn(name = "author_id")
+    @JsonIgnore
     private UserEntity authors;
 
     @OneToMany(mappedBy = "postVote")
+    @JsonIgnore
     private Set<VoteEntity> votes = new HashSet<>();
 
     @OneToMany(mappedBy = "blogPost")
@@ -77,14 +74,15 @@ public class BlogPostEntity {
     private Set<ApprovalRequestEntity> approvalRequests = new HashSet<>();
 
     @OneToMany(mappedBy = "postComment")
-//    @JsonIgnore
+    @JsonIgnore
     private Set<CommentEntity> postComments = new HashSet<>();
 
     @OneToMany(mappedBy = "post")
-//    @JsonIgnore
+    @JsonIgnore
     private Set<PostTagEntity> postTags = new HashSet<>();
 
     @ManyToMany(mappedBy = "markPosts")
+    @JsonIgnore
     private Set<UserEntity> userMarks = new HashSet<>();
 
     public BlogPostEntity(String typePost, String title, String content, CategoryEntity category, UserEntity authors) {
@@ -97,7 +95,7 @@ public class BlogPostEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id);
+        return Objects.hash(id);
     }
 
     @Override
@@ -105,6 +103,6 @@ public class BlogPostEntity {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         BlogPostEntity blogPost = (BlogPostEntity) obj;
-        return Objects.equals(Id, blogPost.getId());
+        return Objects.equals(id, blogPost.getId());
     }
 }

@@ -17,7 +17,7 @@ public class ApprovalRequestEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column
     private boolean isApproved;
@@ -41,7 +41,7 @@ public class ApprovalRequestEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id);
+        return Objects.hash(id);
     }
 
     @Override
@@ -49,11 +49,11 @@ public class ApprovalRequestEntity {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         ApprovalRequestEntity approvalRequest = (ApprovalRequestEntity) obj;
-        return Objects.equals(Id, approvalRequest.getId());
+        return Objects.equals(id, approvalRequest.getId());
     }
 
     public ApprovalRequestEntity(Long id, boolean isApproved, UserEntity request, UserEntity review, BlogPostEntity blogPost) {
-        Id = id;
+        id = id;
         this.isApproved = isApproved;
         this.request = request;
         this.review = review;
