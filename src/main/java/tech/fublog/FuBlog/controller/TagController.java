@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.controller;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/blogPosts/tag")
+@CrossOrigin(origins = "*")
 public class TagController {
     private final TagService tagService;
 

@@ -25,7 +25,6 @@ public class CategoryController {
 
     @GetMapping("/view")
     public ResponseEntity<ResponseObject> getAll() {
-//        List<ResponseCategoryDTO> dtoList = categoryService.getAllCategory();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseObject("ok", "found", categoryService.getAllCategory()));
     }

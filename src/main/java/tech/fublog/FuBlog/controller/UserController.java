@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.controller;
 
+import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.dto.PostMarkDTO;
 import tech.fublog.FuBlog.exception.UserException;
 import tech.fublog.FuBlog.model.ResponseObject;
@@ -7,13 +8,10 @@ import tech.fublog.FuBlog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/blogPosts/user")
+@CrossOrigin(origins = "*")
 public class UserController {
     private final UserService userService;
 

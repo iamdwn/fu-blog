@@ -80,8 +80,8 @@ public class VoteService {
                 notificationEntity.setUserId(blogPostEntity.get().getAuthors());
                 notificationEntity.setPostId(voteDTO.getPostId());
                 notificationStorageService.createNotificationStorage(notificationEntity);
-                Double point = userEntity.get().getPoint();
-                userEntity.get().setPoint(point + 0.5);
+//                Double point = userEntity.get().getPoint();
+//                userEntity.get().setPoint(point + 0.5);
                 voteEntity = new VoteEntity(voteDTO.getVoteValue(), userEntity.get(), blogPostEntity.get());
                 voteRepository.save(voteEntity);
                 return voteDTO;

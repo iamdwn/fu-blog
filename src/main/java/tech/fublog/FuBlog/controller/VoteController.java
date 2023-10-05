@@ -21,7 +21,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/auth/blogPosts/vote")
 @CrossOrigin(origins = "*")
-
 public class VoteController{
     private final VoteService voteService;
     
