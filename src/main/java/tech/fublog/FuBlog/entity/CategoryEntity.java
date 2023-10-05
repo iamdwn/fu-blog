@@ -25,7 +25,7 @@ public class CategoryEntity {
     private String categoryName;
 
     @OneToMany(mappedBy = "category")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<BlogPostEntity> blogPosts = new HashSet<>();
 
     @ManyToOne
