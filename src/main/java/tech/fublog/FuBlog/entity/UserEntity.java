@@ -68,31 +68,31 @@ public class UserEntity implements UserDetails {
 //    private Set<ApprovalRequestEntity> requested = new HashSet<>();
 
     @OneToMany(mappedBy = "review")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<ApprovalRequestEntity> reviewed = new HashSet<>();
 
     @OneToMany(mappedBy = "userComment")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<CommentEntity> comments = new HashSet<>();
 
     @OneToMany(mappedBy = "userVote")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<VoteEntity> votes = new HashSet<>();
 
     @OneToMany(mappedBy = "userId")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<NotificationEntity> notificationList = new HashSet<>();
 
     @OneToMany(mappedBy = "following")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<FollowEntity> followingList = new HashSet<>();
 
     @OneToMany(mappedBy = "follower")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<FollowEntity> followersList = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<UserAwardEntity> userAwards = new HashSet<>();
 
 

@@ -2,6 +2,7 @@ package tech.fublog.FuBlog.controller;
 
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.auth.AuthenticationReponse;
@@ -29,8 +30,8 @@ import java.util.*;
 @RestController
 @RequestMapping("api/v1/auth")
 @RequiredArgsConstructor
-//@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
+//@CrossOrigin(origins = "*")
 public class AuthenticationController {
 
 
@@ -146,6 +147,7 @@ public class AuthenticationController {
 
         String username = jwtService.extractTokenToGetUser(token.substring(7));
         List <String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
+        System.out.println(roles);
 
         Optional<UserEntity> user = userRepository.findByUsername(username);
 //        AuthenticationReponse authenticationReponse = new AuthenticationReponse();
@@ -157,12 +159,12 @@ public class AuthenticationController {
 
 //        return authenticationReponse;
         UserDTO userDTO = new UserDTO();
-        userDTO.setFullName(user.get().getFullName());
+        userDTO.setFullname(user.get().getFullName());
         userDTO.setPicture(user.get().getPicture());
         userDTO.setEmail(user.get().getEmail());
         userDTO.setId(user.get().getId());
         userDTO.setPassword(user.get().getHashedpassword());
-        userDTO.setRole(roles);
+        userDTO.setRoles(roles);
         return userDTO;
 
     }
@@ -192,4 +194,20 @@ public class AuthenticationController {
         return ResponseEntity.badRequest().body(new MessageResponse("Can not have new token!!1"));
 
     }
+//   @GetMapping("/logout")
+//public ResponseEntity<String> logout(@RequestHeader("Authorization") String authorizationHeader) {
+//       String token = authorizationHeader.substring(7);
+//    // Lấy token từ yêu cầu HTTP
+//    String token = request.getHeader("Authorization");
+//
+//    // Xóa token khỏi session
+//    SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
+//    SecurityContextHolder.getContext().setAuthentication(null);
+//    SecurityContextHolder.getContext().getAuthentication().invalidate();
+//
+//    // Truyền thông với người dùng rằng họ đã đăng xuất
+//    return ResponseEntity.ok("Đăng xuất thành công!");
+//}
+//
+//}
 }

@@ -46,54 +46,55 @@ public class BlogPostService {
         return blogPostRepository.findById(postId).orElse(null);
     }
 
-    public BlogPostDTO getBlogPostById(Long postId) {
-
-        BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
-
-        if (blogPostEntity != null) {
-            blogPostEntity.setView(blogPostEntity.getView());
-            blogPostRepository.save(blogPostEntity);
-
-            UserEntity userEntity = userRepository.findById(postId).orElse(null);
-
-            Set<RoleEntity> roleEntities = userEntity.getRoles();
-            Set<PostTagEntity> postTagEntity = blogPostEntity.getPostTags();
-            Set<TagDTO> tagDTOs = postTagEntity.stream()
-                    .map(tagEntity -> {
-                        TagDTO tagDTO = new TagDTO();
-                        tagDTO.setTagId(tagEntity.getId());
-                        tagDTO.setTagName(tagEntity.getTag().getTagName());
-                        return tagDTO;
-                    })
-                    .collect(Collectors.toSet());
-
-            List<String> roleNames = roleEntities.stream()
-                    .map(RoleEntity::getName)
-                    .collect(Collectors.toList());
-
-
-            UserDTO userDTO = new UserDTO(userEntity.getFullName(),
-                    userEntity.getPassword(),
-                    userEntity.getEmail(),
-                    userEntity.getId(),
-                    userEntity.getPicture(),
-                    roleNames);
-            BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
-                    blogPostEntity.getTypePost(),
-                    blogPostEntity.getTitle(),
-                    blogPostEntity.getContent(),
-                    blogPostEntity.getCategory().getCategoryName(),
-                    blogPostEntity.getCategory().getParentCategory(),
-                    tagDTOs,
-                    userDTO,
-                    blogPostEntity.getView(),
-                    blogPostEntity.getCreatedDate());
-
-            return blogPostDTO;
-        } else
-            throw new BlogPostException("not found blogpost with " + postId);
-
-    }
+//    public BlogPostDTO getBlogPostById(Long postId) {
+//
+//        BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
+//
+//        if (blogPostEntity != null) {
+//            blogPostEntity.setView(blogPostEntity.getView());
+//            blogPostRepository.save(blogPostEntity);
+//
+//            UserEntity userEntity = userRepository.findById(postId).orElse(null);
+//
+//            Set<RoleEntity> roleEntities = userEntity.getRoles();
+//            Set<PostTagEntity> postTagEntity = blogPostEntity.getPostTags();
+//            Set<TagDTO> tagDTOs = postTagEntity.stream()
+//                    .map(tagEntity -> {
+//                        TagDTO tagDTO = new TagDTO();
+//                        tagDTO.setTagId(tagEntity.getId());
+//                        tagDTO.setTagName(tagEntity.getTag().getTagName());
+//                        return tagDTO;
+//                    })
+//                    .collect(Collectors.toSet());
+//
+//            List<String> roleNames = roleEntities.stream()
+//                    .map(RoleEntity::getName)
+//                    .collect(Collectors.toList());
+//
+//
+////            UserDTO userDTO = new UserDTO(userEntity.getFullName(),
+////                    userEntity.getPassword(),
+////                    userEntity.getEmail(),
+////                    userEntity.getId(),
+////                    userEntity.getPicture(),
+////                    userEntity.getStatus(),
+////                    roleNames);
+//            BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
+//                    blogPostEntity.getTypePost(),
+//                    blogPostEntity.getTitle(),
+//                    blogPostEntity.getContent(),
+//                    blogPostEntity.getCategory().getCategoryName(),
+//                    blogPostEntity.getCategory().getParentCategory(),
+//                    tagDTOs,
+//                    userDTO,
+//                    blogPostEntity.getView(),
+//                    blogPostEntity.getCreatedDate());
+//
+//            return blogPostDTO;
+//        } else
+//            throw new BlogPostException("not found blogpost with " + postId);
+//
+//    }
 
 
     //xoá --> set Status = 0

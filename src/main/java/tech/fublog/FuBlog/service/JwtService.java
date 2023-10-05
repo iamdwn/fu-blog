@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class JwtService {
+public class  JwtService {
 
     private static final String Secret_key = "123";
 

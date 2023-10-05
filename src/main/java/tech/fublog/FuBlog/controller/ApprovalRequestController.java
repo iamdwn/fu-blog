@@ -14,7 +14,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth/manageApprove")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
+//@CrossOrigin(origins = "*")
 public class ApprovalRequestController {
 
     private final BlogPostService blogPostService;
