@@ -1,6 +1,5 @@
 package tech.fublog.FuBlog.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +29,6 @@ public class RoleEntity {
     private String name;
 
     @ManyToMany(mappedBy = "roles")
-    @JsonIgnore
     private Set<UserEntity> user = new HashSet<>();
 
     public RoleEntity(Long id, String name) {

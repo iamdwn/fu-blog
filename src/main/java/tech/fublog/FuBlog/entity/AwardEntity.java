@@ -28,7 +28,7 @@ public class AwardEntity {
     private String description;
 
     @OneToMany(mappedBy = "award")
-//    @JsonIgnore
+    @JsonIgnore
     private List<UserAwardEntity> userAwards = new ArrayList<>();
 
 //    @ManyToMany

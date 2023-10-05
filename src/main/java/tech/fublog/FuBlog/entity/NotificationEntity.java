@@ -1,6 +1,5 @@
 package tech.fublog.FuBlog.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -39,7 +38,6 @@ public class NotificationEntity {
     private Date createdDate;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "user_id")
     private UserEntity userId;
 

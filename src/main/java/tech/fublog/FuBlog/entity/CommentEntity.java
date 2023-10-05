@@ -43,7 +43,6 @@ public class CommentEntity {
     private BlogPostEntity postComment;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "parent_comment_id")
     private CommentEntity parentComment;
 

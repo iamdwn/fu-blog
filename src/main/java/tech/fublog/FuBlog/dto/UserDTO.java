@@ -19,9 +19,7 @@ public class UserDTO {
     private String email;
     private Long id;
     private String picture;
-    private Boolean status;
-    private String role;
-    private List<String> roles;
+    private List<String> role;
 
 
 }

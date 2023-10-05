@@ -2,7 +2,6 @@ package tech.fublog.FuBlog.controller;
 
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.auth.AuthenticationReponse;
@@ -163,7 +162,7 @@ public class AuthenticationController {
         userDTO.setEmail(user.get().getEmail());
         userDTO.setId(user.get().getId());
         userDTO.setPassword(user.get().getHashedpassword());
-        userDTO.setRoles(roles);
+        userDTO.setRole(roles);
         return userDTO;
 
     }
@@ -193,20 +192,4 @@ public class AuthenticationController {
         return ResponseEntity.badRequest().body(new MessageResponse("Can not have new token!!1"));
 
     }
-//   @GetMapping("/logout")
-//public ResponseEntity<String> logout(@RequestHeader("Authorization") String authorizationHeader) {
-//       String token = authorizationHeader.substring(7);
-//    // Lấy token từ yêu cầu HTTP
-//    String token = request.getHeader("Authorization");
-//
-//    // Xóa token khỏi session
-//    SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
-//    SecurityContextHolder.getContext().setAuthentication(null);
-//    SecurityContextHolder.getContext().getAuthentication().invalidate();
-//
-//    // Truyền thông với người dùng rằng họ đã đăng xuất
-//    return ResponseEntity.ok("Đăng xuất thành công!");
-//}
-//
-//}
 }
