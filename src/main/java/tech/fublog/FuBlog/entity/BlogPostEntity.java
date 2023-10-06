@@ -55,6 +55,9 @@ public class BlogPostEntity {
     @Column
     private Long view;
 
+    @Column
+    private Boolean pinned;
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
@@ -82,12 +85,14 @@ public class BlogPostEntity {
     @JsonIgnore
     private Set<UserEntity> userMarks = new HashSet<>();
 
-    public BlogPostEntity(String typePost, String title, String content, CategoryEntity category, UserEntity authors) {
+    public BlogPostEntity(String typePost, String title, String content, CategoryEntity category, UserEntity authors, Long view, Boolean pinned) {
         this.typePost = typePost;
         this.title = title;
         this.content = content;
         this.category = category;
         this.authors = authors;
+        this.view = view;
+        this.pinned = pinned;
     }
 
     @Override

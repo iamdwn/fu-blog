@@ -6,9 +6,10 @@ import tech.fublog.FuBlog.entity.NotificationEntity;
 import tech.fublog.FuBlog.service.NotificationStorageService;
 
 import java.util.List;
-
-@RequestMapping("/notification")
 @RestController
+@RequestMapping("/notification")
+@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
+//@CrossOrigin(origins = "*")
 public class NotificationStorageController {
 
     private final NotificationStorageService notifService;

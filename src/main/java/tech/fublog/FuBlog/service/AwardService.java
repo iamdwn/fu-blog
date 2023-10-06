@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import tech.fublog.FuBlog.dto.AwardDTO;
+import tech.fublog.FuBlog.dto.request.AwardDTO;
 import tech.fublog.FuBlog.entity.AwardEntity;
 import tech.fublog.FuBlog.entity.UserAwardEntity;
 import tech.fublog.FuBlog.entity.UserEntity;

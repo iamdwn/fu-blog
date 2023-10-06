@@ -24,19 +24,19 @@ import java.util.List;
 public class BlogPostController {
     private final BlogPostService blogPostService;
     private final ApprovalRequestService approvalRequestService;
-    //    private final VoteService voteService;
-    //    private final CommentService commentService;
+        private final VoteService voteService;
+        private final CommentService commentService;
     private final PostTagService postTagService;
 
     @Autowired
     public BlogPostController(BlogPostService blogPostService, ApprovalRequestService approvalRequestService,
-//                              VoteService voteService, CommentService commentService,
+                              VoteService voteService, CommentService commentService,
                               PostTagService postTagService
     ) {
         this.blogPostService = blogPostService;
         this.approvalRequestService = approvalRequestService;
-//        this.voteService = voteService;
-//        this.commentService = commentService;
+        this.voteService = voteService;
+        this.commentService = commentService;
         this.postTagService = postTagService;
     }
 
@@ -80,6 +80,15 @@ public class BlogPostController {
         }
     }
 
+    @GetMapping("getPinnedBlog")
+    public ResponseEntity<ResponseObject> getPinnedBlog(){
+        return  blogPostService.getPinnedBlog();
+    }
+
+    @PostMapping("pinBlogAction/{postId}")
+    public ResponseEntity<ResponseObject> pinBlog(@PathVariable Long postId){
+        return  blogPostService.pinBlogAction(postId);
+    }
 
 //    @GetMapping("/search/{category}")
 //    ResponseEntity<ResponseObject> findBlogByCategory(@PathVariable String category) {
@@ -110,8 +119,9 @@ public class BlogPostController {
     }
 
     @GetMapping("getByCategory/{categoryId}/{page}/{size}")
-    public ResponseEntity<Page<BlogPostEntity>> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
-        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+    public ResponseEntity<List<BlogPostEntity>> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
+//        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+        List<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
 
         if (blogPosts.isEmpty()) {
             return ResponseEntity.notFound().build();

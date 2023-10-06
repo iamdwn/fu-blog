@@ -40,9 +40,7 @@ public class ApprovalRequestService {
         List<ResponseApprovalRequestDTO> dtoList = new ArrayList<>();
         for (ApprovalRequestEntity entity : list) {
             ResponseApprovalRequestDTO dto =
-                    new ResponseApprovalRequestDTO(entity.getBlogPost().getId(),
-                            entity.getRequest(),
-                            entity.getReview());
+                    new ResponseApprovalRequestDTO(entity.getBlogPost().getId(), entity.getRequest().getId());
             dtoList.add(dto);
         }
         return dtoList;

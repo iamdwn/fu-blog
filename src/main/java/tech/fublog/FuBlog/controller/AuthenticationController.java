@@ -149,6 +149,7 @@ public class AuthenticationController {
 
         String username = jwtService.extractTokenToGetUser(token.substring(7));
         List <String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
+        System.out.println(roles);
 
         Optional<UserEntity> user = userRepository.findByUsername(username);
 //        AuthenticationReponse authenticationReponse = new AuthenticationReponse();
@@ -195,4 +196,20 @@ public class AuthenticationController {
         return ResponseEntity.badRequest().body(new MessageResponse("Can not have new token!!1"));
 
     }
+//   @GetMapping("/logout")
+//public ResponseEntity<String> logout(@RequestHeader("Authorization") String authorizationHeader) {
+//       String token = authorizationHeader.substring(7);
+//    // Lấy token từ yêu cầu HTTP
+//    String token = request.getHeader("Authorization");
+//
+//    // Xóa token khỏi session
+//    SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
+//    SecurityContextHolder.getContext().setAuthentication(null);
+//    SecurityContextHolder.getContext().getAuthentication().invalidate();
+//
+//    // Truyền thông với người dùng rằng họ đã đăng xuất
+//    return ResponseEntity.ok("Đăng xuất thành công!");
+//}
+//
+//}
 }
