@@ -60,6 +60,7 @@ public class BlogPostEntity {
     private CategoryEntity category;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "author_id")
     private UserEntity authors;
 

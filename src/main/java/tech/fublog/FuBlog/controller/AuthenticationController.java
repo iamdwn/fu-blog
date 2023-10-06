@@ -2,6 +2,7 @@ package tech.fublog.FuBlog.controller;
 
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.auth.AuthenticationReponse;
@@ -29,8 +30,8 @@ import java.util.*;
 @RestController
 @RequestMapping("api/v1/auth")
 @RequiredArgsConstructor
-//@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
+//@CrossOrigin(origins = "*")
 public class AuthenticationController {
 
 
@@ -97,7 +98,8 @@ public class AuthenticationController {
                 encoder.encode(signUpRequest.getPassword()),
                 signUpRequest.getPicture(),
                 true,
-                true
+                true,
+                0.0
         );
 
         Set<RoleEntity> roleEntities = new HashSet<>();
@@ -131,7 +133,8 @@ public class AuthenticationController {
                 encoder.encode(signUpRequest.getPassword()),
                 signUpRequest.getPicture(),
                 true,
-                true
+                true,
+                0.0
         );
         Set<RoleEntity> roleEntities = new HashSet<>();
         RoleEntity userRole = roleRepository.findByName("USER");
@@ -157,12 +160,12 @@ public class AuthenticationController {
 
 //        return authenticationReponse;
         UserDTO userDTO = new UserDTO();
-        userDTO.setFullName(user.get().getFullName());
+        userDTO.setFullname(user.get().getFullName());
         userDTO.setPicture(user.get().getPicture());
         userDTO.setEmail(user.get().getEmail());
         userDTO.setId(user.get().getId());
         userDTO.setPassword(user.get().getHashedpassword());
-        userDTO.setRole(roles);
+        userDTO.setRoles(roles);
         return userDTO;
 
     }

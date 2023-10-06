@@ -19,8 +19,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth/blogPosts")
-//    @CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
+//@CrossOrigin(origins = "*")
 public class BlogPostController {
     private final BlogPostService blogPostService;
     private final ApprovalRequestService approvalRequestService;
@@ -41,6 +41,7 @@ public class BlogPostController {
     }
 
 
+
     @DeleteMapping("/deleteBlogById/{postId}")
     public ResponseEntity<ResponseObject> deleteBlog(@PathVariable Long postId) {
         try {
@@ -52,23 +53,6 @@ public class BlogPostController {
         }
     }
 
-
-    //    @PostMapping("/writeBlog")
-//    @PreAuthorize("isAuthenticated()")
-//    @PreAuthorize("hasRole('USER')")
-//    @PreAuthorize("hasAuthority('WRITE_BLOG')")
-//    ResponseEntity<ResponseObject> insertBlogPost(
-//            @RequestBody BlogPostDTO blogPostDTO) {
-////            String user = SecurityContextHolder.getContext().getAuthentication().getName();
-//
-//        BlogPostEntity blogPostEntity = blogPostService.createBlogPost(blogPostDTO);
-//        if (blogPostEntity != null) {
-//            return approvalRequestService.createApprovalRequestById(blogPostEntity);
-//        }
-//
-//
-//        return null;
-//    }
     @PostMapping("/insert")
     ResponseEntity<ResponseObject> insertBlogPost(@RequestBody RequestBlogPostDTO blogPostDTO) {
         try {
@@ -102,17 +86,17 @@ public class BlogPostController {
 //        return blogPostService.findBlogByCategory(category);
 //    }
 
-    @GetMapping("/getBlogById/{postId}")
-    ResponseEntity<ResponseObject> getBlogPostById(@PathVariable Long postId) {
-        try {
-            BlogPostDTO dto = blogPostService.getBlogPostById(postId);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "post found", dto));
-        } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-        }
-    }
+//    @GetMapping("/getBlogById/{postId}")
+//    ResponseEntity<ResponseObject> getBlogPostById(@PathVariable Long postId) {
+//        try {
+//            BlogPostDTO dto = blogPostService.getBlogPostById(postId);
+//            return ResponseEntity.status(HttpStatus.OK)
+//                    .body(new ResponseObject("ok", "post found", dto));
+//        } catch (BlogPostException ex) {
+//            return ResponseEntity.status(HttpStatus.OK)
+//                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+//        }
+//    }
 
 
     @GetMapping("getAllBlog/{page}/{size}")
