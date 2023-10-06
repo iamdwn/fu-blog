@@ -1,8 +1,6 @@
 package tech.fublog.FuBlog.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -105,7 +103,7 @@ public class UserEntity implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "Roles_Id"))
     private Set<RoleEntity> roles = new HashSet<>();
 
-    public UserEntity(String fullName, String username, String email, String hashedpassword, String picture, Boolean status,Boolean isVerify, Double point) {
+    public UserEntity(String fullName, String username, String email, String hashedpassword, String picture, Boolean status,Boolean isVerify,Double point) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
@@ -115,6 +113,7 @@ public class UserEntity implements UserDetails {
         this.isVerify = isVerify;
         this.point = point;
     }
+
 
 
     @Override

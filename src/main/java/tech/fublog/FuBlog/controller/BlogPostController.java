@@ -95,17 +95,17 @@ public class BlogPostController {
 //        return blogPostService.findBlogByCategory(category);
 //    }
 
-    @GetMapping("/getBlogById/{postId}")
-    ResponseEntity<ResponseObject> getBlogPostById(@PathVariable Long postId) {
-        try {
-            BlogPostDTO dto = blogPostService.getBlogPostById(postId);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "post found", dto));
-        } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-        }
-    }
+//    @GetMapping("/getBlogById/{postId}")
+//    ResponseEntity<ResponseObject> getBlogPostById(@PathVariable Long postId) {
+//        try {
+//            BlogPostDTO dto = blogPostService.getBlogPostById(postId);
+//            return ResponseEntity.status(HttpStatus.OK)
+//                    .body(new ResponseObject("ok", "post found", dto));
+//        } catch (BlogPostException ex) {
+//            return ResponseEntity.status(HttpStatus.OK)
+//                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+//        }
+//    }
 
 
     @GetMapping("getAllBlog/{page}/{size}")
