@@ -241,6 +241,19 @@ public class BlogPostService {
 
             if (filter.equalsIgnoreCase("")) {
                 pageResult = blogPostRepository.findAll(pageable);
+            } else if ("newest".equalsIgnoreCase(filter)) {
+                pageResult = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
+            } else if ("oldest".equalsIgnoreCase(filter)) {
+                pageResult = blogPostRepository.findAllByOrderByCreatedDateAsc(pageable);
+            } else if ("latestModified".equalsIgnoreCase(filter)) {
+                pageResult = blogPostRepository.findAllByOrderByModifiedDateDesc(pageable);
+            } else if ("oldestModified".equalsIgnoreCase(filter)) {
+                pageResult = blogPostRepository.findAllByOrderByModifiedDateAsc(pageable);
+            } else if ("mostViewed".equalsIgnoreCase(filter)) {
+                pageResult = blogPostRepository.findAllByOrderByViewDesc(pageable);
+//            } else {
+//                // Mặc định, sắp xếp theo ngày tạo mới nhất.
+//                pageResult = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
             } else if (!filter.trim().matches("\\d+")) {
                 pageResult = blogPostRepository.getBlogPostEntitiesByTitle(filter, pageable);
             } else {
@@ -295,26 +308,24 @@ public class BlogPostService {
         return filterBlogPost(String.valueOf(categoryId), page, size);
     }
 
-    public Page<BlogPostEntity> getSortedBlogPosts(String sortBy, int page, int size) {
+    public List<BlogPostDTO> getSortedBlogPosts(String sortBy, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<BlogPostEntity> blogPostEntities = null;
-
-        if ("newest".equalsIgnoreCase(sortBy)) {
-            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
-        } else if ("oldest".equalsIgnoreCase(sortBy)) {
-            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateAsc(pageable);
-        } else if ("latestModified".equalsIgnoreCase(sortBy)) {
-            blogPostEntities = blogPostRepository.findAllByOrderByModifiedDateDesc(pageable);
-        } else if ("oldestModified".equalsIgnoreCase(sortBy)) {
-            blogPostEntities = blogPostRepository.findAllByOrderByModifiedDateAsc(pageable);
-        } else if ("mostViewed".equalsIgnoreCase(sortBy)) {
-            return blogPostRepository.findAllByOrderByViewDesc(pageable);
-        } else {
-            // Mặc định, sắp xếp theo ngày tạo mới nhất.
-            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
-        }
-
-        return blogPostEntities;
+//        Page<BlogPostEntity> blogPostEntities = null;
+//        if ("newest".equalsIgnoreCase(sortBy)) {
+//            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
+//        } else if ("oldest".equalsIgnoreCase(sortBy)) {
+//            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateAsc(pageable);
+//        } else if ("latestModified".equalsIgnoreCase(sortBy)) {
+//            blogPostEntities = blogPostRepository.findAllByOrderByModifiedDateDesc(pageable);
+//        } else if ("oldestModified".equalsIgnoreCase(sortBy)) {
+//            blogPostEntities = blogPostRepository.findAllByOrderByModifiedDateAsc(pageable);
+//        } else if ("mostViewed".equalsIgnoreCase(sortBy)) {
+//            blogPostEntities = blogPostRepository.findAllByOrderByViewDesc(pageable);
+//        } else {
+//            // Mặc định, sắp xếp theo ngày tạo mới nhất.
+//            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
+//        }
+        return filterBlogPost(sortBy, page, size);
     }
 
 

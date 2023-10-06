@@ -142,10 +142,12 @@ public class BlogPostController {
     }
 
     @GetMapping("/sorted/{page}/{size}")
-    public ResponseEntity<Page<BlogPostEntity>> getSortedBlogPosts(
+//    public ResponseEntity<Page<BlogPostEntity>> getSortedBlogPosts(
+    public ResponseEntity<List<BlogPostDTO>> getSortedBlogPosts(
             @RequestParam(name = "sortBy", defaultValue = "newest") String sortBy,
             @PathVariable int page, @PathVariable int size) {
-        Page<BlogPostEntity> blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
+//        Page<BlogPostEntity> blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
+        List<BlogPostDTO> blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
 
         if (blogPostEntities.isEmpty()) {
             return ResponseEntity.notFound().build();
