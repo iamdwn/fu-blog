@@ -24,19 +24,19 @@ import java.util.List;
 public class BlogPostController {
     private final BlogPostService blogPostService;
     private final ApprovalRequestService approvalRequestService;
-    //    private final VoteService voteService;
-    //    private final CommentService commentService;
+        private final VoteService voteService;
+        private final CommentService commentService;
     private final PostTagService postTagService;
 
     @Autowired
     public BlogPostController(BlogPostService blogPostService, ApprovalRequestService approvalRequestService,
-//                              VoteService voteService, CommentService commentService,
+                              VoteService voteService, CommentService commentService,
                               PostTagService postTagService
     ) {
         this.blogPostService = blogPostService;
         this.approvalRequestService = approvalRequestService;
-//        this.voteService = voteService;
-//        this.commentService = commentService;
+        this.voteService = voteService;
+        this.commentService = commentService;
         this.postTagService = postTagService;
     }
 
