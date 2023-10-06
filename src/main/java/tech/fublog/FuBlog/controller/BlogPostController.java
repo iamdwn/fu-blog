@@ -95,33 +95,45 @@ public class BlogPostController {
 //        return blogPostService.findBlogByCategory(category);
 //    }
 
-//    @GetMapping("/getBlogById/{postId}")
-//    ResponseEntity<ResponseObject> getBlogPostById(@PathVariable Long postId) {
-//        try {
-//            BlogPostDTO dto = blogPostService.getBlogPostById(postId);
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(new ResponseObject("ok", "post found", dto));
-//        } catch (BlogPostException ex) {
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-//        }
-//    }
+    @GetMapping("/getBlogById/{postId}")
+    ResponseEntity<ResponseObject> getBlogPostById(@PathVariable Long postId) {
+        try {
+            BlogPostDTO dto = blogPostService.getBlogPostById(postId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", dto));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/getBlogDetailsById/{postId}")
+    ResponseEntity<ResponseObject> getBlogDetailsById(@PathVariable Long postId) {
+        try {
+            BlogPostEntity blogPostEntity = blogPostService.getBlogPostDetailsById(postId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPostEntity));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
 
 
     @GetMapping("getAllBlog/{page}/{size}")
-    public List<BlogPostEntity> getAllBlog(@PathVariable int page, @PathVariable int size) {
+    public List<BlogPostDTO> getAllBlog(@PathVariable int page, @PathVariable int size) {
         return blogPostService.getAllBlogPost(page, size);
     }
 
     @GetMapping("getByTitle/{title}/{page}/{size}")
-    public List<BlogPostEntity> getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
+    public List<BlogPostDTO> getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
         return blogPostService.getAllBlogPostByTitle(title, page, size);
     }
 
     @GetMapping("getByCategory/{categoryId}/{page}/{size}")
-    public ResponseEntity<List<BlogPostEntity>> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
+    public ResponseEntity<List<BlogPostDTO>> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
 //        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
-        List<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+        List<BlogPostDTO> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
 
         if (blogPosts.isEmpty()) {
             return ResponseEntity.notFound().build();
