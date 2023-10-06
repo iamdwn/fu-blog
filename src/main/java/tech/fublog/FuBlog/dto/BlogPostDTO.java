@@ -22,17 +22,17 @@ public class BlogPostDTO {
     private Set<TagDTO> tagList;
     private UserDTO user;
     private Long views;
-    private Date createDate = new Date();
+    private Date createdDate;
 
-//    public BlogPostDTO(Long postId, String typePost, String title, String content, String categoryName, Long parentCategoryId, Set<TagDTO> tagList, UserDTO user) {
-//        this.postId = postId;
-//        this.typePost = typePost;
-//        this.title = title;
-//        this.content = content;
-//        this.categoryName = categoryName;
-//        this.parentCategoryId = parentCategoryId;
-//        this.tagList = tagList;
-//        this.user = user;
-//    }
-
+    public BlogPostDTO(String typePost, String title, String content, String categoryName, CategoryEntity parentCategoryId, Set<TagDTO> tagList, UserDTO user, Long views, Date createdDate) {
+        this.typePost = typePost;
+        this.title = title;
+        this.content = content;
+        this.categoryName = categoryName;
+        this.parentCategoryId = parentCategoryId;
+        this.tagList = tagList;
+        this.user = user;
+        this.views = views;
+        this.createdDate = createdDate;
+    }
 }

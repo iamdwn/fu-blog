@@ -1,4 +1,4 @@
-package tech.fublog.FuBlog.dto;
+package tech.fublog.FuBlog.dto.request;
 
 import lombok.*;
 
@@ -9,11 +9,10 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseCommentDTO {
+public class RequestCommentDTO {
     private Long commentId;
     private Long parentCommentId;
     private String content;
     private Long postId;
     private Long userId;
-    private List<ResponseCommentDTO> subComment;
 }

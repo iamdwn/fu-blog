@@ -98,7 +98,8 @@ public class AuthenticationController {
                 encoder.encode(signUpRequest.getPassword()),
                 signUpRequest.getPicture(),
                 true,
-                true
+                true,
+                0.0
         );
 
         Set<RoleEntity> roleEntities = new HashSet<>();
@@ -132,7 +133,8 @@ public class AuthenticationController {
                 encoder.encode(signUpRequest.getPassword()),
                 signUpRequest.getPicture(),
                 true,
-                true
+                true,
+                0.0
         );
         Set<RoleEntity> roleEntities = new HashSet<>();
         RoleEntity userRole = roleRepository.findByName("USER");

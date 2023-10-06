@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.dto.response;
 
+
 public class UserInfoDTO {
     private String name;
 

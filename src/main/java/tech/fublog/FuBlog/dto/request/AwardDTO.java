@@ -1,4 +1,4 @@
-package tech.fublog.FuBlog.dto;
+package tech.fublog.FuBlog.dto.request;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

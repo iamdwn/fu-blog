@@ -80,23 +80,32 @@ public class BlogPostController {
         }
     }
 
+    @GetMapping("getPinnedBlog")
+    public ResponseEntity<ResponseObject> getPinnedBlog(){
+        return  blogPostService.getPinnedBlog();
+    }
+
+    @PostMapping("pinBlogAction/{postId}")
+    public ResponseEntity<ResponseObject> pinBlog(@PathVariable Long postId){
+        return  blogPostService.pinBlogAction(postId);
+    }
 
 //    @GetMapping("/search/{category}")
 //    ResponseEntity<ResponseObject> findBlogByCategory(@PathVariable String category) {
 //        return blogPostService.findBlogByCategory(category);
 //    }
 
-//    @GetMapping("/getBlogById/{postId}")
-//    ResponseEntity<ResponseObject> getBlogPostById(@PathVariable Long postId) {
-//        try {
-//            BlogPostDTO dto = blogPostService.getBlogPostById(postId);
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(new ResponseObject("ok", "post found", dto));
-//        } catch (BlogPostException ex) {
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-//        }
-//    }
+    @GetMapping("/getBlogById/{postId}")
+    ResponseEntity<ResponseObject> getBlogPostById(@PathVariable Long postId) {
+        try {
+            BlogPostDTO dto = blogPostService.getBlogPostById(postId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", dto));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
 
 
     @GetMapping("getAllBlog/{page}/{size}")
@@ -110,8 +119,9 @@ public class BlogPostController {
     }
 
     @GetMapping("getByCategory/{categoryId}/{page}/{size}")
-    public ResponseEntity<Page<BlogPostEntity>> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
-        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+    public ResponseEntity<List<BlogPostEntity>> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
+//        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+        List<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
 
         if (blogPosts.isEmpty()) {
             return ResponseEntity.notFound().build();
