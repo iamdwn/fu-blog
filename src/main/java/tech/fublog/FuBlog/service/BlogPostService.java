@@ -240,7 +240,7 @@ public class BlogPostService {
             Pageable pageable = PageRequest.of(page - 1, size - blogPostList.size());
 
             if (filter.equalsIgnoreCase("")) {
-                pageResult = blogPostRepository.findAllByStatusIsTrueAndIsApprovedIsTrue(pageable);
+                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
             } else if ("newest".equalsIgnoreCase(filter)) {
                 pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
             } else if ("oldest".equalsIgnoreCase(filter)) {
