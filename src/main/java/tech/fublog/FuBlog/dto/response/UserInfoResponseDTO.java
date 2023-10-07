@@ -1,7 +1,7 @@
 package tech.fublog.FuBlog.dto.response;
 
 
-public class UserInfoDTO {
+public class UserInfoResponseDTO {
     private String name;
 
     private String picture;
@@ -31,10 +31,10 @@ public class UserInfoDTO {
         this.point = point;
     }
 
-    public UserInfoDTO() {
+    public UserInfoResponseDTO() {
     }
 
-    public UserInfoDTO(String name, String picture, Double point) {
+    public UserInfoResponseDTO(String name, String picture, Double point) {
         this.name = name;
         this.picture = picture;
         this.point = point;

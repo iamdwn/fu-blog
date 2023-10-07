@@ -1,16 +1,13 @@
 package tech.fublog.FuBlog.service;
 
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
-import tech.fublog.FuBlog.dto.response.UserInfoDTO;
+import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
-import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.exception.UserException;
@@ -22,7 +19,6 @@ import tech.fublog.FuBlog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.ZoneId;
 import java.util.*;
 
 
@@ -75,7 +71,7 @@ public class UserService {
 
     public ResponseEntity<ResponseObject> getActiveUser() {
         List<UserEntity> userEntities = userRepository.findAllByOrderByPointDesc();
-        List<UserInfoDTO> highestPointUser = new ArrayList<>();
+        List<UserInfoResponseDTO> highestPointUser = new ArrayList<>();
 
         for (UserEntity user : userEntities) {
             if (user.getPoint().equals(userEntities.get(0).getPoint())) {
@@ -83,11 +79,10 @@ public class UserService {
 //                        user.getUsername(),
 //                        user.getFullName(),
 //                        user.getEmail());
+                UserInfoResponseDTO userInfoResponseDTO =
+                        new UserInfoResponseDTO(user.getUsername(), user.getPicture(), user.getPoint());
 
-                UserInfoDTO userInfoDTO =
-                        new UserInfoDTO(user.getUsername(), user.getPicture(), user.getPoint());
-
-                highestPointUser.add(userInfoDTO);
+                highestPointUser.add(userInfoResponseDTO);
             }
         }
 
@@ -98,10 +93,10 @@ public class UserService {
 
 
 
-    public UserInfoDTO getUserInfo(Long userId) {
+    public UserInfoResponseDTO getUserInfo(Long userId) {
         UserEntity user = userRepository.findById(userId).orElse(null);
         if (user != null) {
-            return new UserInfoDTO(user.getUsername(), user.getPicture(), user.getPoint());
+            return new UserInfoResponseDTO(user.getUsername(), user.getPicture(), user.getPoint());
         }
         return null;
 
@@ -116,27 +111,27 @@ public class UserService {
 
     public boolean markPost(Long userId, Long postId) {
         boolean result = false;
-//        Optional<UserEntity> userEntity = userRepository.findById(userId);
-//        if (userEntity.isPresent()) {
-//            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
-//            if (blogPostEntity.isPresent()) {
-//                Set<BlogPostEntity> entitySet;
-//                if (userEntity.get().getMarkPosts().isEmpty()) {
-//                    entitySet = new HashSet<>();
-//                    entitySet.add(blogPostEntity.get());
-//                    userEntity.get().setMarkPosts(entitySet);
-//                    userRepository.save(userEntity.get());
-//                    result = true;
-//                } else {
-//                    entitySet = userEntity.get().getMarkPosts();
-//                    if (entitySet.add(blogPostEntity.get())) {
-//                        userEntity.get().setMarkPosts(entitySet);
-//                        userRepository.save(userEntity.get());
-//                        result = true;
-//                    } else throw new UserException("You already mark this post!");
-//                }
-//            }
-//        }
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+            if (blogPostEntity.isPresent()) {
+                Set<BlogPostEntity> entitySet;
+                if (userEntity.get().getMarkPosts().isEmpty()) {
+                    entitySet = new HashSet<>();
+                    entitySet.add(blogPostEntity.get());
+                    userEntity.get().setMarkPosts(entitySet);
+                    userRepository.save(userEntity.get());
+                    result = true;
+                } else {
+                    entitySet = userEntity.get().getMarkPosts();
+                    if (entitySet.add(blogPostEntity.get())) {
+                        userEntity.get().setMarkPosts(entitySet);
+                        userRepository.save(userEntity.get());
+                        result = true;
+                    } else throw new UserException("You already marked this post!");
+                }
+            }
+        }
         return result;
     }
 
@@ -150,9 +145,7 @@ public class UserService {
         if (userEntity.isPresent()
                 && userEntity.get().getStatus()) {
             UserEntity user = this.getUserById(userId);
-
             user.setStatus(false);
-
             userRepository.save(user);
 
             return ResponseEntity.status(HttpStatus.OK)
@@ -167,9 +160,7 @@ public class UserService {
         if(userEntity.isPresent()){
             if(userDTO.getRole() != null) {
                 Set<RoleEntity> roleEntities = new HashSet<>();
-
                 RoleEntity userRole = roleRepository.findByName(userDTO.getRole().toUpperCase());
-
                 roleEntities.add(userRole);
 
                 UserEntity user = this.getUserById(userId);

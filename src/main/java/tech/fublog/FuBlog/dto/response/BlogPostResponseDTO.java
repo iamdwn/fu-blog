@@ -9,7 +9,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseBlogPostDTO {
+public class BlogPostResponseDTO {
     private Long postId;
     private Long userId;
     private String typePost;
@@ -18,5 +18,5 @@ public class ResponseBlogPostDTO {
     private String categoryName;
     private Long parentCategoryId;
     private long vote;
-    private List<ResponseCommentDTO> comment;
+    private List<CommentResponseDTO> comment;
 }

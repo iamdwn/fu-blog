@@ -9,12 +9,12 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseCommentDTO {
+public class CommentResponseDTO {
     private Long commentId;
     private Long parentCommentId;
     private String content;
     private Long postId;
     private Long userId;
     private boolean status;
-    private List<ResponseCommentDTO> subComment;
+    private List<CommentResponseDTO> subComment;
 }

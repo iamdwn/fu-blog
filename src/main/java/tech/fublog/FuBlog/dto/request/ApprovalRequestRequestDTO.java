@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestApprovalRequestDTO {
+public class ApprovalRequestRequestDTO {
     private Boolean isApproved;
     private Long postId;
 //    private Long requestId;

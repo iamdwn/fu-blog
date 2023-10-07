@@ -38,8 +38,9 @@ public class UserController {
     public List<UserEntity> getAllUser(){
         return  userRepository.findAllByStatusIsTrue();
     }
-    @GetMapping("/mark")
-    public ResponseEntity<ResponseObject> markBook(@RequestBody PostMarkDTO postMarkDTO) {
+
+    @PostMapping("/mark")
+    public ResponseEntity<ResponseObject> markPost(@RequestBody PostMarkDTO postMarkDTO) {
         try {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", userService.markPost(postMarkDTO.getUserId(), postMarkDTO.getPostId())));

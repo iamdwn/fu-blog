@@ -1,6 +1,6 @@
 package tech.fublog.FuBlog.service;
 
-import tech.fublog.FuBlog.dto.response.ResponseCategoryDTO;
+import tech.fublog.FuBlog.dto.response.CategoryResponseDTO;
 import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +18,12 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<ResponseCategoryDTO> getAllCategory() {
+    public List<CategoryResponseDTO> getAllCategory() {
         List<CategoryEntity> list = categoryRepository.findByParentCategoryIsNull();
         if (!list.isEmpty()) {
-            List<ResponseCategoryDTO> dtoList = new ArrayList<>();
+            List<CategoryResponseDTO> dtoList = new ArrayList<>();
             for (CategoryEntity entity : list) {
-                ResponseCategoryDTO dto = convertCategoryToDTO(entity);
+                CategoryResponseDTO dto = convertCategoryToDTO(entity);
                 dtoList.add(dto);
             }
             return dtoList;
@@ -31,17 +31,17 @@ public class CategoryService {
         return new ArrayList<>();
     }
 
-    private ResponseCategoryDTO convertCategoryToDTO(CategoryEntity categoryEntity) {
-        ResponseCategoryDTO responseCategoryDTO = new ResponseCategoryDTO();
-        responseCategoryDTO.setCategoryId(categoryEntity.getId());
-        responseCategoryDTO.setCategoryName(categoryEntity.getCategoryName());
+    private CategoryResponseDTO convertCategoryToDTO(CategoryEntity categoryEntity) {
+        CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO();
+        categoryResponseDTO.setCategoryId(categoryEntity.getId());
+        categoryResponseDTO.setCategoryName(categoryEntity.getCategoryName());
         List<CategoryEntity> subCategory = categoryRepository.findByParentCategory(categoryEntity);
-        List<ResponseCategoryDTO> subcategoryDTOResponse = new ArrayList<>();
+        List<CategoryResponseDTO> subcategoryDTOResponse = new ArrayList<>();
         for (CategoryEntity sub : subCategory) {
-            ResponseCategoryDTO subResponseCategoryDTOs = convertCategoryToDTO(sub);
-            subcategoryDTOResponse.add(subResponseCategoryDTOs);
+            CategoryResponseDTO subCategoryResponseDTOs = convertCategoryToDTO(sub);
+            subcategoryDTOResponse.add(subCategoryResponseDTOs);
         }
-        responseCategoryDTO.setSubCategory(subcategoryDTOResponse);
-        return responseCategoryDTO;
+        categoryResponseDTO.setSubCategory(subcategoryDTOResponse);
+        return categoryResponseDTO;
     }
 }

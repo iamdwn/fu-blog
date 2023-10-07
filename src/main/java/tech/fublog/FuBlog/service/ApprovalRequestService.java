@@ -1,8 +1,8 @@
 package tech.fublog.FuBlog.service;
 
 
-import tech.fublog.FuBlog.dto.request.RequestApprovalRequestDTO;
-import tech.fublog.FuBlog.dto.response.ResponseApprovalRequestDTO;
+import tech.fublog.FuBlog.dto.request.ApprovalRequestRequestDTO;
+import tech.fublog.FuBlog.dto.response.ApprovalRequestResponseDTO;
 import tech.fublog.FuBlog.entity.ApprovalRequestEntity;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
@@ -35,12 +35,12 @@ public class ApprovalRequestService {
         this.approvalRequestRepository = approvalRequestRepository;
     }
 
-    public List<ResponseApprovalRequestDTO> getAllApprovalRequest() {
+    public List<ApprovalRequestResponseDTO> getAllApprovalRequest() {
         List<ApprovalRequestEntity> list = approvalRequestRepository.findAll();
-        List<ResponseApprovalRequestDTO> dtoList = new ArrayList<>();
+        List<ApprovalRequestResponseDTO> dtoList = new ArrayList<>();
         for (ApprovalRequestEntity entity : list) {
-            ResponseApprovalRequestDTO dto =
-                    new ResponseApprovalRequestDTO(entity.getBlogPost().getId(), entity.getRequest().getId());
+            ApprovalRequestResponseDTO dto =
+                    new ApprovalRequestResponseDTO(entity.getBlogPost().getId(), entity.getRequest().getId());
             dtoList.add(dto);
         }
         return dtoList;
@@ -66,9 +66,9 @@ public class ApprovalRequestService {
     }
 
 
-    public ResponseEntity<ResponseObject> approveBlogPost(RequestApprovalRequestDTO requestApprovalRequestDTO) {
-        Optional<UserEntity> userEntity = userRepository.findById(requestApprovalRequestDTO.getReviewId());
-        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(requestApprovalRequestDTO.getPostId());
+    public ResponseEntity<ResponseObject> approveBlogPost(ApprovalRequestRequestDTO approvalRequestRequestDTO) {
+        Optional<UserEntity> userEntity = userRepository.findById(approvalRequestRequestDTO.getReviewId());
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(approvalRequestRequestDTO.getPostId());
         if (blogPostEntity.isPresent() && userEntity.isPresent()) {
             ApprovalRequestEntity approvalRequestEntity = approvalRequestRepository.findByBlogPost(blogPostEntity.get());
             if (approvalRequestEntity != null) {
