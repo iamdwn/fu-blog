@@ -12,6 +12,6 @@ import java.util.List;
 public class ResponseCategoryDTO {
     private Long categoryId;
     private String categoryName;
-    //    private Long parentCategoryId;
+    private Long parentCategoryId;
     private List<ResponseCategoryDTO> subCategory;
 }

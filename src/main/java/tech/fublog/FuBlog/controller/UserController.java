@@ -20,7 +20,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/markAction/{action}")
+    @PostMapping("/markAction/{action}")
     public ResponseEntity<ResponseObject> markBook(@PathVariable String action, @RequestBody PostMarkDTO postMarkDTO) {
         try {
             String result = "";
@@ -36,6 +36,12 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
+    }
+
+    @GetMapping("/getMarkPost/{userId}")
+    public ResponseEntity<ResponseObject> getMarkPostByUser(@PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", userService.getMarkPostByUser(userId)));
     }
 
     @GetMapping("/getActiveUser")

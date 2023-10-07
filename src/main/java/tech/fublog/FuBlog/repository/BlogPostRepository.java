@@ -19,7 +19,7 @@ import java.util.List;
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
     List<BlogPostEntity> findByIsApproved(Boolean isApproved);
 
-    List<BlogPostEntity> findByTitleLike(String title);
+    List<BlogPostEntity> findByTitleLikeAndIsApprovedTrueAndStatusTrue(String title);
 
     List<BlogPostEntity> getBlogPostEntitiesByTitle(String title, Pageable pageable);
 //    List<BlogPostEntity> findAllByCategory(Long id);

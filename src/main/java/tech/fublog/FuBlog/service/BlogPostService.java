@@ -317,7 +317,7 @@ public class BlogPostService {
                     }
                 }
 //                }
-//                blogPostEntitySet = getPageOfItems(blogPostEntitySet, page, size);
+                blogPostEntitySet = getPageOfItems(blogPostEntitySet, page, size);
                 for (BlogPostEntity entity : blogPostEntitySet) {
                     blogPostDTOSet.add(convertPostToDTO(entity));
                 }
@@ -352,13 +352,13 @@ public class BlogPostService {
 
     public List<BlogPostDTO> findBlogByTitle(String title) {
         if (!title.trim().isEmpty()) {
-            List<BlogPostEntity> list = blogPostRepository.findByTitleLike("%" + title.trim() + "%");
+            List<BlogPostEntity> list = blogPostRepository.findByTitleLikeAndIsApprovedTrueAndStatusTrue("%" + title.trim() + "%");
             if (!list.isEmpty()) {
                 List<BlogPostDTO> dtoList = new ArrayList<>();
                 for (BlogPostEntity entity : list) {
-                    if (entity.getIsApproved() && entity.getStatus()) {
-                        dtoList.add(convertPostToDTO(entity));
-                    }
+//                    if (entity.getIsApproved() && entity.getStatus()) {
+                    dtoList.add(convertPostToDTO(entity));
+//                    }
                 }
                 return dtoList;
             } else return new ArrayList<>();

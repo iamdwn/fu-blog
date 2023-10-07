@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import tech.fublog.FuBlog.dto.BlogPostDTO;
+import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.dto.UserInfoDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.RoleEntity;
@@ -136,6 +138,34 @@ public class UserService {
                 }
             } else throw new UserException("Blog doesn't exists!");
         } else throw new UserException("User doesn't exists");
+    }
+
+    public List<BlogPostDTO> getMarkPostByUser(Long userId) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            Set<BlogPostEntity> entitySet = userEntity.get().getMarkPosts();
+            if (!entitySet.isEmpty()) {
+                List<BlogPostDTO> dtoList = new ArrayList<>();
+                for (BlogPostEntity entity : entitySet) {
+                    dtoList.add(convertPostToDTO(entity));
+                }
+                return dtoList;
+            } else return new ArrayList<>();
+        } else throw new UserException("User doesn't exists");
+    }
+
+    public UserDTO convertUserToDTO(UserEntity userEntity) {
+        return new UserDTO(userEntity.getFullName(), userEntity.getPassword(), userEntity.getEmail(), userEntity.getId(), userEntity.getPicture(), new ArrayList<>());
+    }
+
+    public BlogPostDTO convertPostToDTO(BlogPostEntity blogPostEntity) {
+        Long parentCategoryId = null;
+        if (blogPostEntity.getCategory().getParentCategory() != null)
+            parentCategoryId = blogPostEntity.getCategory().getParentCategory().getId();
+        return new BlogPostDTO(blogPostEntity.getId(), blogPostEntity.getTypePost(),
+                blogPostEntity.getTitle(), blogPostEntity.getContent(),
+                blogPostEntity.getCategory().getCategoryName(),
+                parentCategoryId, null, convertUserToDTO(blogPostEntity.getAuthors()));
     }
 
 }
