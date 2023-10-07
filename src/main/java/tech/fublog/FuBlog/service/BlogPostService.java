@@ -9,6 +9,7 @@ import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.dto.request.RequestBlogPostDTO;
+import tech.fublog.FuBlog.dto.response.PageResponse;
 import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.PostTagException;
 import tech.fublog.FuBlog.model.ResponseObject;
@@ -230,150 +231,109 @@ public class BlogPostService {
                 .body(new ResponseObject("ok", "pinned successfull", ""));
     }
 
-    public List<BlogPostDTO> filterBlogPost(String filter, int page, int size) {
+    public PageResponse filterBlogPost(String filter, int page, int size) {
         List<BlogPostEntity> blogPostList = new ArrayList<>();
         List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
-        List<Long> existBlogPostId = page > 1 ? getExistBlogPostPreviousPage(filter, page - 1, size)
-                : new ArrayList<>();
+        List<BlogPostEntity> pageContent;
+        Page<BlogPostEntity> pageResult;
 
-        while (blogPostList.size() < size) {
             Pageable pageable = PageRequest.of(page - 1, size - blogPostList.size());
-            Page<BlogPostEntity> pageResult = null;
-            Page<BlogPostDTO> pageDTOResult = null;
 
             if (filter.equalsIgnoreCase("")) {
-                pageResult = blogPostRepository.findAll(pageable);
+                pageResult = blogPostRepository.findAllByStatusIsTrueAndIsApprovedIsTrue(pageable);
             } else if ("newest".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
+                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
             } else if ("oldest".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByOrderByCreatedDateAsc(pageable);
+                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateAsc(pageable);
             } else if ("latestModified".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByOrderByModifiedDateDesc(pageable);
+                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateDesc(pageable);
             } else if ("oldestModified".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByOrderByModifiedDateAsc(pageable);
+                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateAsc(pageable);
             } else if ("mostViewed".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByOrderByViewDesc(pageable);
-//            } else {
-//                // Mặc định, sắp xếp theo ngày tạo mới nhất.
-//                pageResult = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
+                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(pageable);
             } else if (!filter.trim().matches("\\d+")) {
-                pageResult = blogPostRepository.getBlogPostEntitiesByTitle(filter, pageable);
+                pageResult = blogPostRepository.getBlogPostEntitiesByTitleAndStatusIsTrueAndIsApprovedIsTrue(filter, pageable);
             } else {
                 Optional<CategoryEntity> categoryOptional = categoryRepository.findById(Long.parseLong(filter));
                 pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
             }
 
-            List<BlogPostEntity> pageContent = pageResult.getContent();
-
+            pageContent = pageResult.getContent();
 
             for (BlogPostEntity blogPost : pageContent) {
-                if (!existBlogPostId.contains(blogPost.getId())
-                        && blogPost.getStatus()
-                        && blogPost.getIsApproved()) {
-                    blogPostList.add(blogPost);
                     blogPostDTOList.add(getBlogPostById(blogPost.getId()));
-                    existBlogPostId.add(blogPost.getId());
                 }
-            }
 
-            if (!pageResult.hasNext()) {
-                break;
-            }
-            page++;
-        }
-        return blogPostDTOList;
+        Long blogPostCount = Long.valueOf(pageResult.getTotalElements());
+        Long pageCount = Long.valueOf(pageResult.getTotalPages());
+        PageResponse pageResponse = new PageResponse(blogPostDTOList, blogPostCount, pageCount);
+        return pageResponse;
     }
 
 
-    public List<Long> getExistBlogPostPreviousPage(String filter, int page, int size) {
-        List<BlogPostEntity> blogPostList = new ArrayList<>();
-        List<Long> existBlogPostId = page > 1 ? getExistBlogPostPreviousPage(filter, page - 1, size)
-                : new ArrayList<>();
-
-        while (blogPostList.size() < size) {
-            Pageable pageable = PageRequest.of(page - 1, size - blogPostList.size());
-            Page<BlogPostEntity> pageResult = null;
-            Page<BlogPostDTO> pageDTOResult = null;
-
-            if (filter.equalsIgnoreCase("")) {
-                pageResult = blogPostRepository.findAll(pageable);
-            } else if ("newest".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
-            } else if ("oldest".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByOrderByCreatedDateAsc(pageable);
-            } else if ("latestModified".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByOrderByModifiedDateDesc(pageable);
-            } else if ("oldestModified".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByOrderByModifiedDateAsc(pageable);
-            } else if ("mostViewed".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByOrderByViewDesc(pageable);
+//    public List<Long> getExistBlogPostPreviousPage(String filter, int page, int size) {
+//        List<BlogPostEntity> blogPostList = new ArrayList<>();
+//        List<Long> existBlogPostId = page > 1 ? getExistBlogPostPreviousPage(filter, page - 1, size)
+//                : new ArrayList<>();
+//
+//        while (blogPostList.size() < size) {
+//            Pageable pageable = PageRequest.of(page - 1, size - blogPostList.size());
+//            Page<BlogPostEntity> pageResult = null;
+////            Page<BlogPostDTO> pageDTOResult = null;
+//
+//            if (filter.equalsIgnoreCase("")) {
+//                pageResult = blogPostRepository.findAllByStatusIsTrueAndIsApprovedIsTrue(pageable);
+//            } else if ("newest".equalsIgnoreCase(filter)) {
+//                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
+//            } else if ("oldest".equalsIgnoreCase(filter)) {
+//                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateAsc(pageable);
+//            } else if ("latestModified".equalsIgnoreCase(filter)) {
+//                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateDesc(pageable);
+//            } else if ("oldestModified".equalsIgnoreCase(filter)) {
+//                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateAsc(pageable);
+//            } else if ("mostViewed".equalsIgnoreCase(filter)) {
+//                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(pageable);
+//            } else if (!filter.trim().matches("\\d+")) {
+//                pageResult = blogPostRepository.getBlogPostEntitiesByTitleAndStatusIsTrueAndIsApprovedIsTrue(filter, pageable);
 //            } else {
-//                // Mặc định, sắp xếp theo ngày tạo mới nhất.
-//                pageResult = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
-            } else if (!filter.trim().matches("\\d+")) {
-                pageResult = blogPostRepository.getBlogPostEntitiesByTitle(filter, pageable);
-            } else {
-                Optional<CategoryEntity> categoryOptional = categoryRepository.findById(Long.parseLong(filter));
-                pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
-            }
-
-            List<BlogPostEntity> pageContent = pageResult.getContent();
-
-
-            for (BlogPostEntity blogPost : pageContent) {
-                if (!existBlogPostId.contains(blogPost.getId())
-                        && blogPost.getStatus()
-                        && blogPost.getIsApproved()) {
-                    blogPostList.add(blogPost);
-                    existBlogPostId.add(blogPost.getId());
-                }
-            }
-
-            if (!pageResult.hasNext()) {
-                break;
-            }
-            page++;
-        }
-        return existBlogPostId;
-    }
+//                Optional<CategoryEntity> categoryOptional = categoryRepository.findById(Long.parseLong(filter));
+//                pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
+//            }
+//
+//            List<BlogPostEntity> pageContent = pageResult.getContent();
+//
+//
+//            for (BlogPostEntity blogPost : pageContent) {
+//                if (!existBlogPostId.contains(blogPost.getId())
+//                        && blogPost.getStatus()
+//                        && blogPost.getIsApproved()) {
+//                    blogPostList.add(blogPost);
+//                    existBlogPostId.add(blogPost.getId());
+//                }
+//            }
+//
+//            if (!pageResult.hasNext()) {
+//                break;
+//            }
+//            page++;
+//        }
+//        return existBlogPostId;
+//    }
 
 
-    public Long countFilteredBlogPost(String filter){
-        Long count = 0L;
-        if (filter.equalsIgnoreCase("")) {
-
-        } else if ("newest".equalsIgnoreCase(filter)) {
-
-        } else if ("oldest".equalsIgnoreCase(filter)) {
-
-        } else if ("latestModified".equalsIgnoreCase(filter)) {
-
-        } else if ("oldestModified".equalsIgnoreCase(filter)) {
-
-        } else if ("mostViewed".equalsIgnoreCase(filter)) {
-
-        } else if (!filter.trim().matches("\\d+")) {
-
-        } else {
-            Optional<CategoryEntity> categoryOptional = categoryRepository.findById(Long.parseLong(filter));
-
-        }
-        return count;
-    }
-
-    public List<BlogPostDTO> getAllBlogPost(int page, int size) {
+    public PageResponse getAllBlogPost(int page, int size) {
         return filterBlogPost("", page, size);
     }
 
 
-    public List<BlogPostDTO> getAllBlogPostByTitle(String title, int page, int size) {
+    public PageResponse getAllBlogPostByTitle(String title, int page, int size) {
 //        Pageable pageable = PageRequest.of(page - 1, size);
 //        return blogPostRepository.getBlogPostEntitiesByTitle(title, pageable);
         return filterBlogPost(title, page, size);
     }
 
     //    public Page<BlogPostEntity> getBlogPostsByCategoryId(Long categoryId, int page, int size) {
-    public List<BlogPostDTO> getBlogPostsByCategoryId(Long categoryId, int page, int size) {
+    public PageResponse getBlogPostsByCategoryId(Long categoryId, int page, int size) {
 //        Pageable pageable = PageRequest.of(page - 1, size);
 //        Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
 //
@@ -386,7 +346,7 @@ public class BlogPostService {
         return filterBlogPost(String.valueOf(categoryId), page, size);
     }
 
-    public List<BlogPostDTO> getSortedBlogPosts(String sortBy, int page, int size) {
+    public PageResponse getSortedBlogPosts(String sortBy, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
 //        Page<BlogPostEntity> blogPostEntities = null;
 //        if ("newest".equalsIgnoreCase(sortBy)) {
