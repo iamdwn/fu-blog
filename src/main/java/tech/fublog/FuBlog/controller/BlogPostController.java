@@ -3,6 +3,7 @@ package tech.fublog.FuBlog.controller;
 import org.springframework.data.domain.Page;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.request.RequestBlogPostDTO;
+import tech.fublog.FuBlog.dto.response.PageResponse;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.ApprovalRequestService;
@@ -121,21 +122,21 @@ public class BlogPostController {
 
 
     @GetMapping("getAllBlog/{page}/{size}")
-    public List<BlogPostDTO> getAllBlog(@PathVariable int page, @PathVariable int size) {
+    public PageResponse getAllBlog(@PathVariable int page, @PathVariable int size) {
         return blogPostService.getAllBlogPost(page, size);
     }
 
     @GetMapping("getByTitle/{title}/{page}/{size}")
-    public List<BlogPostDTO> getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
+    public PageResponse getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
         return blogPostService.getAllBlogPostByTitle(title, page, size);
     }
 
     @GetMapping("getByCategory/{categoryId}/{page}/{size}")
-    public ResponseEntity<List<BlogPostDTO>> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
+    public ResponseEntity<PageResponse> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
 //        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
-        List<BlogPostDTO> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+        PageResponse blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
 
-        if (blogPosts.isEmpty()) {
+        if (blogPosts == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(blogPosts);
@@ -143,13 +144,13 @@ public class BlogPostController {
 
     @GetMapping("/sorted/{page}/{size}")
 //    public ResponseEntity<Page<BlogPostEntity>> getSortedBlogPosts(
-    public ResponseEntity<List<BlogPostDTO>> getSortedBlogPosts(
+    public ResponseEntity<PageResponse> getSortedBlogPosts(
             @RequestParam(name = "sortBy", defaultValue = "newest") String sortBy,
             @PathVariable int page, @PathVariable int size) {
 //        Page<BlogPostEntity> blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
-        List<BlogPostDTO> blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
+        PageResponse blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
 
-        if (blogPostEntities.isEmpty()) {
+        if (blogPostEntities == null) {
             return ResponseEntity.notFound().build();
         }
 
