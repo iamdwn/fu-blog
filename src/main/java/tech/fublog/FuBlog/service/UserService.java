@@ -83,7 +83,6 @@ public class UserService {
 //                        user.getUsername(),
 //                        user.getFullName(),
 //                        user.getEmail());
-
                 UserInfoDTO userInfoDTO =
                         new UserInfoDTO(user.getUsername(), user.getPicture(), user.getPoint());
 
@@ -116,27 +115,27 @@ public class UserService {
 
     public boolean markPost(Long userId, Long postId) {
         boolean result = false;
-//        Optional<UserEntity> userEntity = userRepository.findById(userId);
-//        if (userEntity.isPresent()) {
-//            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
-//            if (blogPostEntity.isPresent()) {
-//                Set<BlogPostEntity> entitySet;
-//                if (userEntity.get().getMarkPosts().isEmpty()) {
-//                    entitySet = new HashSet<>();
-//                    entitySet.add(blogPostEntity.get());
-//                    userEntity.get().setMarkPosts(entitySet);
-//                    userRepository.save(userEntity.get());
-//                    result = true;
-//                } else {
-//                    entitySet = userEntity.get().getMarkPosts();
-//                    if (entitySet.add(blogPostEntity.get())) {
-//                        userEntity.get().setMarkPosts(entitySet);
-//                        userRepository.save(userEntity.get());
-//                        result = true;
-//                    } else throw new UserException("You already mark this post!");
-//                }
-//            }
-//        }
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+            if (blogPostEntity.isPresent()) {
+                Set<BlogPostEntity> entitySet;
+                if (userEntity.get().getMarkPosts().isEmpty()) {
+                    entitySet = new HashSet<>();
+                    entitySet.add(blogPostEntity.get());
+                    userEntity.get().setMarkPosts(entitySet);
+                    userRepository.save(userEntity.get());
+                    result = true;
+                } else {
+                    entitySet = userEntity.get().getMarkPosts();
+                    if (entitySet.add(blogPostEntity.get())) {
+                        userEntity.get().setMarkPosts(entitySet);
+                        userRepository.save(userEntity.get());
+                        result = true;
+                    } else throw new UserException("You already marked this post!");
+                }
+            }
+        }
         return result;
     }
 
@@ -150,9 +149,7 @@ public class UserService {
         if (userEntity.isPresent()
                 && userEntity.get().getStatus()) {
             UserEntity user = this.getUserById(userId);
-
             user.setStatus(false);
-
             userRepository.save(user);
 
             return ResponseEntity.status(HttpStatus.OK)
@@ -167,9 +164,7 @@ public class UserService {
         if(userEntity.isPresent()){
             if(userDTO.getRole() != null) {
                 Set<RoleEntity> roleEntities = new HashSet<>();
-
                 RoleEntity userRole = roleRepository.findByName(userDTO.getRole().toUpperCase());
-
                 roleEntities.add(userRole);
 
                 UserEntity user = this.getUserById(userId);

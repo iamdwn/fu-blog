@@ -91,10 +91,6 @@ public class BlogPostController {
         return  blogPostService.pinBlogAction(postId);
     }
 
-//    @GetMapping("/search/{category}")
-//    ResponseEntity<ResponseObject> findBlogByCategory(@PathVariable String category) {
-//        return blogPostService.findBlogByCategory(category);
-//    }
 
     @GetMapping("/getBlogById/{postId}")
     ResponseEntity<ResponseObject> getBlogPostById(@PathVariable Long postId) {
@@ -157,39 +153,5 @@ public class BlogPostController {
         return ResponseEntity.ok(blogPostEntities);
     }
 
-
-//    @GetMapping("/view")
-//    ResponseEntity<ResponseObject> findByApproved(@RequestBody BlogPostDTO blogPostDTO) {
-////        Long vote = voteService.countVote(blogPostDTO.getPostId());
-////        List<ResponseCommentDTO> comment = commentService.viewComment(blogPostDTO.getPostId());
-//        ResponseBlogPostDTO responseBlogPostDTO = blogPostService.viewBlogPost(blogPostDTO.getPostId(), vote, comment);
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(new ResponseObject("ok", "list here", responseBlogPostDTO));
-//    }
-
-//    @GetMapping("/search/category")
-//    ResponseEntity<ResponseObject> findBlogByCategory(@RequestBody CategoryDTO categoryDTO) {
-//        try {
-//            Set<BlogPostDTO> dtoList = blogPostService.findBlogByCategory(categoryDTO.getCategoryName(), categoryDTO.getParentCategoryId());
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(new ResponseObject("ok", "found", dtoList));
-//        } catch (BlogPostException ex) {
-//            System.out.println(ex.getMessage());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-//        }
-//    }
-
-//    @GetMapping("/search/title/{title}")
-//    ResponseEntity<ResponseObject> findBlogByTitle(@PathVariable String title) {
-//        try {
-//            List<BlogPostDTO> dtoList = blogPostService.findBlogByTitle(title);
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(new ResponseObject("ok", "found", dtoList));
-//        } catch (BlogPostException ex) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-//        }
-//    }
 }
 

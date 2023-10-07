@@ -179,7 +179,6 @@ public class BlogPostService {
     public void sort(List<BlogPostDTO> blogPostList) {
 
         Collections.sort(blogPostList, new Comparator<BlogPostDTO>() {
-
             @Override
             public int compare(BlogPostDTO o1, BlogPostDTO o2) {
 
@@ -191,7 +190,6 @@ public class BlogPostService {
                     return -1;
                 }
             }
-
         });
     }
 
@@ -201,7 +199,6 @@ public class BlogPostService {
 
         return !blogPostEntity.isEmpty() ? ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseObject("ok", "found", blogPostDTO))
-
                 : ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ResponseObject("failed", "not found", ""));
     }
@@ -213,18 +210,14 @@ public class BlogPostService {
         if (blogPostEntity.isPresent()) {
 
             blogPostEntity.get().setPinned(false);
-
             blogPostRepository.save(blogPostEntity.get());
-
             if (blogPostEntity.get().getId().equals(postId)) {
 
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "unpinned successfull", ""));
             }
         }
-
         blogPost.get().setPinned(true);
-
         blogPostRepository.save(blogPost.get());
 
         return ResponseEntity.status(HttpStatus.OK)
