@@ -1,15 +1,13 @@
-package tech.fublog.FuBlog.dto.request;
+package tech.fublog.FuBlog.dto.response;
 
 import lombok.*;
-
-import java.util.List;
 
 @Data
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestFollowDTO {
+public class FollowResponseDTO {
     private Long follower;
     private Long following;
 }

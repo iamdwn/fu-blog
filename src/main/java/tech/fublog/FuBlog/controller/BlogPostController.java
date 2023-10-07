@@ -1,9 +1,8 @@
 package tech.fublog.FuBlog.controller;
 
-import org.springframework.data.domain.Page;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
-import tech.fublog.FuBlog.dto.request.RequestBlogPostDTO;
-import tech.fublog.FuBlog.dto.response.PageResponse;
+import tech.fublog.FuBlog.dto.request.BlogPostRequestDTO;
+import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.ApprovalRequestService;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.service.*;
 import org.springframework.http.HttpStatus;
-
-import java.util.List;
 
 
 @RestController
@@ -55,7 +52,7 @@ public class BlogPostController {
     }
 
     @PostMapping("/insert")
-    ResponseEntity<ResponseObject> insertBlogPost(@RequestBody RequestBlogPostDTO blogPostDTO) {
+    ResponseEntity<ResponseObject> insertBlogPost(@RequestBody BlogPostRequestDTO blogPostDTO) {
         try {
             BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(blogPostDTO);
             approvalRequestService.insertApprovalRequest(blogPostEntity);
@@ -70,9 +67,9 @@ public class BlogPostController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<ResponseObject> updateBlog(@RequestBody RequestBlogPostDTO requestBlogPostDTO) {
+    public ResponseEntity<ResponseObject> updateBlog(@RequestBody BlogPostRequestDTO blogPostRequestDTO) {
         try {
-            BlogPostEntity blogPostEntity = blogPostService.updateBlogPost(requestBlogPostDTO);
+            BlogPostEntity blogPostEntity = blogPostService.updateBlogPost(blogPostRequestDTO);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "updated successful", blogPostEntity));
         } catch (BlogPostException ex) {
@@ -118,19 +115,19 @@ public class BlogPostController {
 
 
     @GetMapping("getAllBlog/{page}/{size}")
-    public PageResponse getAllBlog(@PathVariable int page, @PathVariable int size) {
+    public PaginationResponseDTO getAllBlog(@PathVariable int page, @PathVariable int size) {
         return blogPostService.getAllBlogPost(page, size);
     }
 
     @GetMapping("getByTitle/{title}/{page}/{size}")
-    public PageResponse getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
+    public PaginationResponseDTO getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
         return blogPostService.getAllBlogPostByTitle(title, page, size);
     }
 
     @GetMapping("getByCategory/{categoryId}/{page}/{size}")
-    public ResponseEntity<PageResponse> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
+    public ResponseEntity<PaginationResponseDTO> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
 //        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
-        PageResponse blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+        PaginationResponseDTO blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
 
         if (blogPosts == null) {
             return ResponseEntity.notFound().build();
@@ -140,11 +137,11 @@ public class BlogPostController {
 
     @GetMapping("/sorted/{page}/{size}")
 //    public ResponseEntity<Page<BlogPostEntity>> getSortedBlogPosts(
-    public ResponseEntity<PageResponse> getSortedBlogPosts(
+    public ResponseEntity<PaginationResponseDTO> getSortedBlogPosts(
             @RequestParam(name = "sortBy", defaultValue = "newest") String sortBy,
             @PathVariable int page, @PathVariable int size) {
 //        Page<BlogPostEntity> blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
-        PageResponse blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
+        PaginationResponseDTO blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
 
         if (blogPostEntities == null) {
             return ResponseEntity.notFound().build();

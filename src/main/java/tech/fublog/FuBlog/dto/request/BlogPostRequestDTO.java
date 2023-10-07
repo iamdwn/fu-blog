@@ -11,7 +11,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestBlogPostDTO {
+public class BlogPostRequestDTO {
     private Long postId;
     private String typePost;
     private String title;
@@ -24,7 +24,7 @@ public class RequestBlogPostDTO {
 //    private Long views;
     private Date createDate = new Date();
 
-    public RequestBlogPostDTO(String typePost, String title, String content, String categoryName, Long parentCategoryId, Set<TagDTO> tagList, Long userId, String image) {
+    public BlogPostRequestDTO(String typePost, String title, String content, String categoryName, Long parentCategoryId, Set<TagDTO> tagList, Long userId, String image) {
         this.typePost = typePost;
         this.title = title;
         this.content = content;
@@ -35,7 +35,7 @@ public class RequestBlogPostDTO {
         this.image = image;
     }
 
-    public RequestBlogPostDTO(Long postId, String typePost, String title, String content, String categoryName, Long parentCategoryId, Long userId, Set<TagDTO> tagList) {
+    public BlogPostRequestDTO(Long postId, String typePost, String title, String content, String categoryName, Long parentCategoryId, Long userId, Set<TagDTO> tagList) {
         this.postId = postId;
         this.typePost = typePost;
         this.title = title;

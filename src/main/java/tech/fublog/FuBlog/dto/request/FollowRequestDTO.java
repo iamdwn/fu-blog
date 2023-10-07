@@ -1,4 +1,4 @@
-package tech.fublog.FuBlog.dto.response;
+package tech.fublog.FuBlog.dto.request;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseFollowDTO {
+public class FollowRequestDTO {
     private Long follower;
     private Long following;
 }

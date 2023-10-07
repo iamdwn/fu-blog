@@ -10,12 +10,12 @@ import java.util.Date;
 @Data
 @Getter
 @Setter
-public class SortDTO {
+public class SortResponseDTO {
     private String image;
     private String title;
     private Date createdDate;
 
-    public SortDTO(String image, String title, Date createdDate) {
+    public SortResponseDTO(String image, String title, Date createdDate) {
         this.image = image;
         this.title = title;
         this.createdDate = createdDate;

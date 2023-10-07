@@ -2,14 +2,12 @@ package tech.fublog.FuBlog.dto.request;
 
 import lombok.*;
 
-import java.util.List;
-
 @Data
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestCommentDTO {
+public class CommentRequestDTO {
     private Long commentId;
     private Long parentCommentId;
     private String content;

@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
-import tech.fublog.FuBlog.dto.request.RequestBlogPostDTO;
-import tech.fublog.FuBlog.dto.response.PageResponse;
+import tech.fublog.FuBlog.dto.request.BlogPostRequestDTO;
+import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.PostTagException;
 import tech.fublog.FuBlog.model.ResponseObject;
@@ -133,18 +133,18 @@ public class BlogPostService {
     }
 
 
-    public BlogPostEntity updateBlogPost(RequestBlogPostDTO requestBlogPostDTO) {
+    public BlogPostEntity updateBlogPost(BlogPostRequestDTO blogPostRequestDTO) {
 
-        Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(requestBlogPostDTO.getCategoryName(),
-                requestBlogPostDTO.getParentCategoryId());
-        Optional<UserEntity> userEntity = userRepository.findById(requestBlogPostDTO.getUserId());
-        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(requestBlogPostDTO.getPostId());
+        Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(blogPostRequestDTO.getCategoryName(),
+                blogPostRequestDTO.getParentCategoryId());
+        Optional<UserEntity> userEntity = userRepository.findById(blogPostRequestDTO.getUserId());
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(blogPostRequestDTO.getPostId());
 
         if (blogPostEntity.isPresent()
                 && categoryEntity.isPresent()
                 && userEntity.isPresent()) {
 
-            BlogPostEntity blogPost = this.getBlogById(requestBlogPostDTO.getPostId());
+            BlogPostEntity blogPost = this.getBlogById(blogPostRequestDTO.getPostId());
 
             CategoryEntity category = categoryEntity.get();
 //            UserEntity authors = userEntity.get();
@@ -153,7 +153,7 @@ public class BlogPostService {
             modifiedDate.toInstant().atZone(zoneId).toLocalDateTime();
             Set<PostTagEntity> postTagEntities = new HashSet<>();
 
-            for (TagDTO dto : requestBlogPostDTO.getTagList()) {
+            for (TagDTO dto : blogPostRequestDTO.getTagList()) {
                 PostTagEntity entity = new PostTagEntity();
                 Optional<TagEntity> tagEntity = tagRepository.findById(dto.getTagId());
                 if (!tagEntity.isPresent()) throw new PostTagException("tag not exist");
@@ -161,9 +161,9 @@ public class BlogPostService {
                 postTagEntities.add(entity);
             }
 
-            blogPost.setTypePost(requestBlogPostDTO.getTypePost());
-            blogPost.setTitle(requestBlogPostDTO.getTitle());
-            blogPost.setContent(requestBlogPostDTO.getContent());
+            blogPost.setTypePost(blogPostRequestDTO.getTypePost());
+            blogPost.setTitle(blogPostRequestDTO.getTitle());
+            blogPost.setContent(blogPostRequestDTO.getContent());
             blogPost.setModifiedDate(modifiedDate);
             blogPost.setCategory(category);
             blogPost.setPostTags(postTagEntities);
@@ -224,7 +224,7 @@ public class BlogPostService {
                 .body(new ResponseObject("ok", "pinned successfull", ""));
     }
 
-    public PageResponse filterBlogPost(String filter, int page, int size) {
+    public PaginationResponseDTO filterBlogPost(String filter, int page, int size) {
         List<BlogPostEntity> blogPostList = new ArrayList<>();
         List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
         List<BlogPostEntity> pageContent;
@@ -259,8 +259,8 @@ public class BlogPostService {
 
         Long blogPostCount = Long.valueOf(pageResult.getTotalElements());
         Long pageCount = Long.valueOf(pageResult.getTotalPages());
-        PageResponse pageResponse = new PageResponse(blogPostDTOList, blogPostCount, pageCount);
-        return pageResponse;
+        PaginationResponseDTO paginationResponseDTO = new PaginationResponseDTO(blogPostDTOList, blogPostCount, pageCount);
+        return paginationResponseDTO;
     }
 
 
@@ -314,19 +314,19 @@ public class BlogPostService {
 //    }
 
 
-    public PageResponse getAllBlogPost(int page, int size) {
+    public PaginationResponseDTO getAllBlogPost(int page, int size) {
         return filterBlogPost("", page, size);
     }
 
 
-    public PageResponse getAllBlogPostByTitle(String title, int page, int size) {
+    public PaginationResponseDTO getAllBlogPostByTitle(String title, int page, int size) {
 //        Pageable pageable = PageRequest.of(page - 1, size);
 //        return blogPostRepository.getBlogPostEntitiesByTitle(title, pageable);
         return filterBlogPost(title, page, size);
     }
 
     //    public Page<BlogPostEntity> getBlogPostsByCategoryId(Long categoryId, int page, int size) {
-    public PageResponse getBlogPostsByCategoryId(Long categoryId, int page, int size) {
+    public PaginationResponseDTO getBlogPostsByCategoryId(Long categoryId, int page, int size) {
 //        Pageable pageable = PageRequest.of(page - 1, size);
 //        Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
 //
@@ -339,7 +339,7 @@ public class BlogPostService {
         return filterBlogPost(String.valueOf(categoryId), page, size);
     }
 
-    public PageResponse getSortedBlogPosts(String sortBy, int page, int size) {
+    public PaginationResponseDTO getSortedBlogPosts(String sortBy, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
 //        Page<BlogPostEntity> blogPostEntities = null;
 //        if ("newest".equalsIgnoreCase(sortBy)) {
@@ -360,18 +360,18 @@ public class BlogPostService {
     }
 
 
-    public BlogPostEntity insertBlogPost(RequestBlogPostDTO requestBlogPostDTO) {
-        Optional<UserEntity> userEntity = userRepository.findById(requestBlogPostDTO.getUserId());
+    public BlogPostEntity insertBlogPost(BlogPostRequestDTO blogPostRequestDTO) {
+        Optional<UserEntity> userEntity = userRepository.findById(blogPostRequestDTO.getUserId());
         //check parentCategoryId != null
-        Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(requestBlogPostDTO.getCategoryName(),
-                requestBlogPostDTO.getParentCategoryId());
+        Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(blogPostRequestDTO.getCategoryName(),
+                blogPostRequestDTO.getParentCategoryId());
         if (userEntity.isPresent()
                 && categoryEntity.isPresent()) {
             BlogPostEntity blogPostEntity = new BlogPostEntity
-                    (requestBlogPostDTO.getTypePost(),
-                            requestBlogPostDTO.getTitle(),
-                            requestBlogPostDTO.getContent(),
-                            requestBlogPostDTO.getImage(),
+                    (blogPostRequestDTO.getTypePost(),
+                            blogPostRequestDTO.getTitle(),
+                            blogPostRequestDTO.getContent(),
+                            blogPostRequestDTO.getImage(),
                             categoryEntity.get(),
                             userEntity.get(),
                             0L,

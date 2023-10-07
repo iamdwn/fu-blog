@@ -1,10 +1,7 @@
 package tech.fublog.FuBlog.dto.request;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -13,7 +10,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 //@AllArgsConstructor
-public class AwardDTO {
+public class AwardRequestDTO {
 
     private String awardName;
     private Long userId;
@@ -24,7 +21,7 @@ public class AwardDTO {
         return createdDate.toInstant().atZone(zoneId).toLocalDateTime();
     }
 
-    public AwardDTO(String awardName, Long userId) {
+    public AwardRequestDTO(String awardName, Long userId) {
         this.awardName = awardName;
         this.userId = userId;
     }

@@ -1,16 +1,13 @@
 package tech.fublog.FuBlog.service;
 
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
-import tech.fublog.FuBlog.dto.response.UserInfoDTO;
+import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
-import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.exception.UserException;
@@ -22,7 +19,6 @@ import tech.fublog.FuBlog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.ZoneId;
 import java.util.*;
 
 
@@ -75,7 +71,7 @@ public class UserService {
 
     public ResponseEntity<ResponseObject> getActiveUser() {
         List<UserEntity> userEntities = userRepository.findAllByOrderByPointDesc();
-        List<UserInfoDTO> highestPointUser = new ArrayList<>();
+        List<UserInfoResponseDTO> highestPointUser = new ArrayList<>();
 
         for (UserEntity user : userEntities) {
             if (user.getPoint().equals(userEntities.get(0).getPoint())) {
@@ -83,10 +79,10 @@ public class UserService {
 //                        user.getUsername(),
 //                        user.getFullName(),
 //                        user.getEmail());
-                UserInfoDTO userInfoDTO =
-                        new UserInfoDTO(user.getUsername(), user.getPicture(), user.getPoint());
+                UserInfoResponseDTO userInfoResponseDTO =
+                        new UserInfoResponseDTO(user.getUsername(), user.getPicture(), user.getPoint());
 
-                highestPointUser.add(userInfoDTO);
+                highestPointUser.add(userInfoResponseDTO);
             }
         }
 
@@ -97,10 +93,10 @@ public class UserService {
 
 
 
-    public UserInfoDTO getUserInfo(Long userId) {
+    public UserInfoResponseDTO getUserInfo(Long userId) {
         UserEntity user = userRepository.findById(userId).orElse(null);
         if (user != null) {
-            return new UserInfoDTO(user.getUsername(), user.getPicture(), user.getPoint());
+            return new UserInfoResponseDTO(user.getUsername(), user.getPicture(), user.getPoint());
         }
         return null;
 

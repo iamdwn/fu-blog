@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PageResponse {
+public class PaginationResponseDTO {
     private List<BlogPostDTO> blogPostDTOList;
     private Long blogPostCount;
     private Long pageCount;

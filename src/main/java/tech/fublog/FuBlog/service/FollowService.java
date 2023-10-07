@@ -1,7 +1,7 @@
 package tech.fublog.FuBlog.service;
 
-import tech.fublog.FuBlog.dto.request.RequestFollowDTO;
-import tech.fublog.FuBlog.dto.response.ResponseFollowDTO;
+import tech.fublog.FuBlog.dto.request.FollowRequestDTO;
+import tech.fublog.FuBlog.dto.response.FollowResponseDTO;
 import tech.fublog.FuBlog.entity.FollowEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.exception.FollowException;
@@ -26,9 +26,9 @@ public class FollowService {
         this.followRepository = followRepository;
     }
 
-    public void insertFollow(RequestFollowDTO requestFollowDTO) {
-        Optional<UserEntity> userFollower = userRepository.findById(requestFollowDTO.getFollower());
-        Optional<UserEntity> userFollowing = userRepository.findById(requestFollowDTO.getFollowing());
+    public void insertFollow(FollowRequestDTO followRequestDTO) {
+        Optional<UserEntity> userFollower = userRepository.findById(followRequestDTO.getFollower());
+        Optional<UserEntity> userFollowing = userRepository.findById(followRequestDTO.getFollowing());
         if (userFollower.isPresent() && userFollowing.isPresent()) {
             FollowEntity followEntity = followRepository.findByFollowerAndFollowing(userFollower.get(), userFollowing.get());
             if (followEntity == null) {
@@ -38,14 +38,14 @@ public class FollowService {
         } else throw new FollowException("User doesn't exists");
     }
 
-    public List<ResponseFollowDTO> viewFollower(Long userId) {
+    public List<FollowResponseDTO> viewFollower(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
             Set<FollowEntity> set = userEntity.get().getFollowingList();
             if (!set.isEmpty()) {
-                List<ResponseFollowDTO> dtoList = new ArrayList<>();
+                List<FollowResponseDTO> dtoList = new ArrayList<>();
                 for (FollowEntity entity : set) {
-                    ResponseFollowDTO dto = new ResponseFollowDTO(entity.getFollower().getId(), entity.getFollowing().getId());
+                    FollowResponseDTO dto = new FollowResponseDTO(entity.getFollower().getId(), entity.getFollowing().getId());
                     dtoList.add(dto);
                 }
                 return dtoList;
@@ -53,14 +53,14 @@ public class FollowService {
         } else throw new FollowException("User doesn't exists");
     }
 
-    public List<ResponseFollowDTO> viewFollowing(Long userId) {
+    public List<FollowResponseDTO> viewFollowing(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
             Set<FollowEntity> set = userEntity.get().getFollowersList();
             if (!set.isEmpty()) {
-                List<ResponseFollowDTO> dtoList = new ArrayList<>();
+                List<FollowResponseDTO> dtoList = new ArrayList<>();
                 for (FollowEntity entity : set) {
-                    ResponseFollowDTO dto = new ResponseFollowDTO(entity.getFollower().getId(), entity.getFollowing().getId());
+                    FollowResponseDTO dto = new FollowResponseDTO(entity.getFollower().getId(), entity.getFollowing().getId());
                     dtoList.add(dto);
                 }
                 return dtoList;
@@ -68,9 +68,9 @@ public class FollowService {
         } else throw new FollowException("User doesn't exists");
     }
 
-    public void unFollow(RequestFollowDTO requestFollowDTO) {
-        Optional<UserEntity> userFollower = userRepository.findById(requestFollowDTO.getFollower());
-        Optional<UserEntity> userFollowing = userRepository.findById(requestFollowDTO.getFollowing());
+    public void unFollow(FollowRequestDTO followRequestDTO) {
+        Optional<UserEntity> userFollower = userRepository.findById(followRequestDTO.getFollower());
+        Optional<UserEntity> userFollowing = userRepository.findById(followRequestDTO.getFollowing());
         if (userFollower.isPresent() && userFollowing.isPresent()) {
             FollowEntity followEntity = followRepository.findByFollowerAndFollowing(userFollower.get(), userFollowing.get());
             if (followEntity != null) {

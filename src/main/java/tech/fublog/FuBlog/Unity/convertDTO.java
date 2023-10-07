@@ -2,7 +2,7 @@ package tech.fublog.FuBlog.Unity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import tech.fublog.FuBlog.dto.response.ResponseCategoryDTO;
+import tech.fublog.FuBlog.dto.response.CategoryResponseDTO;
 import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.repository.CategoryRepository;
 
@@ -18,17 +18,17 @@ public class convertDTO {
         this.categoryRepository = categoryRepository;
     }
 
-    private ResponseCategoryDTO convertCategoryToDTO(CategoryEntity categoryEntity) {
-        ResponseCategoryDTO responseCategoryDTO = new ResponseCategoryDTO();
-        responseCategoryDTO.setCategoryId(categoryEntity.getId());
-        responseCategoryDTO.setCategoryName(categoryEntity.getCategoryName());
+    private CategoryResponseDTO convertCategoryToDTO(CategoryEntity categoryEntity) {
+        CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO();
+        categoryResponseDTO.setCategoryId(categoryEntity.getId());
+        categoryResponseDTO.setCategoryName(categoryEntity.getCategoryName());
         List<CategoryEntity> subCategory = categoryRepository.findByParentCategory(categoryEntity);
-        List<ResponseCategoryDTO> subcategoryDTOResponse = new ArrayList<>();
+        List<CategoryResponseDTO> subcategoryDTOResponse = new ArrayList<>();
         for (CategoryEntity sub : subCategory) {
-            ResponseCategoryDTO subResponseCategoryDTOs = convertCategoryToDTO(sub);
-            subcategoryDTOResponse.add(subResponseCategoryDTOs);
+            CategoryResponseDTO subCategoryResponseDTOs = convertCategoryToDTO(sub);
+            subcategoryDTOResponse.add(subCategoryResponseDTOs);
         }
-        responseCategoryDTO.setSubCategory(subcategoryDTOResponse);
-        return responseCategoryDTO;
+        categoryResponseDTO.setSubCategory(subcategoryDTOResponse);
+        return categoryResponseDTO;
     }
 }
