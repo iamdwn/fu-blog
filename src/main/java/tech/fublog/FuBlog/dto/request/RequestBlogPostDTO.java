@@ -16,6 +16,7 @@ public class RequestBlogPostDTO {
     private String typePost;
     private String title;
     private String content;
+    private String image;
     private String categoryName;
     private Long parentCategoryId;
     private Long userId;
@@ -23,7 +24,7 @@ public class RequestBlogPostDTO {
 //    private Long views;
     private Date createDate = new Date();
 
-    public RequestBlogPostDTO(String typePost, String title, String content, String categoryName, Long parentCategoryId, Set<TagDTO> tagList, Long userId) {
+    public RequestBlogPostDTO(String typePost, String title, String content, String categoryName, Long parentCategoryId, Set<TagDTO> tagList, Long userId, String image) {
         this.typePost = typePost;
         this.title = title;
         this.content = content;
@@ -31,6 +32,7 @@ public class RequestBlogPostDTO {
         this.parentCategoryId = parentCategoryId;
         this.userId = userId;
         this.tagList = tagList;
+        this.image = image;
     }
 
     public RequestBlogPostDTO(Long postId, String typePost, String title, String content, String categoryName, Long parentCategoryId, Long userId, Set<TagDTO> tagList) {
