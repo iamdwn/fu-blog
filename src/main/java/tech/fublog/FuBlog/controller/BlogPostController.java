@@ -2,7 +2,7 @@ package tech.fublog.FuBlog.controller;
 
 import org.springframework.data.domain.Page;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
-import tech.fublog.FuBlog.dto.SortDTO;
+import tech.fublog.FuBlog.dto.request.RequestBlogPostDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.ApprovalRequestService;
@@ -32,12 +32,6 @@ public class BlogPostController {
     private final CommentService commentService;
     private final PostTagService postTagService;
 
-//    @Autowired
-//    private BlogPostService blogPostService;
-//
-//    @Autowired
-//    private ApprovalRequestService approvalRequestService;
-
     @Autowired
     public BlogPostController(BlogPostService blogPostService, ApprovalRequestService approvalRequestService, VoteService voteService, CommentService commentService, PostTagService postTagService) {
         this.blogPostService = blogPostService;
@@ -47,22 +41,11 @@ public class BlogPostController {
         this.postTagService = postTagService;
     }
 
-//    @GetMapping("/viewAllBlogs")
-////    @PreAuthorize("hasAuthority('USER')")
-////    @PreAuthorize("hasRole('USER')")
-////    @PreAuthorize("isAuthenticated()")
-//    ResponseEntity<ResponseObject> getAllBlogPost() {
-//
-//        return blogPostService.getAllBlogPosts();
-//    }
-
-
     @DeleteMapping("/deleteBlog/{postId}")
     public ResponseEntity<ResponseObject> deleteBlog(@PathVariable Long postId) {
 
         return blogPostService.deleteBlogPost(postId);
     }
-
 
     //    @PostMapping("/writeBlog")
 //    @PreAuthorize("isAuthenticated()")
@@ -81,11 +64,11 @@ public class BlogPostController {
 //        return null;
 //    }
     @PostMapping("/insert")
-    ResponseEntity<ResponseObject> insertBlogPost(@RequestBody BlogPostDTO blogPostDTO) {
+    ResponseEntity<ResponseObject> insertBlogPost(@RequestBody RequestBlogPostDTO requestBlogPostDTO) {
         try {
-            BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(blogPostDTO);
+            BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(requestBlogPostDTO);
             approvalRequestService.insertApprovalRequest(blogPostEntity);
-            postTagService.insertPostTag(blogPostDTO.getTagList(), blogPostEntity);
+            postTagService.insertPostTag(requestBlogPostDTO.getTagList(), blogPostEntity);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post is waiting approve", ""));
         } catch (BlogPostException ex) {
@@ -116,13 +99,12 @@ public class BlogPostController {
         return blogPostService.getBlogPostById(postId);
     }
 
-
-    @GetMapping("getAllBlog/{page}/{size}")
+    @GetMapping("/getAllBlog/{page}/{size}")
     public List<BlogPostEntity> getAllBlog(@PathVariable int page, @PathVariable int size) {
         return blogPostService.getAllBlogPost(page, size);
     }
 
-    @GetMapping("getByTitle/{title}/{page}/{size}")
+    @GetMapping("/getByTitle/{title}/{page}/{size}")
     public List<BlogPostEntity> getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
         return blogPostService.getAllBlogPostByTitle(title, page, size);
     }
@@ -142,28 +124,27 @@ public class BlogPostController {
             @RequestParam(name = "sortBy", defaultValue = "newest") String sortBy,
             @PathVariable int page, @PathVariable int size) {
         Page<BlogPostEntity> blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
-
         if (blogPostEntities.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-
         return ResponseEntity.ok(blogPostEntities);
     }
 
+//    @GetMapping("/view")
+//    ResponseEntity<ResponseObject> findByApproved(@RequestBody BlogPostDTO blogPostDTO) {
+//        Long vote = voteService.countVote(blogPostDTO.getPostId());
+//        List<ResponseCommentDTO> comment = commentService.viewComment(blogPostDTO.getPostId());
+//        ResponseBlogPostDTO responseBlogPostDTO = blogPostService.viewBlogPost(blogPostDTO.getPostId(), vote, comment);
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(new ResponseObject("ok", "list here", responseBlogPostDTO));
+//    }
 
-    @GetMapping("/view")
-    ResponseEntity<ResponseObject> findByApproved(@RequestBody BlogPostDTO blogPostDTO) {
-        Long vote = voteService.countVote(blogPostDTO.getPostId());
-        List<ResponseCommentDTO> comment = commentService.viewComment(blogPostDTO.getPostId());
-        ResponseBlogPostDTO responseBlogPostDTO = blogPostService.viewBlogPost(blogPostDTO.getPostId(), vote, comment);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseObject("ok", "list here", responseBlogPostDTO));
-    }
-
-    @GetMapping("/search/category")
-    ResponseEntity<ResponseObject> findBlogByCategory(@RequestBody CategoryDTO categoryDTO) {
+    @GetMapping("/search/category/{page}/{size}")
+    ResponseEntity<ResponseObject> findBlogByCategory(
+            @PathVariable int page, @PathVariable int size,
+            @RequestBody CategoryDTO categoryDTO) {
         try {
-            Set<BlogPostDTO> dtoList = blogPostService.findBlogByCategory(categoryDTO.getCategoryName(), categoryDTO.getParentCategoryId());
+            Set<BlogPostDTO> dtoList = blogPostService.findBlogByCategory(categoryDTO.getCategoryName(), categoryDTO.getParentCategoryId(), page, size);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", dtoList));
         } catch (BlogPostException ex) {

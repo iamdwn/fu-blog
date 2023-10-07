@@ -20,18 +20,24 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/mark")
-    public ResponseEntity<ResponseObject> markBook(@RequestBody PostMarkDTO postMarkDTO) {
+    @GetMapping("/markAction/{action}")
+    public ResponseEntity<ResponseObject> markBook(@PathVariable String action, @RequestBody PostMarkDTO postMarkDTO) {
         try {
+            String result = "";
+            if (action.equals("mark")) {
+                result = userService.markPost(postMarkDTO.getUserId(), postMarkDTO.getPostId());
+            } else if (action.equals("unMark")) {
+                result = userService.unMarkPost(postMarkDTO.getUserId(), postMarkDTO.getPostId());
+            }
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "found", userService.markPost(postMarkDTO.getUserId(), postMarkDTO.getPostId())));
+                    .body(new ResponseObject("ok", "successfully", result));
         } catch (UserException ex) {
             System.out.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
-
     }
+
     @GetMapping("/getActiveUser")
     public ResponseEntity<ResponseObject> getActiveUser() {
 

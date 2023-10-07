@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
+import tech.fublog.FuBlog.dto.request.RequestBlogPostDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
@@ -25,24 +26,21 @@ import tech.fublog.FuBlog.exception.BlogPostException;
 
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class BlogPostService {
 
-    @Autowired
     private BlogPostRepository blogPostRepository;
-
-    @Autowired
     private CategoryRepository categoryRepository;
-
-    @Autowired
     private UserRepository userRepository;
 
-//    private final CategoryRepository categoryRepository;
-//    private final UserRepository userRepository;
-//
-//    private final BlogPostRepository blogPostRepository;
-
+    @Autowired
+    public BlogPostService(BlogPostRepository blogPostRepository, CategoryRepository categoryRepository, UserRepository userRepository) {
+        this.blogPostRepository = blogPostRepository;
+        this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
+    }
 
 //    public ResponseEntity<ResponseObject> getAllBlogPosts() {
 //        List<BlogPostEntity> blogPostEntity = blogPostRepository.findAll();
@@ -288,36 +286,69 @@ public class BlogPostService {
         return blogPostEntities;
     }
 
+    public List<BlogPostEntity> getPageOfItems(List<BlogPostEntity> items, int page, int pageSize) {
+        int startIndex = page * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, items.size());
 
-    @Autowired
-    public BlogPostService(BlogPostRepository blogPostRepository, CategoryRepository categoryRepository, UserRepository userRepository) {
-        this.blogPostRepository = blogPostRepository;
-        this.categoryRepository = categoryRepository;
-        this.userRepository = userRepository;
+        if (startIndex >= items.size()) {
+            return Collections.emptyList(); // Trang không có phần tử nào
+        }
+
+        return items.subList(startIndex, endIndex);
     }
 
-    public Set<BlogPostDTO> findBlogByCategory(String name, Long parentCategoryId) {
-//        Optional<CategoryEntity> categoryEntity;
-//        if (parentCategoryId == null)
-//            categoryEntity = categoryRepository.findByCategoryNameAndParentCategoryIsNull(name);
-//        else
+
+    public Set<BlogPostDTO> findBlogByCategory(String name, Long parentCategoryId, int page, int size) {
         Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(name, parentCategoryId);
         if (categoryEntity.isPresent()) {
             List<CategoryEntity> categoryEntityList = findCategoryToSearch(categoryEntity.get(), new ArrayList<>());
             if (!categoryEntityList.isEmpty()) {
-                Set<BlogPostEntity> blogPostEntitySet = new HashSet<>();
+                List<BlogPostEntity> blogPostEntitySet = new ArrayList<>();
                 Set<BlogPostDTO> blogPostDTOSet = new HashSet<>();
+//                Pageable pageable = PageRequest.of(page - 1, size);
                 for (CategoryEntity entity : categoryEntityList) {
-                    blogPostEntitySet.addAll(entity.getBlogPosts());
+//                    Page<BlogPostEntity> blogPostEntityPage = blogPostRepository.findByCategoryAndIsApprovedTrueAndStatusTrue(entity, pageable);
+                    List<BlogPostEntity> blogPostEntityPage = blogPostRepository.findByCategoryAndIsApprovedTrueAndStatusTrue(entity/*, pageable*/);
+                    if (blogPostEntityPage != null) {
+//                        for (BlogPostEntity blogPostEntity : blogPostEntityPage) {
+//                            if (blogPostEntitySet.size() < size)
+                        blogPostEntitySet.addAll(blogPostEntityPage);
+//                        }
+                    }
                 }
+//                }
+//                blogPostEntitySet = getPageOfItems(blogPostEntitySet, page, size);
                 for (BlogPostEntity entity : blogPostEntitySet) {
-                    if (entity.getStatus() && entity.getIsApproved())
-                        blogPostDTOSet.add(convertPostToDTO(entity));
+                    blogPostDTOSet.add(convertPostToDTO(entity));
                 }
                 return blogPostDTOSet;
-            } else throw new BlogPostException("List empty");
+            } else return new HashSet<>();
         } else throw new BlogPostException("Category doesn't exists");
     }
+
+//    public Page<BlogPostDTO> findBlogByCategory(String name, Long parentCategoryId, int page, int size) {
+//        Pageable pageable = PageRequest.of(page - 1, size);
+//        Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(name, parentCategoryId);
+//        if (categoryEntity.isPresent()) {
+//            List<CategoryEntity> categoryEntityList = findCategoryToSearch(categoryEntity.get(), new ArrayList<>());
+//            if (!categoryEntityList.isEmpty()) {
+//                List<BlogPostEntity> blogPostEntityList = new ArrayList<>();
+//                for (CategoryEntity entity : categoryEntityList) {
+//                    Page<BlogPostEntity> blogPostEntityPage = blogPostRepository.findByCategoryAndIsApprovedTrueAndStatusTrue(entity, pageable);
+//                    List<BlogPostEntity> blogPostEntityPageContent = blogPostEntityPage.getContent();
+//                    blogPostEntityList.addAll(blogPostEntityPageContent);
+//                }
+//                List<BlogPostDTO> blogPostDTOList = blogPostEntityList.stream()
+//                        .map(this::convertPostToDTO)
+//                        .collect(Collectors.toList());
+//                return new PageImpl<>(blogPostDTOList, pageable, blogPostEntityList.size());
+//            } else {
+//                return new PageImpl<>(Collections.emptyList(), pageable, 0);
+//            }
+//        } else {
+//            throw new BlogPostException("Category doesn't exist");
+//        }
+//    }
 
     public List<BlogPostDTO> findBlogByTitle(String title) {
         if (!title.trim().isEmpty()) {
@@ -330,17 +361,17 @@ public class BlogPostService {
                     }
                 }
                 return dtoList;
-            } else throw new BlogPostException("Cannot found any blog post with this title");
+            } else return new ArrayList<>();
         } else throw new BlogPostException("Nothing to search");
     }
 
-    public BlogPostEntity insertBlogPost(BlogPostDTO blogPostDTO) {
-        Optional<UserEntity> userEntity = userRepository.findById(blogPostDTO.getUser().getId());
+    public BlogPostEntity insertBlogPost(RequestBlogPostDTO requestBlogPostDTO) {
+        Optional<UserEntity> userEntity = userRepository.findById(requestBlogPostDTO.getUserId());
         //check parentCategoryId != null
-        Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(blogPostDTO.getCategoryName(), blogPostDTO.getParentCategoryId());
+        Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(requestBlogPostDTO.getCategoryName(), requestBlogPostDTO.getParentCategoryId());
         if (userEntity.isPresent() && categoryEntity.isPresent()) {
             BlogPostEntity blogPostEntity = new BlogPostEntity
-                    (blogPostDTO.getTypePost(), blogPostDTO.getTitle(), blogPostDTO.getContent(), categoryEntity.get(), userEntity.get());
+                    (requestBlogPostDTO.getTypePost(), requestBlogPostDTO.getTitle(), requestBlogPostDTO.getContent(), categoryEntity.get(), userEntity.get());
             return blogPostRepository.save(blogPostEntity);
         } else throw new BlogPostException("User or Category doesn't exists");
     }

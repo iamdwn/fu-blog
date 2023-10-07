@@ -21,17 +21,23 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
     List<BlogPostEntity> findByTitleLike(String title);
 
-    public List<BlogPostEntity> getBlogPostEntitiesByTitle(String title, Pageable pageable);
+    List<BlogPostEntity> getBlogPostEntitiesByTitle(String title, Pageable pageable);
 //    List<BlogPostEntity> findAllByCategory(Long id);
 
     Page<BlogPostEntity> findByCategory(CategoryEntity category, Pageable pageable);
 
-//    @Query("SELECT e FROM BlogPostEntity e ORDER BY e.createdDate DESC")
+    //    Page<BlogPostEntity> findByCategoryAndIsApprovedTrueAndStatusTrue(CategoryEntity category, Pageable pageable);
+    List<BlogPostEntity> findByCategoryAndIsApprovedTrueAndStatusTrue(CategoryEntity category);
+
+    //    @Query("SELECT e FROM BlogPostEntity e ORDER BY e.createdDate DESC")
     Page<BlogPostEntity> findAllByOrderByCreatedDateDesc(Pageable pageable);
+
     Page<BlogPostEntity> findAllByOrderByCreatedDateAsc(Pageable pageable);
+
     Page<BlogPostEntity> findAllByOrderByModifiedDateDesc(Pageable pageable);
+
     Page<BlogPostEntity> findAllByOrderByModifiedDateAsc(Pageable pageable);
-//    Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
+
     Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
 
 }
