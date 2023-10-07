@@ -378,6 +378,7 @@ public class BlogPostService {
                     (requestBlogPostDTO.getTypePost(),
                             requestBlogPostDTO.getTitle(),
                             requestBlogPostDTO.getContent(),
+                            requestBlogPostDTO.getImage(),
                             categoryEntity.get(),
                             userEntity.get(),
                             0L,
