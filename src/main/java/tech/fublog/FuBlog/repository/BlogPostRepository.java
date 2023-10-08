@@ -19,7 +19,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
     List<BlogPostEntity> findByTitleLike(String title);
 
     //    public List<BlogPostEntity> getBlogPostEntitiesByTitle(String title, Pageable pageable);
-    public Page<BlogPostEntity> getBlogPostEntitiesByTitleAndStatusIsTrueAndIsApprovedIsTrue(String title, Pageable pageable);
+    public Page<BlogPostEntity> getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(String title, Pageable pageable);
 
 //    List<BlogPostEntity> findAllByCategory(Long id);
 
@@ -27,7 +27,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
 
     @Query("SELECT bp FROM BlogPostEntity bp WHERE (bp.category.id = :categoryId OR bp.category.parentCategory.id = :categoryId) " +
-            "AND (bp.isApproved = true AND bp.status = true) ")
+            "AND (bp.isApproved = true AND bp.status = true) ORDER BY bp.category.categoryName asc ")
     Page<BlogPostEntity> findBlogPostsByCategoryIdOrParentId(
             @Param("categoryId") Long categoryId,
             Pageable pageable
