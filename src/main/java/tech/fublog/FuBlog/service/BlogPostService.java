@@ -3,6 +3,7 @@ package tech.fublog.FuBlog.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
@@ -245,7 +246,10 @@ public class BlogPostService {
             } else if ("mostViewed".equalsIgnoreCase(filter)) {
                 pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(pageable);
             } else if (!filter.trim().matches("\\d+")) {
-                pageResult = blogPostRepository.getBlogPostEntitiesByTitleAndStatusIsTrueAndIsApprovedIsTrue(filter, pageable);
+                Sort sort = Sort.by(Sort.Direction.ASC, "title");
+                pageable = PageRequest.of(page - 1, size - blogPostList.size(),sort);
+                filter = "%" +filter +"%";
+                pageResult = blogPostRepository.getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(filter, pageable);
             } else {
                 Optional<CategoryEntity> categoryOptional = categoryRepository.findById(Long.parseLong(filter));
                 pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
