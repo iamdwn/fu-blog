@@ -1,9 +1,6 @@
 package tech.fublog.FuBlog.service;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
@@ -82,6 +79,9 @@ public class BlogPostService {
                     roleNames.get(roleNames.size() - 1),
                     roleNames);
 
+            blogPostEntity.setView(blogPostEntity.getView() + 1);
+            blogPostRepository.save(blogPostEntity);
+
             BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
                     blogPostEntity.getTypePost(),
                     blogPostEntity.getTitle(),
@@ -99,8 +99,7 @@ public class BlogPostService {
 //                  Date.from(Instant.ofEpochMilli((blogPostEntity.getCreatedDate().getTime())))
 //                  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
 //                    .parse(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(blogPostEntity.getCreatedDate())));
-//            blogPostEntity.setView(blogPostEntity.getView() + 1);
-            blogPostRepository.save(blogPostEntity);
+
             return blogPostDTO;
         } else
             throw new BlogPostException("not found blogpost with " + postId);
@@ -121,8 +120,9 @@ public class BlogPostService {
 
 
     //xoá --> set Status = 0
-    public void deleteBlogPost(Long postId) {
+    public ResponseEntity<ResponseObject> deleteBlogPost(Long postId) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+
         if (blogPostEntity.isPresent()
                 && blogPostEntity.get().getStatus()) {
             BlogPostEntity blogPost = this.getBlogById(postId);
@@ -130,7 +130,13 @@ public class BlogPostService {
             blogPost.setStatus(false);
 
             blogPostRepository.save(blogPost);
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "deleted successful", ""));
         }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ResponseObject("failed", "deleted failed", ""));
     }
 
 
@@ -227,39 +233,43 @@ public class BlogPostService {
 
     public PaginationResponseDTO filterBlogPost(String filter, int page, int size) {
         List<BlogPostEntity> blogPostList = new ArrayList<>();
+        List<BlogPostEntity> blogPostByCategoryList = new ArrayList<>();
         List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
         List<BlogPostEntity> pageContent;
-        Page<BlogPostEntity> pageResult;
+        Page<BlogPostEntity> pageResult = null;
 
-            Pageable pageable = PageRequest.of(page - 1, size - blogPostList.size());
+        Pageable pageable = PageRequest.of(page - 1, size - blogPostList.size());
 
-            if (filter.equalsIgnoreCase("")) {
-                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
-            } else if ("newest".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
-            } else if ("oldest".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateAsc(pageable);
-            } else if ("latestModified".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateDesc(pageable);
-            } else if ("oldestModified".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateAsc(pageable);
-            } else if ("mostViewed".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(pageable);
-            } else if (!filter.trim().matches("\\d+")) {
-                Sort sort = Sort.by(Sort.Direction.ASC, "title");
-                pageable = PageRequest.of(page - 1, size - blogPostList.size(),sort);
-                filter = "%" +filter +"%";
-                pageResult = blogPostRepository.getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(filter, pageable);
-            } else {
-                Optional<CategoryEntity> categoryOptional = categoryRepository.findById(Long.parseLong(filter));
-                pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
-            }
+        if (filter.equalsIgnoreCase("")) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
+        } else if ("newest".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
+        } else if ("oldest".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateAsc(pageable);
+        } else if ("latestModified".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateDesc(pageable);
+        } else if ("oldestModified".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateAsc(pageable);
+        } else if ("mostViewed".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(pageable);
+        } else if (!filter.trim().matches("\\d+")) {
+            Sort sort = Sort.by(Sort.Direction.ASC, "title");
+            pageable = PageRequest.of(page - 1, size - blogPostList.size(), sort);
+            filter = "%" + filter + "%";
+            pageResult = blogPostRepository.getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(filter, pageable);
+        } else {
+            Long cateroryId = Long.parseLong(filter);
+            Optional<CategoryEntity> categoryOptional = categoryRepository.findById(Long.parseLong(filter));
+            pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
+        }
 
-            pageContent = pageResult.getContent();
+        pageContent = pageResult.getContent();
 
+        if (!pageContent.isEmpty()) {
             for (BlogPostEntity blogPost : pageContent) {
-                    blogPostDTOList.add(getBlogPostById(blogPost.getId()));
-                }
+                blogPostDTOList.add(getBlogPostById(blogPost.getId()));
+            }
+        }
 
         Long blogPostCount = Long.valueOf(pageResult.getTotalElements());
         Long pageCount = Long.valueOf(pageResult.getTotalPages());
@@ -324,42 +334,14 @@ public class BlogPostService {
 
 
     public PaginationResponseDTO getAllBlogPostByTitle(String title, int page, int size) {
-//        Pageable pageable = PageRequest.of(page - 1, size);
-//        return blogPostRepository.getBlogPostEntitiesByTitle(title, pageable);
         return filterBlogPost(title, page, size);
     }
 
-    //    public Page<BlogPostEntity> getBlogPostsByCategoryId(Long categoryId, int page, int size) {
     public PaginationResponseDTO getBlogPostsByCategoryId(Long categoryId, int page, int size) {
-//        Pageable pageable = PageRequest.of(page - 1, size);
-//        Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
-//
-//        if (!categoryOptional.isPresent()) {
-//            return new PageImpl<>(Collections.emptyList());
-//        }
-//
-//        CategoryEntity category = categoryOptional.get();
-//        return blogPostRepository.findByCategory(category, pageable);
         return filterBlogPost(String.valueOf(categoryId), page, size);
     }
 
     public PaginationResponseDTO getSortedBlogPosts(String sortBy, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-//        Page<BlogPostEntity> blogPostEntities = null;
-//        if ("newest".equalsIgnoreCase(sortBy)) {
-//            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
-//        } else if ("oldest".equalsIgnoreCase(sortBy)) {
-//            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateAsc(pageable);
-//        } else if ("latestModified".equalsIgnoreCase(sortBy)) {
-//            blogPostEntities = blogPostRepository.findAllByOrderByModifiedDateDesc(pageable);
-//        } else if ("oldestModified".equalsIgnoreCase(sortBy)) {
-//            blogPostEntities = blogPostRepository.findAllByOrderByModifiedDateAsc(pageable);
-//        } else if ("mostViewed".equalsIgnoreCase(sortBy)) {
-//            blogPostEntities = blogPostRepository.findAllByOrderByViewDesc(pageable);
-//        } else {
-//            // Mặc định, sắp xếp theo ngày tạo mới nhất.
-//            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
-//        }
         return filterBlogPost(sortBy, page, size);
     }
 
