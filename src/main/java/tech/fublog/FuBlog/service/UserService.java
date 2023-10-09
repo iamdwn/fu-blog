@@ -6,11 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
+import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.dto.UserInfoDTO;
-import tech.fublog.FuBlog.entity.BlogPostEntity;
-import tech.fublog.FuBlog.entity.RoleEntity;
-import tech.fublog.FuBlog.entity.UserEntity;
+import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.UserException;
 import tech.fublog.FuBlog.hash.Hashing;
 import tech.fublog.FuBlog.model.ResponseObject;
@@ -21,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -143,7 +143,7 @@ public class UserService {
     public List<BlogPostDTO> getMarkPostByUser(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
-            Set<BlogPostEntity> entitySet = userEntity.get().getMarkPosts();
+            Set<BlogPostEntity> entitySet = blogPostRepository.findByUserMarks(userEntity.get());/*userEntity.get().getMarkPosts();*/
             if (!entitySet.isEmpty()) {
                 List<BlogPostDTO> dtoList = new ArrayList<>();
                 for (BlogPostEntity entity : entitySet) {
@@ -158,14 +158,25 @@ public class UserService {
         return new UserDTO(userEntity.getFullName(), userEntity.getPassword(), userEntity.getEmail(), userEntity.getId(), userEntity.getPicture(), new ArrayList<>());
     }
 
+    public Set<TagDTO> convertTagToDTO(Set<PostTagEntity> postTagEntity) {
+        return postTagEntity.stream()
+                .map(tagEntity -> {
+                    TagDTO tagDTO = new TagDTO();
+                    tagDTO.setTagId(tagEntity.getId());
+                    tagDTO.setTagName(tagEntity.getTag().getTagName());
+                    return tagDTO;
+                })
+                .collect(Collectors.toSet());
+    }
+
     public BlogPostDTO convertPostToDTO(BlogPostEntity blogPostEntity) {
         Long parentCategoryId = null;
         if (blogPostEntity.getCategory().getParentCategory() != null)
             parentCategoryId = blogPostEntity.getCategory().getParentCategory().getId();
-        return new BlogPostDTO(blogPostEntity.getId(), blogPostEntity.getTypePost(),
+        return new BlogPostDTO(blogPostEntity.getId(), blogPostEntity.getCreatedDate(), blogPostEntity.getTypePost(),
                 blogPostEntity.getTitle(), blogPostEntity.getContent(),
                 blogPostEntity.getCategory().getCategoryName(),
-                parentCategoryId, null, convertUserToDTO(blogPostEntity.getAuthors()));
+                parentCategoryId, convertTagToDTO(blogPostEntity.getPostTags()), convertUserToDTO(blogPostEntity.getAuthors()));
     }
 
 }

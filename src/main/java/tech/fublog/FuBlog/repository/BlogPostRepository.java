@@ -12,8 +12,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.CategoryEntity;
+import tech.fublog.FuBlog.entity.UserEntity;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
@@ -22,14 +24,11 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
     List<BlogPostEntity> findByTitleLikeAndIsApprovedTrueAndStatusTrue(String title);
 
     List<BlogPostEntity> getBlogPostEntitiesByTitle(String title, Pageable pageable);
-//    List<BlogPostEntity> findAllByCategory(Long id);
 
     Page<BlogPostEntity> findByCategory(CategoryEntity category, Pageable pageable);
 
-    //    Page<BlogPostEntity> findByCategoryAndIsApprovedTrueAndStatusTrue(CategoryEntity category, Pageable pageable);
-    List<BlogPostEntity> findByCategoryAndIsApprovedTrueAndStatusTrue(CategoryEntity category);
+    Page<BlogPostEntity> findByCategoryInAndIsApprovedTrueAndStatusTrue(List<CategoryEntity> categoryEntityList, Pageable pageable);
 
-    //    @Query("SELECT e FROM BlogPostEntity e ORDER BY e.createdDate DESC")
     Page<BlogPostEntity> findAllByOrderByCreatedDateDesc(Pageable pageable);
 
     Page<BlogPostEntity> findAllByOrderByCreatedDateAsc(Pageable pageable);
@@ -39,5 +38,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
     Page<BlogPostEntity> findAllByOrderByModifiedDateAsc(Pageable pageable);
 
     Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
+
+    Set<BlogPostEntity> findByUserMarks(UserEntity userMarks);
 
 }

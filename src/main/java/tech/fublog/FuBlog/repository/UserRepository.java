@@ -19,6 +19,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     List<UserEntity> findAllByOrderByPointDesc();
 
-
 }
 

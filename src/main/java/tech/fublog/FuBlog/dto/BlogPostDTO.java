@@ -13,6 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class BlogPostDTO {
     private Long postId;
+    private Date createDate;
     private String typePost;
     private String title;
     private String content;
@@ -21,10 +22,10 @@ public class BlogPostDTO {
     private Set<TagDTO> tagList;
     private UserDTO user;
     private Long views;
-    private Date createDate = new Date();
 
-    public BlogPostDTO(Long postId, String typePost, String title, String content, String categoryName, Long parentCategoryId, Set<TagDTO> tagList, UserDTO user) {
+    public BlogPostDTO(Long postId, Date createDate, String typePost, String title, String content, String categoryName, Long parentCategoryId, Set<TagDTO> tagList, UserDTO user) {
         this.postId = postId;
+        this.createDate = createDate;
         this.typePost = typePost;
         this.title = title;
         this.content = content;
