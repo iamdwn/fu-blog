@@ -43,4 +43,5 @@ public class BlogPostDTO {
         this.voteCount = voteCount;
         this.commentCount = commentCount;
     }
+
 }

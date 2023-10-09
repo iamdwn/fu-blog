@@ -49,8 +49,14 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
-
     }
+
+    @GetMapping("/getMarkPost/{userId}")
+    public ResponseEntity<ResponseObject> getMarkPostByUser(@PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", userService.getMarkPostByUser(userId)));
+    }
+
     @GetMapping("/getActiveUser")
     public ResponseEntity<ResponseObject> getActiveUser() {
 
