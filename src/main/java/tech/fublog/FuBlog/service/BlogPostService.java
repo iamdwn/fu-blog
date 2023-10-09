@@ -1,9 +1,6 @@
 package tech.fublog.FuBlog.service;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
@@ -240,35 +237,38 @@ public class BlogPostService {
         List<BlogPostEntity> pageContent;
         Page<BlogPostEntity> pageResult;
 
-            Pageable pageable = PageRequest.of(page - 1, size - blogPostList.size());
+        Pageable pageable = PageRequest.of(page - 1, size - blogPostList.size());
 
-            if (filter.equalsIgnoreCase("")) {
-                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
-            } else if ("newest".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
-            } else if ("oldest".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateAsc(pageable);
-            } else if ("latestModified".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateDesc(pageable);
-            } else if ("oldestModified".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateAsc(pageable);
-            } else if ("mostViewed".equalsIgnoreCase(filter)) {
-                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(pageable);
-            } else if (!filter.trim().matches("\\d+")) {
-                Sort sort = Sort.by(Sort.Direction.ASC, "title");
-                pageable = PageRequest.of(page - 1, size - blogPostList.size(),sort);
-                filter = "%" +filter +"%";
-                pageResult = blogPostRepository.getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(filter, pageable);
-            } else {
-                Optional<CategoryEntity> categoryOptional = categoryRepository.findById(Long.parseLong(filter));
-                pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
-            }
+        if (filter.equalsIgnoreCase("")) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
+        } else if ("newest".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
+        } else if ("oldest".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateAsc(pageable);
+        } else if ("latestModified".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateDesc(pageable);
+        } else if ("oldestModified".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateAsc(pageable);
+        } else if ("mostViewed".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(pageable);
+        } else if (!filter.trim().matches("\\d+")) {
+            Sort sort = Sort.by(Sort.Direction.ASC, "title");
+            pageable = PageRequest.of(page - 1, size - blogPostList.size(), sort);
+            filter = "%" + filter + "%";
+            pageResult = blogPostRepository.getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(filter, pageable);
+        } else {
+            Long cateroryId = Long.parseLong(filter);
+            Optional<CategoryEntity> categoryOptional = categoryRepository.findById(Long.parseLong(filter));
+            pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
+        }
 
-            pageContent = pageResult.getContent();
+        pageContent = pageResult.getContent();
 
+        if (!pageContent.isEmpty()) {
             for (BlogPostEntity blogPost : pageContent) {
-                    blogPostDTOList.add(getBlogPostById(blogPost.getId()));
-                }
+                blogPostDTOList.add(getBlogPostById(blogPost.getId()));
+            }
+        }
 
         Long blogPostCount = Long.valueOf(pageResult.getTotalElements());
         Long pageCount = Long.valueOf(pageResult.getTotalPages());
