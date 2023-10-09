@@ -82,6 +82,9 @@ public class BlogPostService {
                     roleNames.get(roleNames.size() - 1),
                     roleNames);
 
+            blogPostEntity.setView(blogPostEntity.getView() + 1);
+            blogPostRepository.save(blogPostEntity);
+
             BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
                     blogPostEntity.getTypePost(),
                     blogPostEntity.getTitle(),
@@ -99,8 +102,7 @@ public class BlogPostService {
 //                  Date.from(Instant.ofEpochMilli((blogPostEntity.getCreatedDate().getTime())))
 //                  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
 //                    .parse(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(blogPostEntity.getCreatedDate())));
-//            blogPostEntity.setView(blogPostEntity.getView() + 1);
-            blogPostRepository.save(blogPostEntity);
+
             return blogPostDTO;
         } else
             throw new BlogPostException("not found blogpost with " + postId);
@@ -121,8 +123,9 @@ public class BlogPostService {
 
 
     //xoá --> set Status = 0
-    public void deleteBlogPost(Long postId) {
+    public ResponseEntity<ResponseObject> deleteBlogPost(Long postId) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+
         if (blogPostEntity.isPresent()
                 && blogPostEntity.get().getStatus()) {
             BlogPostEntity blogPost = this.getBlogById(postId);
@@ -130,7 +133,13 @@ public class BlogPostService {
             blogPost.setStatus(false);
 
             blogPostRepository.save(blogPost);
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "deleted successful", ""));
         }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ResponseObject("failed", "deleted failed", ""));
     }
 
 
