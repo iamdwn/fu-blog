@@ -92,22 +92,42 @@ public class AuthenticationController {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
         }
-        UserEntity user = new UserEntity(signUpRequest.getFullName(),
-                signUpRequest.getUsername(),
-                signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword()),
-                signUpRequest.getPicture(),
-                true,
-                true,
-                0.0
-        );
+        if(signUpRequest.getPicture() == null){
+            UserEntity user = new UserEntity(signUpRequest.getFullName(),
+                    signUpRequest.getUsername(),
+                    signUpRequest.getEmail(),
+                    encoder.encode(signUpRequest.getPassword()),
+                    "/images/default-avatar.png",
+                    true,
+                    true,
+                    0.0
+            );
 
-        Set<RoleEntity> roleEntities = new HashSet<>();
-        RoleEntity userRole = roleRepository.findByName("USER");
-        roleEntities.add(userRole);
-        user.setRoles(roleEntities);
+            Set<RoleEntity> roleEntities = new HashSet<>();
+            RoleEntity userRole = roleRepository.findByName("USER");
+            roleEntities.add(userRole);
+            user.setRoles(roleEntities);
 
-        userRepository.save(user);
+            userRepository.save(user);
+        }else{
+            UserEntity user = new UserEntity(signUpRequest.getFullName(),
+                    signUpRequest.getUsername(),
+                    signUpRequest.getEmail(),
+                    encoder.encode(signUpRequest.getPassword()),
+                    signUpRequest.getPicture(),
+                    true,
+                    true,
+                    0.0
+            );
+
+            Set<RoleEntity> roleEntities = new HashSet<>();
+            RoleEntity userRole = roleRepository.findByName("USER");
+            roleEntities.add(userRole);
+            user.setRoles(roleEntities);
+
+            userRepository.save(user);
+        }
+
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(signUpRequest.getUsername(), signUpRequest.getPassword());
         return ResponseEntity.ok(authenticationService.authenticate(authenticationRequest));
     }
