@@ -116,6 +116,17 @@ public class BlogPostController {
         }
     }
 
+    @GetMapping("/getPopularBlogPost")
+    public ResponseEntity<ResponseObject> getPopularBlog() {
+        try {
+            List<BlogPostDTO> blogPostEntity = blogPostService.getPopularBlogPost();
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPostEntity));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
 
     @GetMapping("getAllBlog/{page}/{size}")
     public PaginationResponseDTO getAllBlog(@PathVariable int page, @PathVariable int size) {
