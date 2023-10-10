@@ -335,13 +335,6 @@ public class BlogPostService {
         return paginationResponseDTO;
     }
 
-    public Page<BlogPostEntity> convertSetToPage(Set<BlogPostEntity> blogPostSet, int pageNumber, int pageSize) {
-        List<BlogPostEntity> list = new ArrayList<>(blogPostSet);
-        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
-        Page<BlogPostEntity> page = new PageImpl<>(list, pageRequest, blogPostSet.size());
-        return page;
-    }
-
 
     public Page<BlogPostEntity> findBlogByCategory(String name, Long parentCategoryId, int page, int size) {
         Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(name, parentCategoryId);
@@ -363,19 +356,20 @@ public class BlogPostService {
         } else throw new BlogPostException("Category doesn't exists");
     }
 
-    public static Page<BlogPostEntity> filterDuplicateEntities(Page<BlogPostEntity> page) {
-        List<BlogPostEntity> content = page.getContent();
-        Set<Long> seenIds = new HashSet<>();
-        List<BlogPostEntity> uniqueEntities = content.stream()
-                .filter(entity -> seenIds.add(entity.getId()))
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(uniqueEntities, page.getPageable(), uniqueEntities.size());
-    }
+//    public static Page<BlogPostEntity> filterDuplicateEntities(Page<BlogPostEntity> page) {
+//        List<BlogPostEntity> content = page.getContent();
+//        Set<Long> seenIds = new HashSet<>();
+//        List<BlogPostEntity> uniqueEntities = content.stream()
+//                .filter(entity -> seenIds.add(entity.getId()))
+//                .collect(Collectors.toList());
+//
+//        return new PageImpl<>(uniqueEntities, page.getPageable(), uniqueEntities.size());
+//    }
 
     public PaginationResponseDTO getAllBlogPost(int page, int size) {
         return filterBlogPost("", page, size);
     }
+
 
 
     public PaginationResponseDTO getAllBlogPostByTitle(String title, int page, int size) {
