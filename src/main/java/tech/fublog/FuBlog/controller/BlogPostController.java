@@ -14,6 +14,8 @@ import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.service.*;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/v1/auth/blogPosts")
@@ -43,6 +45,7 @@ public class BlogPostController {
     @DeleteMapping("/deleteBlogById/{postId}")
     public ResponseEntity<ResponseObject> deleteBlog(@PathVariable Long postId) {
         try {
+            blogPostService.deleteBlogPost(postId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "deleted successful", ""));
         } catch (BlogPostException ex) {
@@ -134,6 +137,8 @@ public class BlogPostController {
         }
         return ResponseEntity.ok(blogPosts);
     }
+
+
 
     @GetMapping("/sorted/{page}/{size}")
 //    public ResponseEntity<Page<BlogPostEntity>> getSortedBlogPosts(
