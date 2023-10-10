@@ -116,10 +116,10 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("getPopularBlog")
+    @GetMapping("/getPopularBlogPost")
     public ResponseEntity<ResponseObject> getPopularBlog() {
         try {
-            List<BlogPostDTO> blogPostEntity = blogPostService.getPopularBlog();
+            List<BlogPostDTO> blogPostEntity = blogPostService.getPopularBlogPost();
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", blogPostEntity));
         } catch (BlogPostException ex) {

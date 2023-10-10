@@ -28,10 +28,6 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
     Page<BlogPostEntity> findByCategory(CategoryEntity category, Pageable pageable);
 
 
-    @Query("SELECT bp FROM BlogPostEntity bp WHERE bp IN :blogPostPage ORDER BY bp.category.categoryName asc ")
-    Page<BlogPostEntity> arrangeAscendingByCategoryName(@Param("blogPostPage") Page<BlogPostEntity> blogPostPage,
-                                                       Pageable pageable);
-
     @Query("SELECT bp FROM BlogPostEntity bp WHERE bp.category IN:categoryEntityList AND " +
             "bp.isApproved = true AND bp.status = true ORDER BY bp.category.categoryName asc ")
     Page<BlogPostEntity> findByCategoryInAndIsApprovedTrueAndStatusTrue(@Param("categoryEntityList") List<CategoryEntity> categoryEntityList,
@@ -43,7 +39,6 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 //            @Param("categoryId") Long categoryId,
 //            Pageable pageable
 //    );
-
 
 
     Optional<BlogPostEntity> findByPinnedIsTrue();

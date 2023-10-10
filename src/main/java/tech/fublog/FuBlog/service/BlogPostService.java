@@ -234,16 +234,16 @@ public class BlogPostService {
     }
 
 
-    //sort theo thứ tự bài BlogPost mới nằm đầu tiên (giảm dần theo NGÀY)
     public void sort(List<BlogPostDTO> blogPostList) {
 
         Collections.sort(blogPostList, new Comparator<BlogPostDTO>() {
             @Override
             public int compare(BlogPostDTO o1, BlogPostDTO o2) {
-
-                if (o1.getCreatedDate().compareTo(o2.getCreatedDate()) < 0) {
+                double point1 = o1.getVoteCount() * 0.4 + o1.getViews() * 0.6;
+                double point2 = o2.getVoteCount() * 0.4 + o2.getViews() * 0.6;
+                if (point1 < point2) {
                     return 1;
-                } else if (o1.getCreatedDate().compareTo(o2.getCreatedDate()) == 0) {
+                } else if (point1 == point2) {
                     return 0;
                 } else {
                     return -1;
@@ -287,9 +287,7 @@ public class BlogPostService {
         List<BlogPostEntity> blogPostList = new ArrayList<>();
         List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
         List<BlogPostEntity> pageContent;
-        List<BlogPostDTO> pageContentDTO;
         Page<BlogPostEntity> pageResult = null;
-        Page<BlogPostDTO> pageResultDTO = null;
 
         Pageable pageable = PageRequest.of(page - 1, size - blogPostList.size());
 
@@ -366,10 +364,21 @@ public class BlogPostService {
 //        return new PageImpl<>(uniqueEntities, page.getPageable(), uniqueEntities.size());
 //    }
 
-    public List<BlogPostDTO> getPopularBlog() {
+    public List<BlogPostDTO> getPopularBlogPost() {
+        List<BlogPostDTO> popularBlogPostList = new ArrayList<>();
+        List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
+        List<BlogPostEntity> blogPostEntity = blogPostRepository.findAll();
 
-
-        return null;
+        for (BlogPostEntity entity : blogPostEntity){
+            blogPostDTOList.add(convertBlogPostDTO(entity.getId()));
+        }
+        sort(blogPostDTOList);
+        for (BlogPostDTO entity : blogPostDTOList){
+            if (popularBlogPostList.size() < 6) {
+                popularBlogPostList.add(entity);
+            } else return popularBlogPostList;
+        }
+        throw new BlogPostException("not found");
     }
 
     public PaginationResponseDTO getAllBlogPost(int page, int size) {
