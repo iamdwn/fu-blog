@@ -51,8 +51,6 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 //    @Query("SELECT b.id AS id, b.createdDate AS createdDate FROM BlogPostEntity b WHERE b.status = true AND b.isApproved = true ORDER BY b.createdDate DESC")
 //    Page<BlogPostProjection> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(Pageable pageable);
 
-//    @Query("SELECT b.id AS id, b.title AS title, b.createdDate AS createdDate FROM BlogPostEntity b")
-//    Page<BlogPostProjection> findSelectedFields(Pageable pageable);
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateAsc(Pageable pageable);
 
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateDesc(Pageable pageable);
@@ -65,4 +63,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
     @Query("SELECT bp FROM BlogPostEntity bp WHERE bp.status = true AND bp.isApproved = true ORDER BY bp.view DESC LIMIT 6")
     List<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc();
+
+    @Query("SELECT bp FROM BlogPostEntity bp WHERE bp.status = true AND bp.isApproved = true ORDER BY SIZE(bp.votes) DESC LIMIT 6")
+    List<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByVoteDesc();
 }

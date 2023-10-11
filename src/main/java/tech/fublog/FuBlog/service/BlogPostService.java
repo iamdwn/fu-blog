@@ -376,22 +376,22 @@ public class BlogPostService {
     public List<BlogPostDTO> getPopularBlogPostByView() {
         List<BlogPostDTO> popularBlogPostList = new ArrayList<>();
         List<BlogPostEntity> blogPostEntity = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc();
-        for (BlogPostEntity entity : blogPostEntity){
-                popularBlogPostList.add(getBlogPostById(entity.getId()));
-            return popularBlogPostList;
-        }
-        throw new BlogPostException("not found");
+        if (blogPostEntity != null) {
+            for (BlogPostEntity entity : blogPostEntity) {
+                popularBlogPostList.add(convertBlogPostDTO(entity));
+            } return popularBlogPostList;
+        } throw new BlogPostException("not found");
     }
 
-//    public List<BlogPostDTO> getPopularBlogPostByVote() {
-//        List<BlogPostDTO> popularBlogPostList = new ArrayList<>();
-//        List<BlogPostEntity> blogPostEntity = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByVoteDesc();
-//        for (BlogPostEntity entity : blogPostEntity){
-//            popularBlogPostList.add(getBlogPostById(entity.getId()));
-//            return popularBlogPostList;
-//        }
-//        throw new BlogPostException("not found");
-//    }
+    public List<BlogPostDTO> getPopularBlogPostByVote() {
+        List<BlogPostDTO> popularBlogPostList = new ArrayList<>();
+        List<BlogPostEntity> blogPostEntity = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByVoteDesc();
+        if (blogPostEntity != null) {
+            for (BlogPostEntity entity : blogPostEntity) {
+                popularBlogPostList.add(convertBlogPostDTO(entity));
+            } return popularBlogPostList;
+        } throw new BlogPostException("not found");
+    }
 
     public PaginationResponseDTO getAllBlogPost(int page, int size) {
         return filterBlogPost("", page, size);
