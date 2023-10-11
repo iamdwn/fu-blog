@@ -1,6 +1,6 @@
 package tech.fublog.FuBlog.controller;
 
-import tech.fublog.FuBlog.dto.request.AwardDTO;
+import tech.fublog.FuBlog.dto.request.AwardRequestDTO;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.AwardService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +25,9 @@ public class  AwardController {
 
     @PostMapping("awardPrize")
     ResponseEntity<ResponseObject> awardPrize(
-            @RequestBody AwardDTO awardDTO) {
+            @RequestBody AwardRequestDTO awardRequestDTO) {
 
-        return awardService.awardPrize(awardDTO);
+        return awardService.awardPrize(awardRequestDTO);
     }
 
 

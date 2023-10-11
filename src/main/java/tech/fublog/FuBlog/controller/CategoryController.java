@@ -24,9 +24,15 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping("/view")
-    public ResponseEntity<ResponseObject> getAll() {
+    @GetMapping("/viewAll")
+    public ResponseEntity<ResponseObject> getAllCategory() {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseObject("ok", "found", categoryService.getAllCategory()));
+    }
+
+    @GetMapping("/view")
+    public ResponseEntity<ResponseObject> getCategory() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", categoryService.getCategory()));
     }
 }

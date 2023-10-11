@@ -2,9 +2,12 @@ package tech.fublog.FuBlog.dto;
 
 import lombok.*;
 import tech.fublog.FuBlog.entity.CategoryEntity;
+import tech.fublog.FuBlog.entity.CommentEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
+import tech.fublog.FuBlog.entity.VoteEntity;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -17,14 +20,17 @@ public class BlogPostDTO {
     private String typePost;
     private String title;
     private String content;
+    private String image;
     private String categoryName;
     private CategoryEntity parentCategoryId;
     private Set<TagDTO> tagList;
     private UserDTO user;
     private Long views;
     private Date createdDate;
+    private Long voteCount;
+    private Long commentCount;
 
-    public BlogPostDTO(String typePost, String title, String content, String categoryName, CategoryEntity parentCategoryId, Set<TagDTO> tagList, UserDTO user, Long views, Date createdDate) {
+    public BlogPostDTO(String typePost, String title, String content, String categoryName, CategoryEntity parentCategoryId, Set<TagDTO> tagList, UserDTO user, Long views, Date createdDate, Long voteCount, Long commentCount) {
         this.typePost = typePost;
         this.title = title;
         this.content = content;
@@ -34,5 +40,7 @@ public class BlogPostDTO {
         this.user = user;
         this.views = views;
         this.createdDate = createdDate;
+        this.voteCount = voteCount;
+        this.commentCount = commentCount;
     }
 }

@@ -80,10 +80,10 @@ public class VoteService {
                 notificationEntity.setUserId(blogPostEntity.get().getAuthors());
                 notificationEntity.setPostId(voteDTO.getPostId());
                 notificationStorageService.createNotificationStorage(notificationEntity);
-                userEntity.get().setPoint(userEntity.get().getPoint() +0.5);
+                Double point = userEntity.get().getPoint();
+                userEntity.get().setPoint(point + 0.5);
                 voteEntity = new VoteEntity(voteDTO.getVoteValue(), userEntity.get(), blogPostEntity.get());
                 voteRepository.save(voteEntity);
-                voteDTO.setVoteId(voteEntity.getId());
                 return voteDTO;
             }
         } else throw new VoteException("User or Blog doesn't exists");

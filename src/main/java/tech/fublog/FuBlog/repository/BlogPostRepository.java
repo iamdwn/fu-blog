@@ -19,31 +19,34 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
     List<BlogPostEntity> findByTitleLike(String title);
 
     //    public List<BlogPostEntity> getBlogPostEntitiesByTitle(String title, Pageable pageable);
-    public Page<BlogPostEntity> getBlogPostEntitiesByTitle(String title, Pageable pageable);
+    public Page<BlogPostEntity> getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(String title, Pageable pageable);
 
 //    List<BlogPostEntity> findAllByCategory(Long id);
 
     Page<BlogPostEntity> findByCategory(CategoryEntity category, Pageable pageable);
 
-
-    @Query("SELECT bp FROM BlogPostEntity bp WHERE bp.category.id = :categoryId OR bp.category.parentCategory.id = :categoryId")
+    @Query("SELECT bp FROM BlogPostEntity bp WHERE (bp.category.id = :categoryId OR bp.category.parentCategory.id = :categoryId) " +
+            "AND (bp.isApproved = true AND bp.status = true) ORDER BY bp.category.categoryName asc ")
     Page<BlogPostEntity> findBlogPostsByCategoryIdOrParentId(
             @Param("categoryId") Long categoryId,
             Pageable pageable
     );
 
+
     Optional<BlogPostEntity> findByPinnedIsTrue();
 
     //    @Query("SELECT e FROM BlogPostEntity e ORDER BY e.createdDate DESC")
-    Page<BlogPostEntity> findAllByOrderByCreatedDateDesc(Pageable pageable);
+    Page<BlogPostEntity> findAllByStatusIsTrueAndIsApprovedIsTrue(Pageable pageable);
 
-    Page<BlogPostEntity> findAllByOrderByCreatedDateAsc(Pageable pageable);
+    Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(Pageable pageable);
 
-    Page<BlogPostEntity> findAllByOrderByModifiedDateDesc(Pageable pageable);
+    Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateAsc(Pageable pageable);
 
-    Page<BlogPostEntity> findAllByOrderByModifiedDateAsc(Pageable pageable);
+    Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateDesc(Pageable pageable);
+
+    Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateAsc(Pageable pageable);
 
     //    Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
-    Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
+    Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(Pageable pageable);
 
 }

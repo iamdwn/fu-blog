@@ -38,8 +38,9 @@ public class UserController {
     public List<UserEntity> getAllUser(){
         return  userRepository.findAllByStatusIsTrue();
     }
-    @GetMapping("/mark")
-    public ResponseEntity<ResponseObject> markBook(@RequestBody PostMarkDTO postMarkDTO) {
+
+    @PostMapping("/mark")
+    public ResponseEntity<ResponseObject> markPost(@RequestBody PostMarkDTO postMarkDTO) {
         try {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", userService.markPost(postMarkDTO.getUserId(), postMarkDTO.getPostId())));
@@ -48,8 +49,14 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
-
     }
+
+    @GetMapping("/getMarkPost/{userId}")
+    public ResponseEntity<ResponseObject> getMarkPostByUser(@PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", userService.getMarkPostByUser(userId)));
+    }
+
     @GetMapping("/getActiveUser")
     public ResponseEntity<ResponseObject> getActiveUser() {
 

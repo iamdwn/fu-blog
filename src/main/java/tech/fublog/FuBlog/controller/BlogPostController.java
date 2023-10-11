@@ -1,8 +1,8 @@
 package tech.fublog.FuBlog.controller;
 
-import org.springframework.data.domain.Page;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
-import tech.fublog.FuBlog.dto.request.RequestBlogPostDTO;
+import tech.fublog.FuBlog.dto.request.BlogPostRequestDTO;
+import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.ApprovalRequestService;
@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.service.*;
 import org.springframework.http.HttpStatus;
-
-import java.util.List;
 
 
 @RestController
@@ -54,7 +52,7 @@ public class BlogPostController {
     }
 
     @PostMapping("/insert")
-    ResponseEntity<ResponseObject> insertBlogPost(@RequestBody RequestBlogPostDTO blogPostDTO) {
+    ResponseEntity<ResponseObject> insertBlogPost(@RequestBody BlogPostRequestDTO blogPostDTO) {
         try {
             BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(blogPostDTO);
             approvalRequestService.insertApprovalRequest(blogPostEntity);
@@ -69,9 +67,9 @@ public class BlogPostController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<ResponseObject> updateBlog(@RequestBody RequestBlogPostDTO requestBlogPostDTO) {
+    public ResponseEntity<ResponseObject> updateBlog(@RequestBody BlogPostRequestDTO blogPostRequestDTO) {
         try {
-            BlogPostEntity blogPostEntity = blogPostService.updateBlogPost(requestBlogPostDTO);
+            BlogPostEntity blogPostEntity = blogPostService.updateBlogPost(blogPostRequestDTO);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "updated successful", blogPostEntity));
         } catch (BlogPostException ex) {
@@ -90,91 +88,67 @@ public class BlogPostController {
         return  blogPostService.pinBlogAction(postId);
     }
 
-//    @GetMapping("/search/{category}")
-//    ResponseEntity<ResponseObject> findBlogByCategory(@PathVariable String category) {
-//        return blogPostService.findBlogByCategory(category);
-//    }
 
-//    @GetMapping("/getBlogById/{postId}")
-//    ResponseEntity<ResponseObject> getBlogPostById(@PathVariable Long postId) {
-//        try {
-//            BlogPostDTO dto = blogPostService.getBlogPostById(postId);
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(new ResponseObject("ok", "post found", dto));
-//        } catch (BlogPostException ex) {
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-//        }
-//    }
+    @GetMapping("/getBlogById/{postId}")
+    ResponseEntity<ResponseObject> getBlogPostById(@PathVariable Long postId) {
+        try {
+            BlogPostDTO dto = blogPostService.getBlogPostById(postId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", dto));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/getBlogDetailsById/{postId}")
+    ResponseEntity<ResponseObject> getBlogDetailsById(@PathVariable Long postId) {
+        try {
+            BlogPostEntity blogPostEntity = blogPostService.getBlogPostDetailsById(postId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPostEntity));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
 
 
     @GetMapping("getAllBlog/{page}/{size}")
-    public List<BlogPostEntity> getAllBlog(@PathVariable int page, @PathVariable int size) {
+    public PaginationResponseDTO getAllBlog(@PathVariable int page, @PathVariable int size) {
         return blogPostService.getAllBlogPost(page, size);
     }
 
     @GetMapping("getByTitle/{title}/{page}/{size}")
-    public List<BlogPostEntity> getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
+    public PaginationResponseDTO getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
         return blogPostService.getAllBlogPostByTitle(title, page, size);
     }
 
     @GetMapping("getByCategory/{categoryId}/{page}/{size}")
-    public ResponseEntity<List<BlogPostEntity>> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
+    public ResponseEntity<PaginationResponseDTO> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
 //        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
-        List<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+        PaginationResponseDTO blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
 
-        if (blogPosts.isEmpty()) {
+        if (blogPosts == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(blogPosts);
     }
 
     @GetMapping("/sorted/{page}/{size}")
-    public ResponseEntity<Page<BlogPostEntity>> getSortedBlogPosts(
+//    public ResponseEntity<Page<BlogPostEntity>> getSortedBlogPosts(
+    public ResponseEntity<PaginationResponseDTO> getSortedBlogPosts(
             @RequestParam(name = "sortBy", defaultValue = "newest") String sortBy,
             @PathVariable int page, @PathVariable int size) {
-        Page<BlogPostEntity> blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
+//        Page<BlogPostEntity> blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
+        PaginationResponseDTO blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
 
-        if (blogPostEntities.isEmpty()) {
+        if (blogPostEntities == null) {
             return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity.ok(blogPostEntities);
     }
 
-
-//    @GetMapping("/view")
-//    ResponseEntity<ResponseObject> findByApproved(@RequestBody BlogPostDTO blogPostDTO) {
-////        Long vote = voteService.countVote(blogPostDTO.getPostId());
-////        List<ResponseCommentDTO> comment = commentService.viewComment(blogPostDTO.getPostId());
-//        ResponseBlogPostDTO responseBlogPostDTO = blogPostService.viewBlogPost(blogPostDTO.getPostId(), vote, comment);
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(new ResponseObject("ok", "list here", responseBlogPostDTO));
-//    }
-
-//    @GetMapping("/search/category")
-//    ResponseEntity<ResponseObject> findBlogByCategory(@RequestBody CategoryDTO categoryDTO) {
-//        try {
-//            Set<BlogPostDTO> dtoList = blogPostService.findBlogByCategory(categoryDTO.getCategoryName(), categoryDTO.getParentCategoryId());
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(new ResponseObject("ok", "found", dtoList));
-//        } catch (BlogPostException ex) {
-//            System.out.println(ex.getMessage());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-//        }
-//    }
-
-//    @GetMapping("/search/title/{title}")
-//    ResponseEntity<ResponseObject> findBlogByTitle(@PathVariable String title) {
-//        try {
-//            List<BlogPostDTO> dtoList = blogPostService.findBlogByTitle(title);
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(new ResponseObject("ok", "found", dtoList));
-//        } catch (BlogPostException ex) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-//        }
-//    }
 }
 

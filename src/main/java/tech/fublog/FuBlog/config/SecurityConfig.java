@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/demo/test").hasAnyAuthority("USER", "ADMIN")
+//                .requestMatchers("/v3/api-docs/**","/swagger-ui/**").permitAll()
                 .requestMatchers("/**").permitAll()
 //
 //                .anyRequest().authenticated();
