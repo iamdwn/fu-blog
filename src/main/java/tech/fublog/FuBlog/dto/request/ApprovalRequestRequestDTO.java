@@ -1,6 +1,9 @@
 package tech.fublog.FuBlog.dto.request;
 
 import lombok.*;
+import tech.fublog.FuBlog.dto.TagDTO;
+
+import java.util.Set;
 
 @Data
 @Getter
@@ -12,4 +15,8 @@ public class ApprovalRequestRequestDTO {
     private Long postId;
 //    private Long requestId;
     private Long reviewId;
+
+    private Set<TagDTO> tagList;
+
+
 }

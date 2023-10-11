@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import tech.fublog.FuBlog.entity.CategoryEntity;
+import tech.fublog.FuBlog.entity.TagEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
             Pageable pageable
     );
 
-
+//    BlogPostEntity findById(String id);
     Optional<BlogPostEntity> findByPinnedIsTrue();
 
     //    @Query("SELECT e FROM BlogPostEntity e ORDER BY e.createdDate DESC")
@@ -48,5 +49,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
     //    Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(Pageable pageable);
+
+    List<BlogPostEntity> findByPostTagsTag(TagEntity tag);
 
 }

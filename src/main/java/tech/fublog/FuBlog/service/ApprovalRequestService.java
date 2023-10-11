@@ -1,15 +1,12 @@
 package tech.fublog.FuBlog.service;
 
 
+import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.request.ApprovalRequestRequestDTO;
 import tech.fublog.FuBlog.dto.response.ApprovalRequestResponseDTO;
-import tech.fublog.FuBlog.entity.ApprovalRequestEntity;
-import tech.fublog.FuBlog.entity.BlogPostEntity;
-import tech.fublog.FuBlog.entity.UserEntity;
+import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.model.ResponseObject;
-import tech.fublog.FuBlog.repository.ApprovalRequestRepository;
-import tech.fublog.FuBlog.repository.BlogPostRepository;
-import tech.fublog.FuBlog.repository.UserRepository;
+import tech.fublog.FuBlog.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +25,17 @@ public class ApprovalRequestService {
 
     private final ApprovalRequestRepository approvalRequestRepository;
 
+    private final TagRepository tagRepository;
+
+    private final PostTagRepository postTagRepository;
+
     @Autowired
-    public ApprovalRequestService(BlogPostRepository blogPostRepository, UserRepository userRepository, ApprovalRequestRepository approvalRequestRepository) {
+    public ApprovalRequestService(BlogPostRepository blogPostRepository, UserRepository userRepository, ApprovalRequestRepository approvalRequestRepository, TagRepository tagRepository, PostTagRepository postTagRepository) {
         this.blogPostRepository = blogPostRepository;
         this.userRepository = userRepository;
         this.approvalRequestRepository = approvalRequestRepository;
+        this.tagRepository = tagRepository;
+        this.postTagRepository = postTagRepository;
     }
 
     public List<ApprovalRequestResponseDTO> getAllApprovalRequest() {
@@ -78,10 +81,30 @@ public class ApprovalRequestService {
                 blogPostEntity.get().setIsApproved(true);
                 blogPostRepository.save(blogPostEntity.get());
                 approvalRequestRepository.save(approvalRequestEntity);
+                for (TagDTO tag : approvalRequestRequestDTO.getTagList()) {
+
+                    String tagName = tag.getTagName();
+                    TagEntity tagEntity = tagRepository.findByTagName(tagName);
+                    PostTagEntity postTagEntity = new PostTagEntity();
+                    if(tagEntity != null){
+                        postTagEntity.setTag(tagEntity);
+                        postTagEntity.setPost(blogPostEntity.get());
+                        postTagRepository.save(postTagEntity);
+                    }else{
+                        TagEntity postTag = new TagEntity();
+                        postTag.setTagName(tagName);
+                        tagRepository.save(postTag);
+                        TagEntity tagNameEntity = tagRepository.findByTagName(tagName);
+                        postTagEntity.setTag(tagNameEntity);
+                        postTagEntity.setPost(blogPostEntity.get());
+                        postTagRepository.save(postTagEntity);
+                    }
+                }
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "approved successful", ""));
             }
         }
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ResponseObject("failed", "approved failed", ""));
     }

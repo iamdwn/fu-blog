@@ -14,6 +14,8 @@ import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.service.*;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/v1/auth/blogPosts")
@@ -148,6 +150,12 @@ public class BlogPostController {
         }
 
         return ResponseEntity.ok(blogPostEntities);
+    }
+
+    @GetMapping("/bytag")
+    public ResponseEntity<List<BlogPostEntity>> getBlogPostsByTag(@RequestParam(name = "tag") String tagName) {
+        List<BlogPostEntity> blogPosts = blogPostService.findByTagName(tagName);
+        return ResponseEntity.ok(blogPosts);
     }
 
 }
