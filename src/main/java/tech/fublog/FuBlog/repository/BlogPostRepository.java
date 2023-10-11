@@ -9,10 +9,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import tech.fublog.FuBlog.entity.CategoryEntity;
+import tech.fublog.FuBlog.entity.TagEntity;
+import tech.fublog.FuBlog.projection.BlogPostProjection;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Repository
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
@@ -20,10 +23,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
     List<BlogPostEntity> findByTitleLike(String title);
 
-    //    public List<BlogPostEntity> getBlogPostEntitiesByTitle(String title, Pageable pageable);
     public Page<BlogPostEntity> getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(String title, Pageable pageable);
-
-//    List<BlogPostEntity> findAllByCategory(Long id);
 
     Page<BlogPostEntity> findByCategory(CategoryEntity category, Pageable pageable);
 
@@ -41,20 +41,28 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 //    );
 
 
-    Optional<BlogPostEntity> findByPinnedIsTrue();
+    BlogPostEntity findByPinnedIsTrue();
 
     //    @Query("SELECT e FROM BlogPostEntity e ORDER BY e.createdDate DESC")
     Page<BlogPostEntity> findAllByStatusIsTrueAndIsApprovedIsTrue(Pageable pageable);
 
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(Pageable pageable);
 
+//    @Query("SELECT b.id AS id, b.createdDate AS createdDate FROM BlogPostEntity b WHERE b.status = true AND b.isApproved = true ORDER BY b.createdDate DESC")
+//    Page<BlogPostProjection> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(Pageable pageable);
+
+//    @Query("SELECT b.id AS id, b.title AS title, b.createdDate AS createdDate FROM BlogPostEntity b")
+//    Page<BlogPostProjection> findSelectedFields(Pageable pageable);
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateAsc(Pageable pageable);
 
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateDesc(Pageable pageable);
 
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateAsc(Pageable pageable);
 
-    //    Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(Pageable pageable);
 
+    List<BlogPostEntity> findByPostTagsTag(TagEntity tag);
+
+    @Query("SELECT bp FROM BlogPostEntity bp WHERE bp.status = true AND bp.isApproved = true ORDER BY bp.view DESC LIMIT 6")
+    List<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc();
 }

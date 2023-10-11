@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.controller;
 
+import org.springframework.data.domain.Page;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.request.BlogPostRequestDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
@@ -116,10 +117,10 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("/getPopularBlogPost")
-    public ResponseEntity<ResponseObject> getPopularBlog() {
+    @GetMapping("/getPopularBlogPostByView")
+    public ResponseEntity<ResponseObject> getPopularBlogByView() {
         try {
-            List<BlogPostDTO> blogPostEntity = blogPostService.getPopularBlogPost();
+            List<BlogPostDTO> blogPostEntity = blogPostService.getPopularBlogPostByView();
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", blogPostEntity));
         } catch (BlogPostException ex) {
@@ -127,6 +128,17 @@ public class BlogPostController {
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
+//    @GetMapping("/getPopularBlogPostByVote")
+//    public ResponseEntity<ResponseObject> getPopularBlogByVote() {
+//        try {
+//            List<BlogPostDTO> blogPostEntity = blogPostService.getPopularBlogPostByVote();
+//            return ResponseEntity.status(HttpStatus.OK)
+//                    .body(new ResponseObject("ok", "post found", blogPostEntity));
+//        } catch (BlogPostException ex) {
+//            return ResponseEntity.status(HttpStatus.OK)
+//                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+//        }
+//    }
 
     @GetMapping("getAllBlog/{page}/{size}")
     public PaginationResponseDTO getAllBlog(@PathVariable int page, @PathVariable int size) {
@@ -149,8 +161,6 @@ public class BlogPostController {
         return ResponseEntity.ok(blogPosts);
     }
 
-
-
     @GetMapping("/sorted/{page}/{size}")
 //    public ResponseEntity<Page<BlogPostEntity>> getSortedBlogPosts(
     public ResponseEntity<PaginationResponseDTO> getSortedBlogPosts(
@@ -164,6 +174,12 @@ public class BlogPostController {
         }
 
         return ResponseEntity.ok(blogPostEntities);
+    }
+
+    @GetMapping("/bytag")
+    public ResponseEntity<List<BlogPostEntity>> getBlogPostsByTag(@RequestParam(name = "tag") String tagName) {
+        List<BlogPostEntity> blogPosts = blogPostService.findByTagName(tagName);
+        return ResponseEntity.ok(blogPosts);
     }
 
 }

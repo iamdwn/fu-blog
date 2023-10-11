@@ -169,7 +169,6 @@ public class AuthenticationController {
 
         String username = jwtService.extractTokenToGetUser(token.substring(7));
         List <String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
-        System.out.println(roles);
 
         Optional<UserEntity> user = userRepository.findByUsername(username);
 //        AuthenticationReponse authenticationReponse = new AuthenticationReponse();

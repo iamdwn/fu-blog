@@ -108,4 +108,152 @@ public class BlogPostEntity {
         BlogPostEntity blogPost = (BlogPostEntity) obj;
         return Objects.equals(id, blogPost.getId());
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getTypePost() {
+        return typePost;
+    }
+
+    public void setTypePost(String typePost) {
+        this.typePost = typePost;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Date modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
+    public Long getApprovedBy() {
+        return approvedBy;
+    }
+
+    public void setApprovedBy(Long approvedBy) {
+        this.approvedBy = approvedBy;
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
+
+    public Boolean getApproved() {
+        return isApproved;
+    }
+
+    public void setApproved(Boolean approved) {
+        isApproved = approved;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public Long getView() {
+        return view;
+    }
+
+    public void setView(Long view) {
+        this.view = view;
+    }
+
+    public Boolean getPinned() {
+        return pinned;
+    }
+
+    public void setPinned(Boolean pinned) {
+        this.pinned = pinned;
+    }
+
+    public CategoryEntity getCategory() {
+        return category;
+    }
+
+    public void setCategory(CategoryEntity category) {
+        this.category = category;
+    }
+
+    public UserEntity getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(UserEntity authors) {
+        this.authors = authors;
+    }
+
+    public Set<VoteEntity> getVotes() {
+        return votes;
+    }
+
+    public void setVotes(Set<VoteEntity> votes) {
+        this.votes = votes;
+    }
+
+    public Set<ApprovalRequestEntity> getApprovalRequests() {
+        return approvalRequests;
+    }
+
+    public void setApprovalRequests(Set<ApprovalRequestEntity> approvalRequests) {
+        this.approvalRequests = approvalRequests;
+    }
+
+    public Set<CommentEntity> getPostComments() {
+        return postComments;
+    }
+
+    public void setPostComments(Set<CommentEntity> postComments) {
+        this.postComments = postComments;
+    }
+
+    public Set<PostTagEntity> getPostTags() {
+        return postTags;
+    }
+
+    public void setPostTags(Set<PostTagEntity> postTags) {
+        this.postTags = postTags;
+    }
+
+    public Set<UserEntity> getUserMarks() {
+        return userMarks;
+    }
+
+    public void setUserMarks(Set<UserEntity> userMarks) {
+        this.userMarks = userMarks;
+    }
 }

@@ -2,7 +2,9 @@ package tech.fublog.FuBlog.dto;
 
 import lombok.*;
 import org.springframework.stereotype.Service;
+import tech.fublog.FuBlog.entity.RoleEntity;
 
+import javax.management.relation.Role;
 import java.util.List;
 import java.util.Set;
 
@@ -20,6 +22,5 @@ public class UserDTO {
     private Boolean status;
     private String role;
     private List<String> roles;
-
 
 }

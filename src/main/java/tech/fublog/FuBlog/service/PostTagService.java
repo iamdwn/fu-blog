@@ -9,6 +9,7 @@ import tech.fublog.FuBlog.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,13 +25,13 @@ public class PostTagService {
         this.tagRepository = tagRepository;
     }
 
-    public void insertPostTag(Set<TagDTO> tagDTOList, BlogPostEntity blogPostEntity) {
+    public void insertPostTag(List<TagDTO> tagDTOList, BlogPostEntity blogPostEntity) {
         for (TagDTO tagDTO : tagDTOList) {
-            Optional<TagEntity> tagEntity = tagRepository.findById(tagDTO.getTagId());
-            if (tagEntity.isPresent()) {
-                Optional<PostTagEntity> postTagEntity = postTagRepository.findByPostAndTag(blogPostEntity, tagEntity.get());
+            TagEntity tagEntity = tagRepository.findByTagName(tagDTO.getTagName());
+            if (tagEntity != null) {
+                Optional<PostTagEntity> postTagEntity = postTagRepository.findByPostAndTag(blogPostEntity, tagEntity);
                 if (postTagEntity.isEmpty()) {
-                    PostTagEntity entity = new PostTagEntity(blogPostEntity, tagEntity.get());
+                    PostTagEntity entity = new PostTagEntity(blogPostEntity, tagEntity);
                     postTagRepository.save(entity);
                 }
             }

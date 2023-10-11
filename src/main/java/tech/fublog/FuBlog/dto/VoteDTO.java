@@ -1,6 +1,5 @@
 package tech.fublog.FuBlog.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 @Data

@@ -11,6 +11,7 @@ import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.PostTagException;
 import tech.fublog.FuBlog.model.ResponseObject;
+import tech.fublog.FuBlog.projection.BlogPostProjection;
 import tech.fublog.FuBlog.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import tech.fublog.FuBlog.exception.BlogPostException;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class BlogPostService {
@@ -106,9 +108,9 @@ public class BlogPostService {
 
     }
 
-    public BlogPostDTO convertBlogPostDTO(Long postId) {
+    public BlogPostDTO convertBlogPostDTO(BlogPostEntity blogPostEntity) {
 
-        BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
+//        BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
 
         if (blogPostEntity != null) {
             UserEntity userEntity = userRepository.findById(blogPostEntity.getAuthors().getId()).orElse(null);
@@ -157,7 +159,7 @@ public class BlogPostService {
 
             return blogPostDTO;
         } else
-            throw new BlogPostException("not found blogpost with " + postId);
+            throw new BlogPostException("not found blogpost with " + blogPostEntity.getId());
 
     }
 
@@ -253,24 +255,23 @@ public class BlogPostService {
     }
 
     public ResponseEntity<ResponseObject> getPinnedBlog() {
-        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findByPinnedIsTrue();
-        BlogPostDTO blogPostDTO = convertBlogPostDTO(blogPostEntity.get().getId());
+        BlogPostEntity blogPostEntity = blogPostRepository.findByPinnedIsTrue();
 
-        return !blogPostEntity.isEmpty() ? ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseObject("ok", "found", blogPostDTO))
+        return blogPostEntity != null ? ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", convertBlogPostDTO(blogPostEntity)))
                 : ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ResponseObject("failed", "not found", ""));
     }
 
     public ResponseEntity<ResponseObject> pinBlogAction(Long postId) {
-        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findByPinnedIsTrue();
+        BlogPostEntity blogPostEntity = blogPostRepository.findByPinnedIsTrue();
         Optional<BlogPostEntity> blogPost = blogPostRepository.findById(postId);
 
-        if (blogPostEntity.isPresent()) {
+        if (blogPostEntity != null) {
 
-            blogPostEntity.get().setPinned(false);
-            blogPostRepository.save(blogPostEntity.get());
-            if (blogPostEntity.get().getId().equals(postId)) {
+            blogPostEntity.setPinned(false);
+            blogPostRepository.save(blogPostEntity);
+            if (blogPostEntity.getId().equals(postId)) {
 
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "unpinned successfull", ""));
@@ -283,13 +284,15 @@ public class BlogPostService {
                 .body(new ResponseObject("ok", "pinned successfull", ""));
     }
 
-    public PaginationResponseDTO filterBlogPost(String filter, int page, int size) {
+//    @Cacheable("blogpost")
+    public PaginationResponseDTO filterBlogPost(String filter, int pageNumber, int size) {
         List<BlogPostEntity> blogPostList = new ArrayList<>();
         List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
         List<BlogPostEntity> pageContent;
         Page<BlogPostEntity> pageResult = null;
+        Page<BlogPostProjection> pageResult2 = null;
 
-        Pageable pageable = PageRequest.of(page - 1, size - blogPostList.size());
+        Pageable pageable = PageRequest.of(pageNumber - 1, size - blogPostList.size());
 
 
         if (filter.equalsIgnoreCase("")) {
@@ -306,7 +309,7 @@ public class BlogPostService {
             pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(pageable);
         } else if (!filter.trim().matches("\\d+")) {
             Sort sort = Sort.by(Sort.Direction.ASC, "title");
-            pageable = PageRequest.of(page - 1, size - blogPostList.size(), sort);
+            pageable = PageRequest.of(pageNumber - 1, size, sort);
             filter = "%" + filter + "%";
             pageResult = blogPostRepository.getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(filter, pageable);
         } else {
@@ -316,15 +319,21 @@ public class BlogPostService {
 
             pageResult = findBlogByCategory(categoryOptional.get().getCategoryName(),
                             categoryOptional.get().getParentCategory() == null ? null
-                                    : categoryOptional.get().getParentCategory().getId(), page, size);
+                                    : categoryOptional.get().getParentCategory().getId(), pageNumber, size);
         }
 
         if (pageResult != null) {
             pageContent = pageResult.getContent();
             for (BlogPostEntity blogPost : pageContent) {
-                blogPostDTOList.add(convertBlogPostDTO(blogPost.getId()));
+                blogPostDTOList.add(convertBlogPostDTO(blogPost));
             }
         }
+//        if (pageResult2 != null) {
+//            List<BlogPostProjection> pageContent2 = pageResult2.getContent();
+//            for (BlogPostProjection blogPost : pageContent2) {
+//                blogPostDTOList.add(convertBlogPostDTO(blogPost.getId()));
+//            }
+//        }
 
         Long blogPostCount = Long.valueOf(pageResult.getTotalElements());
         Long pageCount = Long.valueOf(pageResult.getTotalPages());
@@ -364,22 +373,25 @@ public class BlogPostService {
 //        return new PageImpl<>(uniqueEntities, page.getPageable(), uniqueEntities.size());
 //    }
 
-    public List<BlogPostDTO> getPopularBlogPost() {
+    public List<BlogPostDTO> getPopularBlogPostByView() {
         List<BlogPostDTO> popularBlogPostList = new ArrayList<>();
-        List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
-        List<BlogPostEntity> blogPostEntity = blogPostRepository.findAll();
-
+        List<BlogPostEntity> blogPostEntity = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc();
         for (BlogPostEntity entity : blogPostEntity){
-            blogPostDTOList.add(convertBlogPostDTO(entity.getId()));
-        }
-        sort(blogPostDTOList);
-        for (BlogPostDTO entity : blogPostDTOList){
-            if (popularBlogPostList.size() < 6) {
-                popularBlogPostList.add(entity);
-            } else return popularBlogPostList;
+                popularBlogPostList.add(getBlogPostById(entity.getId()));
+            return popularBlogPostList;
         }
         throw new BlogPostException("not found");
     }
+
+//    public List<BlogPostDTO> getPopularBlogPostByVote() {
+//        List<BlogPostDTO> popularBlogPostList = new ArrayList<>();
+//        List<BlogPostEntity> blogPostEntity = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByVoteDesc();
+//        for (BlogPostEntity entity : blogPostEntity){
+//            popularBlogPostList.add(getBlogPostById(entity.getId()));
+//            return popularBlogPostList;
+//        }
+//        throw new BlogPostException("not found");
+//    }
 
     public PaginationResponseDTO getAllBlogPost(int page, int size) {
         return filterBlogPost("", page, size);
@@ -438,6 +450,14 @@ public class BlogPostService {
     public Optional<CategoryEntity> findCategoryByNameAndParentId(String name, Long parentCategoryId) {
         CategoryEntity parentCategory = categoryRepository.findParentCategoryById(parentCategoryId);
         return categoryRepository.findByCategoryNameAndParentCategory(name, parentCategory);
+    }
+
+    public List<BlogPostEntity> findByTagName(String tagName) {
+        TagEntity tag = tagRepository.findByTagName(tagName);
+        if (tag != null) {
+            return blogPostRepository.findByPostTagsTag(tag);
+        }
+        return Collections.emptyList();
     }
 
 }
