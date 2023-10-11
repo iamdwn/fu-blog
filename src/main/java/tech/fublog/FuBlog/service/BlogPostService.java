@@ -373,4 +373,12 @@ public class BlogPostService {
         return categoryRepository.findByCategoryNameAndParentCategory(name, parentCategory);
     }
 
+    public List<BlogPostEntity> findByTagName(String tagName) {
+        TagEntity tag = tagRepository.findByTagName(tagName);
+        if (tag != null) {
+            return blogPostRepository.findByPostTagsTag(tag);
+        }
+        return Collections.emptyList();
+    }
+
 }
