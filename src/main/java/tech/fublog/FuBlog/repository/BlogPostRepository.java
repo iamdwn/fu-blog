@@ -62,4 +62,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
     @Query("SELECT bp FROM BlogPostEntity bp WHERE bp.status = true AND bp.isApproved = true ORDER BY bp.view DESC LIMIT 6")
     List<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc();
+
+    @Query("SELECT bp FROM BlogPostEntity bp WHERE bp.status = true AND bp.isApproved = true ORDER BY SIZE(bp.votes) DESC LIMIT 6")
+    List<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByVoteDesc();
 }
