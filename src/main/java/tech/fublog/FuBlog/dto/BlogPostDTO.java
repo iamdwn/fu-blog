@@ -1,9 +1,13 @@
 package tech.fublog.FuBlog.dto;
 
 import lombok.*;
+import tech.fublog.FuBlog.entity.CategoryEntity;
+import tech.fublog.FuBlog.entity.CommentEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
+import tech.fublog.FuBlog.entity.VoteEntity;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -13,19 +17,20 @@ import java.util.Set;
 @AllArgsConstructor
 public class BlogPostDTO {
     private Long postId;
-    private Date createDate;
     private String typePost;
     private String title;
     private String content;
+    private String image;
     private String categoryName;
-    private Long parentCategoryId;
+    private CategoryEntity parentCategoryId;
     private Set<TagDTO> tagList;
     private UserDTO user;
     private Long views;
+    private Date createdDate;
+    private Long voteCount;
+    private Long commentCount;
 
-    public BlogPostDTO(Long postId, Date createDate, String typePost, String title, String content, String categoryName, Long parentCategoryId, Set<TagDTO> tagList, UserDTO user) {
-        this.postId = postId;
-        this.createDate = createDate;
+    public BlogPostDTO(String typePost, String title, String content, String categoryName, CategoryEntity parentCategoryId, Set<TagDTO> tagList, UserDTO user, Long views, Date createdDate, Long voteCount, Long commentCount) {
         this.typePost = typePost;
         this.title = title;
         this.content = content;
@@ -33,5 +38,9 @@ public class BlogPostDTO {
         this.parentCategoryId = parentCategoryId;
         this.tagList = tagList;
         this.user = user;
+        this.views = views;
+        this.createdDate = createdDate;
+        this.voteCount = voteCount;
+        this.commentCount = commentCount;
     }
 }

@@ -68,31 +68,31 @@ public class UserEntity implements UserDetails {
 //    private Set<ApprovalRequestEntity> requested = new HashSet<>();
 
     @OneToMany(mappedBy = "review")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<ApprovalRequestEntity> reviewed = new HashSet<>();
 
     @OneToMany(mappedBy = "userComment")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<CommentEntity> comments = new HashSet<>();
 
     @OneToMany(mappedBy = "userVote")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<VoteEntity> votes = new HashSet<>();
 
     @OneToMany(mappedBy = "userId")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<NotificationEntity> notificationList = new HashSet<>();
 
     @OneToMany(mappedBy = "following")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<FollowEntity> followingList = new HashSet<>();
 
     @OneToMany(mappedBy = "follower")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<FollowEntity> followersList = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<UserAwardEntity> userAwards = new HashSet<>();
 
 
@@ -103,7 +103,7 @@ public class UserEntity implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "Roles_Id"))
     private Set<RoleEntity> roles = new HashSet<>();
 
-    public UserEntity(String fullName, String username, String email, String hashedpassword, String picture, Boolean status,Boolean isVerify) {
+    public UserEntity(String fullName, String username, String email, String hashedpassword, String picture, Boolean status,Boolean isVerify,Double point) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
@@ -111,7 +111,9 @@ public class UserEntity implements UserDetails {
         this.picture = picture;
         this.status = status;
         this.isVerify = isVerify;
+        this.point = point;
     }
+
 
 
     @Override

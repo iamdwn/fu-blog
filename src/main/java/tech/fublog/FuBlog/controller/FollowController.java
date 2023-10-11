@@ -1,7 +1,7 @@
 package tech.fublog.FuBlog.controller;
 
-import tech.fublog.FuBlog.dto.request.RequestFollowDTO;
-import tech.fublog.FuBlog.dto.response.ResponseFollowDTO;
+import tech.fublog.FuBlog.dto.request.FollowRequestDTO;
+import tech.fublog.FuBlog.dto.response.FollowResponseDTO;
 import tech.fublog.FuBlog.exception.FollowException;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.FollowService;
@@ -14,7 +14,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth/user")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
+//@CrossOrigin(origins = "*")
 public class FollowController {
     private final FollowService followService;
 
@@ -23,10 +24,10 @@ public class FollowController {
         this.followService = followService;
     }
 
-    @GetMapping("/follower/{userId}")
+    @GetMapping("/follower/view/{userId}")
     public ResponseEntity<ResponseObject> viewFollower(@PathVariable Long userId) {
         try {
-            List<ResponseFollowDTO> dtoList = followService.viewFollower(userId);
+            List<FollowResponseDTO> dtoList = followService.viewFollower(userId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", dtoList));
         } catch (FollowException ex) {
@@ -36,10 +37,10 @@ public class FollowController {
         }
     }
 
-    @GetMapping("/following/{userId}")
+    @GetMapping("/following/view/{userId}")
     public ResponseEntity<ResponseObject> viewFollowing(@PathVariable Long userId) {
         try {
-            List<ResponseFollowDTO> dtoList = followService.viewFollowing(userId);
+            List<FollowResponseDTO> dtoList = followService.viewFollowing(userId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", dtoList));
         } catch (FollowException ex) {
@@ -75,13 +76,13 @@ public class FollowController {
         }
     }
 
-    @PostMapping("/follow/{action}")
-    public ResponseEntity<ResponseObject> insertFollow(@PathVariable String action, @RequestBody RequestFollowDTO requestFollowDTO) {
+    @PostMapping("/followAction/{action}")
+    public ResponseEntity<ResponseObject> insertFollow(@PathVariable String action, @RequestBody FollowRequestDTO followRequestDTO) {
         try {
             if (action.equals("follow"))
-                followService.insertFollow(requestFollowDTO);
+                followService.insertFollow(followRequestDTO);
             else if (action.equals("unfollow"))
-                followService.unFollow(requestFollowDTO);
+                followService.unFollow(followRequestDTO);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "successfully", ""));
         } catch (FollowException ex) {

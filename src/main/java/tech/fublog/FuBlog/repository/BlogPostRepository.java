@@ -1,44 +1,60 @@
 package tech.fublog.FuBlog.repository;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.jpa.repository.Query;
-import tech.fublog.FuBlog.dto.SortDTO;
+import org.springframework.data.repository.query.Param;
+import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.CategoryEntity;
-import tech.fublog.FuBlog.entity.UserEntity;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
     List<BlogPostEntity> findByIsApproved(Boolean isApproved);
 
-    List<BlogPostEntity> findByTitleLikeAndIsApprovedTrueAndStatusTrue(String title);
+    List<BlogPostEntity> findByTitleLike(String title);
 
-    List<BlogPostEntity> getBlogPostEntitiesByTitle(String title, Pageable pageable);
+    //    public List<BlogPostEntity> getBlogPostEntitiesByTitle(String title, Pageable pageable);
+    public Page<BlogPostEntity> getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(String title, Pageable pageable);
+
+//    List<BlogPostEntity> findAllByCategory(Long id);
 
     Page<BlogPostEntity> findByCategory(CategoryEntity category, Pageable pageable);
 
-    Page<BlogPostEntity> findByCategoryInAndIsApprovedTrueAndStatusTrue(List<CategoryEntity> categoryEntityList, Pageable pageable);
 
-    Page<BlogPostEntity> findAllByOrderByCreatedDateDesc(Pageable pageable);
+    @Query("SELECT bp FROM BlogPostEntity bp WHERE bp.category IN:categoryEntityList AND " +
+            "bp.isApproved = true AND bp.status = true ORDER BY bp.category.categoryName asc ")
+    Page<BlogPostEntity> findByCategoryInAndIsApprovedTrueAndStatusTrue(@Param("categoryEntityList") List<CategoryEntity> categoryEntityList,
+                                                                        Pageable pageable);
 
-    Page<BlogPostEntity> findAllByOrderByCreatedDateAsc(Pageable pageable);
+//    @Query("SELECT bp FROM BlogPostEntity bp WHERE (bp.category.id = :categoryId OR bp.category.parentCategory.id = :categoryId) " +
+//            "AND (bp.isApproved = true AND bp.status = true) ORDER BY bp.category.categoryName asc ")
+//    Page<BlogPostEntity> findBlogPostsByCategoryIdOrParentId(
+//            @Param("categoryId") Long categoryId,
+//            Pageable pageable
+//    );
 
-    Page<BlogPostEntity> findAllByOrderByModifiedDateDesc(Pageable pageable);
 
-    Page<BlogPostEntity> findAllByOrderByModifiedDateAsc(Pageable pageable);
+    Optional<BlogPostEntity> findByPinnedIsTrue();
 
-    Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
+    //    @Query("SELECT e FROM BlogPostEntity e ORDER BY e.createdDate DESC")
+    Page<BlogPostEntity> findAllByStatusIsTrueAndIsApprovedIsTrue(Pageable pageable);
 
-    Set<BlogPostEntity> findByUserMarks(UserEntity userMarks);
+    Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(Pageable pageable);
+
+    Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateAsc(Pageable pageable);
+
+    Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateDesc(Pageable pageable);
+
+    Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateAsc(Pageable pageable);
+
+    //    Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
+    Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(Pageable pageable);
 
 }

@@ -13,7 +13,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/push-notifications")
 @Slf4j
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
+//@CrossOrigin(origins = "*")
 public class PushNotificationController {
 
     private final PushNotificationService service;

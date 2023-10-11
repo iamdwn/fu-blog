@@ -1,8 +1,8 @@
 package tech.fublog.FuBlog.controller;
 
 import org.springframework.http.HttpStatus;
-import tech.fublog.FuBlog.dto.request.RequestApprovalRequestDTO;
-import tech.fublog.FuBlog.dto.response.ResponseApprovalRequestDTO;
+import tech.fublog.FuBlog.dto.request.ApprovalRequestRequestDTO;
+import tech.fublog.FuBlog.dto.response.ApprovalRequestResponseDTO;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.ApprovalRequestService;
 import tech.fublog.FuBlog.service.BlogPostService;
@@ -14,7 +14,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth/manageApprove")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
+//@CrossOrigin(origins = "*")
 public class ApprovalRequestController {
 
     private final BlogPostService blogPostService;
@@ -27,18 +28,18 @@ public class ApprovalRequestController {
         this.approvalRequestService = approvalRequestService;
     }
 
-    @RequestMapping("/view")
+    @GetMapping("/view")
     public ResponseEntity<ResponseObject> getAllRequest() {
-        List<ResponseApprovalRequestDTO> dtoList = approvalRequestService.getAllApprovalRequest();
+        List<ApprovalRequestResponseDTO> dtoList = approvalRequestService.getAllApprovalRequest();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseObject("ok", "found", dtoList));
     }
 
     @PutMapping("/approve")
     public ResponseEntity<ResponseObject> approveBlog(
-            @RequestBody RequestApprovalRequestDTO requestApprovalRequestDTO) {
+            @RequestBody ApprovalRequestRequestDTO approvalRequestRequestDTO) {
 
-        return approvalRequestService.approveBlogPost(requestApprovalRequestDTO);
+        return approvalRequestService.approveBlogPost(approvalRequestRequestDTO);
     }
 
 }

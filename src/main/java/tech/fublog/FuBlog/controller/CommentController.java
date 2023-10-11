@@ -1,7 +1,7 @@
 package tech.fublog.FuBlog.controller;
 
-import tech.fublog.FuBlog.dto.request.RequestCommentDTO;
-import tech.fublog.FuBlog.dto.response.ResponseCommentDTO;
+import tech.fublog.FuBlog.dto.request.CommentRequestDTO;
+import tech.fublog.FuBlog.dto.response.CommentResponseDTO;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.exception.CommentException;
 import tech.fublog.FuBlog.service.CommentService;
@@ -14,7 +14,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth/blogPosts/comment")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
+//@CrossOrigin(origins = "*")
 public class CommentController {
     private final CommentService commentService;
 
@@ -24,12 +25,13 @@ public class CommentController {
     }
 
     @PostMapping("/insert")
-    public ResponseEntity<ResponseObject> insertComment(@RequestBody ResponseCommentDTO commentDTO) {
+    public ResponseEntity<ResponseObject> insertComment(@RequestBody CommentResponseDTO commentDTO) {
         try {
             commentService.insertComment(commentDTO);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "Comment have been inserted", ""));
         } catch (CommentException ex) {
+            System.out.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
@@ -38,7 +40,7 @@ public class CommentController {
     @GetMapping("/view/{postId}")
     public ResponseEntity<ResponseObject> viewComment(@PathVariable Long postId) {
         try {
-            List<ResponseCommentDTO> dtoList = commentService.viewComment(postId);
+            List<CommentResponseDTO> dtoList = commentService.viewComment(postId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", dtoList));
         } catch (CommentException ex) {
@@ -48,10 +50,10 @@ public class CommentController {
         }
     }
 
-    @PutMapping("/view/update")
-    public ResponseEntity<ResponseObject> updateComment(@RequestBody RequestCommentDTO requestCommentDTO) {
+    @PutMapping("/update")
+    public ResponseEntity<ResponseObject> updateComment(@RequestBody CommentRequestDTO commentRequestDTO) {
         try {
-            commentService.updateComment(requestCommentDTO);
+            commentService.updateComment(commentRequestDTO);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "Comment have been updated", ""));
         } catch (CommentException ex) {
@@ -62,9 +64,10 @@ public class CommentController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<ResponseObject> deleteComment(@RequestBody RequestCommentDTO requestCommentDTO) {
+    public ResponseEntity<ResponseObject> deleteComment(
+            @RequestBody CommentRequestDTO commentRequestDTO) {
         try {
-            commentService.deleteComment(requestCommentDTO);
+            commentService.deleteComment(commentRequestDTO);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "Comment have been deleted", ""));
         } catch (CommentException ex) {

@@ -55,18 +55,19 @@ public class BlogPostEntity {
     @Column
     private Long view;
 
+    @Column
+    private Boolean pinned;
+
     @ManyToOne
     @JoinColumn(name = "category_id")
-    @JsonIgnore
     private CategoryEntity category;
 
     @ManyToOne
-    @JoinColumn(name = "author_id")
     @JsonIgnore
+    @JoinColumn(name = "author_id")
     private UserEntity authors;
 
     @OneToMany(mappedBy = "postVote")
-    @JsonIgnore
     private Set<VoteEntity> votes = new HashSet<>();
 
     @OneToMany(mappedBy = "blogPost")
@@ -74,7 +75,6 @@ public class BlogPostEntity {
     private Set<ApprovalRequestEntity> approvalRequests = new HashSet<>();
 
     @OneToMany(mappedBy = "postComment")
-    @JsonIgnore
     private Set<CommentEntity> postComments = new HashSet<>();
 
     @OneToMany(mappedBy = "post")
@@ -85,12 +85,15 @@ public class BlogPostEntity {
     @JsonIgnore
     private Set<UserEntity> userMarks = new HashSet<>();
 
-    public BlogPostEntity(String typePost, String title, String content, CategoryEntity category, UserEntity authors) {
+    public BlogPostEntity(String typePost, String title, String content, String image, CategoryEntity category, UserEntity authors, Long view, Boolean pinned) {
         this.typePost = typePost;
         this.title = title;
         this.content = content;
+        this.image = image;
         this.category = category;
         this.authors = authors;
+        this.view = view;
+        this.pinned = pinned;
     }
 
     @Override

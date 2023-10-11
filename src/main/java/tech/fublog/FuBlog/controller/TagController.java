@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/blogPosts/tag")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/v1/auth/tag")
+@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
+//@CrossOrigin(origins = "*")
 public class TagController {
     private final TagService tagService;
 

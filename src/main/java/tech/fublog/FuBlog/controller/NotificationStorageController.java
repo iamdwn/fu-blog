@@ -8,7 +8,8 @@ import tech.fublog.FuBlog.service.NotificationStorageService;
 import java.util.List;
 @RestController
 @RequestMapping("/notification")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
+//@CrossOrigin(origins = "*")
 public class NotificationStorageController {
 
     private final NotificationStorageService notifService;

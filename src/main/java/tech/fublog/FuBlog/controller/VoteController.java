@@ -20,10 +20,11 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/auth/blogPosts/vote")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
+
 public class VoteController{
     private final VoteService voteService;
-    
+
     private final NotificationStorageService notificationStorageService;
 
     private final UserRepository userRepository;

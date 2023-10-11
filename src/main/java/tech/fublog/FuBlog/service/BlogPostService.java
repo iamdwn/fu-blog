@@ -1,24 +1,21 @@
 package tech.fublog.FuBlog.service;
 
 import org.springframework.data.domain.*;
-import tech.fublog.FuBlog.dto.BlogPostDTO;
-import tech.fublog.FuBlog.dto.UserDTO;
-import tech.fublog.FuBlog.dto.request.RequestBlogPostDTO;
-import tech.fublog.FuBlog.entity.BlogPostEntity;
-import tech.fublog.FuBlog.entity.CategoryEntity;
-import tech.fublog.FuBlog.entity.UserEntity;
-import tech.fublog.FuBlog.repository.BlogPostRepository;
-import tech.fublog.FuBlog.repository.CategoryRepository;
-import tech.fublog.FuBlog.repository.UserRepository;
-import tech.fublog.FuBlog.model.ResponseObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import tech.fublog.FuBlog.dto.BlogPostDTO;
+import tech.fublog.FuBlog.dto.TagDTO;
+import tech.fublog.FuBlog.dto.UserDTO;
+import tech.fublog.FuBlog.dto.request.BlogPostRequestDTO;
+import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
+import tech.fublog.FuBlog.entity.*;
+import tech.fublog.FuBlog.exception.PostTagException;
+import tech.fublog.FuBlog.model.ResponseObject;
+import tech.fublog.FuBlog.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-import tech.fublog.FuBlog.dto.response.ResponseBlogPostDTO;
-import tech.fublog.FuBlog.dto.response.ResponseCommentDTO;
 import tech.fublog.FuBlog.exception.BlogPostException;
 
 import java.time.ZoneId;
@@ -28,44 +25,22 @@ import java.util.stream.Collectors;
 @Service
 public class BlogPostService {
 
-    private BlogPostRepository blogPostRepository;
-    private CategoryRepository categoryRepository;
-    private UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
+    private final BlogPostRepository blogPostRepository;
+    private final TagRepository tagRepository;
+    private final VoteRepository voteRepository;
+    private final CommentRepository commentRepository;
 
     @Autowired
-    public BlogPostService(BlogPostRepository blogPostRepository, CategoryRepository categoryRepository, UserRepository userRepository) {
-        this.blogPostRepository = blogPostRepository;
+    public BlogPostService(CategoryRepository categoryRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, TagRepository tagRepository, VoteRepository voteRepository, CommentRepository commentRepository) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.blogPostRepository = blogPostRepository;
+        this.tagRepository = tagRepository;
+        this.voteRepository = voteRepository;
+        this.commentRepository = commentRepository;
     }
-
-//    public ResponseEntity<ResponseObject> getAllBlogPosts() {
-//        List<BlogPostEntity> blogPostEntity = blogPostRepository.findAll();
-//        List<BlogPostDTO> blogPostList = new ArrayList<>();
-//
-//        if (!blogPostEntity.isEmpty()) {
-//            for (int i = 0; i < blogPostEntity.size(); i++) {
-//                if (blogPostEntity.get(i).getStatus() != null
-//                        && blogPostEntity.get(i).getStatus()) {
-//                    BlogPostDTO blogPost = new BlogPostDTO(blogPostEntity.get(i).getTypePost(),
-//                            blogPostEntity.get(i).getTitle(),
-//                            blogPostEntity.get(i).getContent(),
-//                            blogPostEntity.get(i).getCategory().getId(),
-//                            blogPostEntity.get(i).getAuthors().getId(),
-//                            blogPostEntity.get(i).getCreatedDate(),
-//                            blogPostEntity.get(i).getViews());
-//
-//                    blogPostList.add(blogPost);
-//                }
-//            }
-//            sort(blogPostList);
-//
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(new ResponseObject("ok", "found", blogPostList));
-//        }
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                .body(new ResponseObject("failed", "not found", ""));
-//    }
 
 
     public BlogPostEntity getBlogById(Long postId) {
@@ -73,21 +48,129 @@ public class BlogPostService {
         return blogPostRepository.findById(postId).orElse(null);
     }
 
-    public ResponseEntity<ResponseObject> getBlogPostById(Long postId) {
+    public BlogPostDTO getBlogPostById(Long postId) {
 
         BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
 
         if (blogPostEntity != null) {
-            blogPostEntity.setView(blogPostEntity.getView());
+            UserEntity userEntity = userRepository.findById(blogPostEntity.getAuthors().getId()).orElse(null);
 
+            Set<RoleEntity> roleEntities = userEntity.getRoles();
+            Set<PostTagEntity> postTagEntity = blogPostEntity.getPostTags();
+            Set<TagDTO> tagDTOs = postTagEntity.stream()
+                    .map(tagEntity -> {
+                        TagDTO tagDTO = new TagDTO();
+                        tagDTO.setTagId(tagEntity.getId());
+                        tagDTO.setTagName(tagEntity.getTag().getTagName());
+                        return tagDTO;
+                    })
+                    .collect(Collectors.toSet());
+
+            List<String> roleNames = roleEntities.stream()
+                    .map(RoleEntity::getName)
+                    .collect(Collectors.toList());
+
+            UserDTO userDTO = new UserDTO(userEntity.getFullName(),
+                    userEntity.getPassword(),
+                    userEntity.getEmail(),
+                    userEntity.getId(),
+                    userEntity.getPicture(),
+                    userEntity.getStatus(),
+                    roleNames.get(roleNames.size() - 1),
+                    roleNames);
+
+            blogPostEntity.setView(blogPostEntity.getView() + 1);
             blogPostRepository.save(blogPostEntity);
 
+            BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
+                    blogPostEntity.getTypePost(),
+                    blogPostEntity.getTitle(),
+                    blogPostEntity.getContent(),
+                    blogPostEntity.getImage(),
+                    blogPostEntity.getCategory().getCategoryName(),
+                    blogPostEntity.getCategory().getParentCategory(),
+                    tagDTOs,
+                    userDTO,
+                    blogPostEntity.getView(),
+                    blogPostEntity.getCreatedDate(),
+                    voteRepository.countByPostVote(blogPostEntity),
+                    commentRepository.countByPostComment(blogPostEntity)
+            );
+//                  Date.from(Instant.ofEpochMilli((blogPostEntity.getCreatedDate().getTime())))
+//                  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
+//                    .parse(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(blogPostEntity.getCreatedDate())));
 
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("found", "post found", blogPostEntity));
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ResponseObject("not found", "post not found", ""));
+            return blogPostDTO;
+        } else
+            throw new BlogPostException("not found blogpost with " + postId);
+
+    }
+
+    public BlogPostDTO convertBlogPostDTO(Long postId) {
+
+        BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
+
+        if (blogPostEntity != null) {
+            UserEntity userEntity = userRepository.findById(blogPostEntity.getAuthors().getId()).orElse(null);
+
+            Set<RoleEntity> roleEntities = userEntity.getRoles();
+            Set<PostTagEntity> postTagEntity = blogPostEntity.getPostTags();
+            Set<TagDTO> tagDTOs = postTagEntity.stream()
+                    .map(tagEntity -> {
+                        TagDTO tagDTO = new TagDTO();
+                        tagDTO.setTagId(tagEntity.getId());
+                        tagDTO.setTagName(tagEntity.getTag().getTagName());
+                        return tagDTO;
+                    })
+                    .collect(Collectors.toSet());
+
+            List<String> roleNames = roleEntities.stream()
+                    .map(RoleEntity::getName)
+                    .collect(Collectors.toList());
+
+            UserDTO userDTO = new UserDTO(userEntity.getFullName(),
+                    userEntity.getPassword(),
+                    userEntity.getEmail(),
+                    userEntity.getId(),
+                    userEntity.getPicture(),
+                    userEntity.getStatus(),
+                    roleNames.get(roleNames.size() - 1),
+                    roleNames);
+
+            BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
+                    blogPostEntity.getTypePost(),
+                    blogPostEntity.getTitle(),
+                    blogPostEntity.getContent(),
+                    blogPostEntity.getImage(),
+                    blogPostEntity.getCategory().getCategoryName(),
+                    blogPostEntity.getCategory().getParentCategory(),
+                    tagDTOs,
+                    userDTO,
+                    blogPostEntity.getView(),
+                    blogPostEntity.getCreatedDate(),
+                    voteRepository.countByPostVote(blogPostEntity),
+                    commentRepository.countByPostComment(blogPostEntity)
+            );
+//                  Date.from(Instant.ofEpochMilli((blogPostEntity.getCreatedDate().getTime())))
+//                  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
+//                    .parse(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(blogPostEntity.getCreatedDate())));
+
+            return blogPostDTO;
+        } else
+            throw new BlogPostException("not found blogpost with " + postId);
+
+    }
+
+    public BlogPostEntity getBlogPostDetailsById(Long postId) {
+        BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
+
+        if (blogPostEntity != null) {
+            UserEntity userEntity = userRepository.findById(blogPostEntity.getAuthors().getId()).orElse(null);
+            blogPostEntity.setView(blogPostEntity.getView() + 1);
+            return blogPostRepository.save(blogPostEntity);
+
+        } else
+            throw new BlogPostException("not found blogpost with " + postId);
     }
 
 
@@ -105,272 +188,239 @@ public class BlogPostService {
 
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "deleted successful", ""));
-        }
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ResponseObject("failed", "deleted failed", ""));
+        } throw new BlogPostException("this blog was deleted or the blog not exist");
     }
 
 
-//    public BlogPostEntity createBlogPost(BlogPostDTO blogPostDTO) {
-//        Optional<CategoryEntity> categoryEntity = categoryRepository.findById(blogPostDTO.getParentCategoryId());
-//        Optional<UserEntity> userEntity = userRepository.findById(blogPostDTO.getUserId());
-////        Optional<UserEntity> userEntity = userRepository.findByUsername(user);
-//
-//        if (categoryEntity.isPresent()
-//                && userEntity.isPresent()) {
-//
-//
-//            CategoryEntity category = categoryEntity.get();
-//            UserEntity authors = userEntity.get();
-//
-//            Date createdDate = new Date();
-//            ZoneId zoneId = ZoneId.of("Asia/Ho_Chi_Minh"); // Múi giờ Việt Nam
-//            createdDate.toInstant().atZone(zoneId).toLocalDateTime();
-//
-//            String typePost = blogPostDTO.getTypePost();
-//            String title = blogPostDTO.getTitle();
-//            String content = blogPostDTO.getContent();
-//            Double point = userEntity.get().getPoint();
-//            userEntity.get().setPoint(point + 1);
-//
-////            //tạo và save bài BlogPost mới
-//            BlogPostEntity newBlogPost = new BlogPostEntity(typePost, title, content,  null,
-//                    null, true, false, category, authors, createdDate);
-//            return blogPostRepository.save(newBlogPost);
-//        }
-//
-//        return null;
-//    }
+    public BlogPostEntity updateBlogPost(BlogPostRequestDTO blogPostRequestDTO) {
 
+        Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(blogPostRequestDTO.getCategoryName(),
+                blogPostRequestDTO.getParentCategoryId());
+        Optional<UserEntity> userEntity = userRepository.findById(blogPostRequestDTO.getUserId());
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(blogPostRequestDTO.getPostId());
 
-    public ResponseEntity<ResponseObject> updateBlogPost(Long postId, BlogPostDTO blogPostDTO) {
-
-        Optional<CategoryEntity> categoryEntity = categoryRepository.findById(blogPostDTO.getParentCategoryId());
-        Optional<UserEntity> userEntity = userRepository.findById(blogPostDTO.getUser().getId());
-        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
         if (blogPostEntity.isPresent()
                 && categoryEntity.isPresent()
                 && userEntity.isPresent()) {
 
-            BlogPostEntity blogPost = this.getBlogById(postId);
+            BlogPostEntity blogPost = this.getBlogById(blogPostRequestDTO.getPostId());
 
             CategoryEntity category = categoryEntity.get();
 //            UserEntity authors = userEntity.get();
             Date modifiedDate = new Date();
             ZoneId zoneId = ZoneId.of("Asia/Ho_Chi_Minh");
             modifiedDate.toInstant().atZone(zoneId).toLocalDateTime();
+            Set<PostTagEntity> postTagEntities = new HashSet<>();
 
-            blogPost.setTypePost(blogPostDTO.getTypePost());
-            blogPost.setTitle(blogPostDTO.getTitle());
-            blogPost.setContent(blogPostDTO.getContent());
+            for (TagDTO dto : blogPostRequestDTO.getTagList()) {
+                PostTagEntity entity = new PostTagEntity();
+                Optional<TagEntity> tagEntity = tagRepository.findById(dto.getTagId());
+                if (!tagEntity.isPresent()) throw new PostTagException("tag not exist");
+                entity.setId(dto.getTagId());
+                postTagEntities.add(entity);
+            }
+
+            blogPost.setTypePost(blogPostRequestDTO.getTypePost());
+            blogPost.setTitle(blogPostRequestDTO.getTitle());
+            blogPost.setContent(blogPostRequestDTO.getContent());
             blogPost.setModifiedDate(modifiedDate);
             blogPost.setCategory(category);
-//            blogPost.setAuthorsModified(authors);
+            blogPost.setPostTags(postTagEntities);
 
-            blogPostRepository.save(blogPost);
+            return blogPostRepository.save(blogPost);
 
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "updated successful", ""));
-        }
+        } else throw new BlogPostException("updated failed");
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ResponseObject("failed", "updated failed", ""));
     }
 
 
-//    public ResponseEntity<ResponseObject> findBlogByCategory(String name) {
-//
-//        Optional<CategoryEntity> categoryEntity = categoryRepository.findByCategoryName(name);
-//        List<BlogPostDTO> blogPostList = new ArrayList<>();
-//
-//        if (categoryEntity != null) {
-//
-//            for (int i = 0; i < categoryEntity.get().getBlogPosts().size(); i++) {
-//                if (categoryEntity.get().getBlogPosts().get(i).getStatus() != null
-//                        && categoryEntity.get().getBlogPosts().get(i).getStatus()) {
-//                    BlogPostDTO blogPost = new BlogPostDTO(categoryEntity.get().getBlogPosts().get(i).getTypePost(),
-//                            categoryEntity.get().getBlogPosts().get(i).getTitle(),
-//                            categoryEntity.get().getBlogPosts().get(i).getContent(),
-//                            categoryEntity.get().getBlogPosts().get(i).getCategory().getId(),
-//                            categoryEntity.get().getBlogPosts().get(i).getAuthors().getId(),
-//                            categoryEntity.get().getBlogPosts().get(i).getCreatedDate(),
-//                            categoryEntity.get().getBlogPosts().get(i).getViews());
-//
-//                    blogPostList.add(blogPost);
-//                }
-//            }
-//
-//
-//            if (!blogPostList.isEmpty()) {
-//
-//                return ResponseEntity.status(HttpStatus.OK)
-//                        .body(new ResponseObject("ok", "found", blogPostList));
-//            } else {
-//
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                        .body(new ResponseObject("failed", "cannot found any blog with category", ""));
-//            }
-//        } else {
-//
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(new ResponseObject("failed", "category not exists", ""));
-//        }
-//    }
-
-
-    //sort theo thứ tự bài BlogPost mới nằm đầu tiên (giảm dần theo NGÀY)
     public void sort(List<BlogPostDTO> blogPostList) {
 
         Collections.sort(blogPostList, new Comparator<BlogPostDTO>() {
-
             @Override
             public int compare(BlogPostDTO o1, BlogPostDTO o2) {
-
-                if (o1.getCreateDate().compareTo(o2.getCreateDate()) < 0) {
+                double point1 = o1.getVoteCount() * 0.4 + o1.getViews() * 0.6;
+                double point2 = o2.getVoteCount() * 0.4 + o2.getViews() * 0.6;
+                if (point1 < point2) {
                     return 1;
-                } else if (o1.getCreateDate().compareTo(o2.getCreateDate()) == 0) {
+                } else if (point1 == point2) {
                     return 0;
                 } else {
                     return -1;
                 }
             }
-
         });
     }
 
-    public List<BlogPostEntity> getAllBlogPost(int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-        return blogPostRepository.findAll(pageable).get().toList();
+    public ResponseEntity<ResponseObject> getPinnedBlog() {
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findByPinnedIsTrue();
+        BlogPostDTO blogPostDTO = convertBlogPostDTO(blogPostEntity.get().getId());
+
+        return !blogPostEntity.isEmpty() ? ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", blogPostDTO))
+                : ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ResponseObject("failed", "not found", ""));
     }
 
-    public List<BlogPostEntity> getAllBlogPostByTitle(String title, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-        return blogPostRepository.getBlogPostEntitiesByTitle(title, pageable);
-    }
+    public ResponseEntity<ResponseObject> pinBlogAction(Long postId) {
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findByPinnedIsTrue();
+        Optional<BlogPostEntity> blogPost = blogPostRepository.findById(postId);
 
-    public Page<BlogPostEntity> getBlogPostsByCategoryId(Long categoryId, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
+        if (blogPostEntity.isPresent()) {
 
-        if (!categoryOptional.isPresent()) {
-            return new PageImpl<>(Collections.emptyList());
+            blogPostEntity.get().setPinned(false);
+            blogPostRepository.save(blogPostEntity.get());
+            if (blogPostEntity.get().getId().equals(postId)) {
+
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "unpinned successfull", ""));
+            }
         }
+        blogPost.get().setPinned(true);
+        blogPostRepository.save(blogPost.get());
 
-        CategoryEntity category = categoryOptional.get();
-        return blogPostRepository.findByCategory(category, pageable);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "pinned successfull", ""));
     }
 
-    public Page<BlogPostEntity> getSortedBlogPosts(String sortBy, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Page<BlogPostEntity> blogPostEntities = null;
+    public PaginationResponseDTO filterBlogPost(String filter, int page, int size) {
+        List<BlogPostEntity> blogPostList = new ArrayList<>();
+        List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
+        List<BlogPostEntity> pageContent;
+        Page<BlogPostEntity> pageResult = null;
 
-        if ("newest".equalsIgnoreCase(sortBy)) {
-            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
-        } else if ("oldest".equalsIgnoreCase(sortBy)) {
-            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateAsc(pageable);
-        } else if ("latestModified".equalsIgnoreCase(sortBy)) {
-//            blogPostEntities = blogPostRepository.findAllByOrderByModifiedDateDesc(pageable);
-        } else if ("oldestModified".equalsIgnoreCase(sortBy)) {
-//            blogPostEntities = blogPostRepository.findAllByOrderByModifiedDateAsc(pageable);
-        } else if ("mostViewed".equalsIgnoreCase(sortBy)) {
-//            return blogPostRepository.findAllByOrderByViewsDesc(pageable);
+        Pageable pageable = PageRequest.of(page - 1, size - blogPostList.size());
+
+
+        if (filter.equalsIgnoreCase("")) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
+        } else if ("newest".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
+        } else if ("oldest".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateAsc(pageable);
+        } else if ("latestModified".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateDesc(pageable);
+        } else if ("oldestModified".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateAsc(pageable);
+        } else if ("mostViewed".equalsIgnoreCase(filter)) {
+            pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(pageable);
+        } else if (!filter.trim().matches("\\d+")) {
+            Sort sort = Sort.by(Sort.Direction.ASC, "title");
+            pageable = PageRequest.of(page - 1, size - blogPostList.size(), sort);
+            filter = "%" + filter + "%";
+            pageResult = blogPostRepository.getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(filter, pageable);
         } else {
-            // Mặc định, sắp xếp theo ngày tạo mới nhất.
-            blogPostEntities = blogPostRepository.findAllByOrderByCreatedDateDesc(pageable);
+            Long cateroryId = Long.parseLong(filter);
+            Optional<CategoryEntity> categoryOptional = categoryRepository.findById(cateroryId);
+//            pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
+
+            pageResult = findBlogByCategory(categoryOptional.get().getCategoryName(),
+                            categoryOptional.get().getParentCategory() == null ? null
+                                    : categoryOptional.get().getParentCategory().getId(), page, size);
         }
 
-        return blogPostEntities;
-    }
-
-    public List<BlogPostEntity> getPageOfItems(List<BlogPostEntity> items, int page, int pageSize) {
-        int startIndex = page * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, items.size());
-
-        if (startIndex >= items.size()) {
-            return Collections.emptyList(); // Trang không có phần tử nào
+        if (pageResult != null) {
+            pageContent = pageResult.getContent();
+            for (BlogPostEntity blogPost : pageContent) {
+                blogPostDTOList.add(convertBlogPostDTO(blogPost.getId()));
+            }
         }
 
-        return items.subList(startIndex, endIndex);
+        Long blogPostCount = Long.valueOf(pageResult.getTotalElements());
+        Long pageCount = Long.valueOf(pageResult.getTotalPages());
+
+        PaginationResponseDTO paginationResponseDTO = new PaginationResponseDTO(blogPostDTOList, blogPostCount, pageCount);
+        return paginationResponseDTO;
     }
 
 
-    public Set<BlogPostDTO> findBlogByCategory(String name, Long parentCategoryId, int page, int size) {
+    public Page<BlogPostEntity> findBlogByCategory(String name, Long parentCategoryId, int page, int size) {
         Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(name, parentCategoryId);
         if (categoryEntity.isPresent()) {
             List<CategoryEntity> categoryEntityList = findCategoryToSearch(categoryEntity.get(), new ArrayList<>());
             if (!categoryEntityList.isEmpty()) {
                 List<BlogPostEntity> blogPostEntitySet = new ArrayList<>();
-                Set<BlogPostDTO> blogPostDTOSet = new HashSet<>();
-                Pageable pageable = PageRequest.of(page - 1, size, Sort.by("createdDate").descending());
+                Set<BlogPostEntity> blogPostSet = new HashSet<>();
+                Pageable pageable = PageRequest.of(page - 1, size);
                 Page<BlogPostEntity> blogPostEntityPage = blogPostRepository.findByCategoryInAndIsApprovedTrueAndStatusTrue(categoryEntityList, pageable);
                 if (blogPostEntityPage != null) {
                     blogPostEntitySet.addAll(blogPostEntityPage.getContent());
                 }
                 for (BlogPostEntity entity : blogPostEntitySet) {
-                    blogPostDTOSet.add(convertPostToDTO(entity));
+                    blogPostSet.add(entity);
                 }
-                return blogPostDTOSet;
-            } else return new HashSet<>();
+                return blogPostEntityPage;
+            } else return new PageImpl<>(Collections.emptyList());
         } else throw new BlogPostException("Category doesn't exists");
     }
 
-    public List<BlogPostDTO> findBlogByTitle(String title) {
-        if (!title.trim().isEmpty()) {
-            List<BlogPostEntity> list = blogPostRepository.findByTitleLikeAndIsApprovedTrueAndStatusTrue("%" + title.trim() + "%");
-            if (!list.isEmpty()) {
-                List<BlogPostDTO> dtoList = new ArrayList<>();
-                for (BlogPostEntity entity : list) {
-//                    if (entity.getIsApproved() && entity.getStatus()) {
-                    dtoList.add(convertPostToDTO(entity));
-//                    }
-                }
-                return dtoList;
-            } else return new ArrayList<>();
-        } else throw new BlogPostException("Nothing to search");
+//    public static Page<BlogPostEntity> filterDuplicateEntities(Page<BlogPostEntity> page) {
+//        List<BlogPostEntity> content = page.getContent();
+//        Set<Long> seenIds = new HashSet<>();
+//        List<BlogPostEntity> uniqueEntities = content.stream()
+//                .filter(entity -> seenIds.add(entity.getId()))
+//                .collect(Collectors.toList());
+//
+//        return new PageImpl<>(uniqueEntities, page.getPageable(), uniqueEntities.size());
+//    }
+
+    public List<BlogPostDTO> getPopularBlogPost() {
+        List<BlogPostDTO> popularBlogPostList = new ArrayList<>();
+        List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
+        List<BlogPostEntity> blogPostEntity = blogPostRepository.findAll();
+
+        for (BlogPostEntity entity : blogPostEntity){
+            blogPostDTOList.add(convertBlogPostDTO(entity.getId()));
+        }
+        sort(blogPostDTOList);
+        for (BlogPostDTO entity : blogPostDTOList){
+            if (popularBlogPostList.size() < 6) {
+                popularBlogPostList.add(entity);
+            } else return popularBlogPostList;
+        }
+        throw new BlogPostException("not found");
     }
 
-    public BlogPostEntity insertBlogPost(RequestBlogPostDTO requestBlogPostDTO) {
-        Optional<UserEntity> userEntity = userRepository.findById(requestBlogPostDTO.getUserId());
+    public PaginationResponseDTO getAllBlogPost(int page, int size) {
+        return filterBlogPost("", page, size);
+    }
+
+
+
+    public PaginationResponseDTO getAllBlogPostByTitle(String title, int page, int size) {
+        return filterBlogPost(title, page, size);
+    }
+
+    public PaginationResponseDTO getBlogPostsByCategoryId(Long categoryId, int page, int size) {
+        return filterBlogPost(String.valueOf(categoryId), page, size);
+    }
+
+    public PaginationResponseDTO getSortedBlogPosts(String sortBy, int page, int size) {
+        return filterBlogPost(sortBy, page, size);
+    }
+
+
+    public BlogPostEntity insertBlogPost(BlogPostRequestDTO blogPostRequestDTO) {
+        Optional<UserEntity> userEntity = userRepository.findById(blogPostRequestDTO.getUserId());
         //check parentCategoryId != null
-        Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(requestBlogPostDTO.getCategoryName(), requestBlogPostDTO.getParentCategoryId());
-        if (userEntity.isPresent() && categoryEntity.isPresent()) {
+        Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(blogPostRequestDTO.getCategoryName(),
+                blogPostRequestDTO.getParentCategoryId());
+        if (userEntity.isPresent()
+                && categoryEntity.isPresent()) {
             BlogPostEntity blogPostEntity = new BlogPostEntity
-                    (requestBlogPostDTO.getTypePost(), requestBlogPostDTO.getTitle(), requestBlogPostDTO.getContent(), categoryEntity.get(), userEntity.get());
+                    (blogPostRequestDTO.getTypePost(),
+                            blogPostRequestDTO.getTitle(),
+                            blogPostRequestDTO.getContent(),
+                            blogPostRequestDTO.getImage(),
+                            categoryEntity.get(),
+                            userEntity.get(),
+                            0L,
+                            false);
+            userEntity.get().setPoint(userEntity.get().getPoint() + 1);
             return blogPostRepository.save(blogPostEntity);
         } else throw new BlogPostException("User or Category doesn't exists");
     }
 
-    public ResponseBlogPostDTO viewBlogPost(Long postId, Long vote, List<ResponseCommentDTO> comment) {
-        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
-        if (blogPostEntity.isPresent()) {
-            return convertResponseDTO(blogPostEntity.get(), vote, comment);
-        } else throw new BlogPostException("Blog doesn't exists");
-    }
-
-    public UserDTO convertUserToDTO(UserEntity userEntity) {
-        return new UserDTO(userEntity.getFullName(), userEntity.getPassword(), userEntity.getEmail(), userEntity.getId(), userEntity.getPicture(), new ArrayList<>());
-    }
-
-    public BlogPostDTO convertPostToDTO(BlogPostEntity blogPostEntity) {
-        Long parentCategoryId = null;
-        if (blogPostEntity.getCategory().getParentCategory() != null)
-            parentCategoryId = blogPostEntity.getCategory().getParentCategory().getId();
-        return new BlogPostDTO(blogPostEntity.getId(), blogPostEntity.getCreatedDate(), blogPostEntity.getTypePost(),
-                blogPostEntity.getTitle(), blogPostEntity.getContent(),
-                blogPostEntity.getCategory().getCategoryName(),
-                parentCategoryId, null, convertUserToDTO(blogPostEntity.getAuthors()));
-    }
-
-    public ResponseBlogPostDTO convertResponseDTO(BlogPostEntity blogPostEntity, Long vote, List<ResponseCommentDTO> comment) {
-        Long parentCategoryId = null;
-        if (blogPostEntity.getCategory().getParentCategory() != null)
-            parentCategoryId = blogPostEntity.getCategory().getParentCategory().getId();
-        return new ResponseBlogPostDTO(blogPostEntity.getId(), blogPostEntity.getAuthors().getId(),
-                blogPostEntity.getTypePost(), blogPostEntity.getTitle(),
-                blogPostEntity.getContent(), blogPostEntity.getCategory().getCategoryName(),
-                parentCategoryId, vote, comment);
-    }
 
     public List<CategoryEntity> findCategoryToSearch(CategoryEntity categoryEntity, List<CategoryEntity> categoryEntityList) {
         List<CategoryEntity> subEntityList = categoryRepository.findByParentCategory(categoryEntity);
