@@ -105,10 +105,11 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("/getBlogPostByAuthor/{userId}")
-    ResponseEntity<ResponseObject> getBlogPostByAuthor(@PathVariable Long userId) {
+    @GetMapping("/getBlogPostByAuthor/{userId}/{page}/{size}")
+    ResponseEntity<ResponseObject> getBlogPostByAuthor(@PathVariable Long userId,
+    @PathVariable int page, @PathVariable int size) {
         try {
-            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByAuthor(userId);
+            PaginationResponseDTO dtoList = blogPostService.getBlogPostByAuthor(userId, page, size);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", dtoList));
         } catch (BlogPostException ex) {
@@ -117,17 +118,17 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("/getBlogPostByTag/{tagId}")
-    ResponseEntity<ResponseObject> getBlogPostByTag(@PathVariable Long tagId) {
-        try {
-            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByTag(tagId);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "post found", dtoList));
-        } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-        }
-    }
+//    @GetMapping("/getBlogPostByTag/{tagId}")
+//    ResponseEntity<ResponseObject> getBlogPostByTag(@PathVariable Long tagId) {
+//        try {
+//            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByTag(tagId);
+//            return ResponseEntity.status(HttpStatus.OK)
+//                    .body(new ResponseObject("ok", "post found", dtoList));
+//        } catch (BlogPostException ex) {
+//            return ResponseEntity.status(HttpStatus.OK)
+//                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+//        }
+//    }
 
     @GetMapping("/getBlogDetailsById/{postId}")
     ResponseEntity<ResponseObject> getBlogDetailsById(@PathVariable Long postId) {
@@ -165,13 +166,21 @@ public class BlogPostController {
     }
 
     @GetMapping("getAllBlog/{page}/{size}")
-    public PaginationResponseDTO getAllBlog(@PathVariable int page, @PathVariable int size) {
-        return blogPostService.getAllBlogPost(page, size);
+    public ResponseEntity<PaginationResponseDTO> getAllBlog(@PathVariable int page, @PathVariable int size) {
+        PaginationResponseDTO blogPosts = blogPostService.getAllBlogPost(page, size);
+        if (blogPosts == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(blogPosts);
     }
 
     @GetMapping("getByTitle/{title}/{page}/{size}")
-    public PaginationResponseDTO getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
-        return blogPostService.getAllBlogPostByTitle(title, page, size);
+    public ResponseEntity<PaginationResponseDTO> getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
+        PaginationResponseDTO blogPosts = blogPostService.getAllBlogPostByTitle(title, page, size);
+        if (blogPosts == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(blogPosts);
     }
 
     @GetMapping("getByCategory/{categoryId}/{page}/{size}")
@@ -191,18 +200,22 @@ public class BlogPostController {
             @RequestParam(name = "sortBy", defaultValue = "newest") String sortBy,
             @PathVariable int page, @PathVariable int size) {
 //        Page<BlogPostEntity> blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
-        PaginationResponseDTO blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
+        PaginationResponseDTO blogPosts = blogPostService.getSortedBlogPosts(sortBy, page, size);
 
-        if (blogPostEntities == null) {
+        if (blogPosts == null) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(blogPostEntities);
+        return ResponseEntity.ok(blogPosts);
     }
 
-    @GetMapping("/bytag")
-    public ResponseEntity<List<BlogPostEntity>> getBlogPostsByTag(@RequestParam(name = "tag") String tagName) {
-        List<BlogPostEntity> blogPosts = blogPostService.findByTagName(tagName);
+    @GetMapping("/bytag/{page}/{size}")
+    public ResponseEntity<PaginationResponseDTO> getBlogPostsByTag(@RequestParam(name = "tag") String tagName,
+                                                                   @PathVariable int page, @PathVariable int size) {
+        PaginationResponseDTO blogPosts = blogPostService.findByTagName(tagName, page, size);
+        if (blogPosts == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(blogPosts);
     }
 

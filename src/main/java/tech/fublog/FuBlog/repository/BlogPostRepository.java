@@ -15,6 +15,7 @@ import tech.fublog.FuBlog.entity.UserEntity;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Repository
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
@@ -22,10 +23,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
     List<BlogPostEntity> findByTitleLike(String title);
 
-    //    public List<BlogPostEntity> getBlogPostEntitiesByTitle(String title, Pageable pageable);
     public Page<BlogPostEntity> getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(String title, Pageable pageable);
-
-//    List<BlogPostEntity> findAllByCategory(Long id);
 
     Page<BlogPostEntity> findByCategory(CategoryEntity category, Pageable pageable);
 
@@ -56,12 +54,11 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateAsc(Pageable pageable);
 
-    //    Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(Pageable pageable);
 
-    List<BlogPostEntity> findByPostTagsTag(TagEntity tag);
+    Page<BlogPostEntity> findByPostTagsTag(TagEntity tag, Pageable pageable);
 
-    List<BlogPostEntity> findByAuthorsAndStatusTrueAndIsApprovedTrue(UserEntity userEntity);
+    Page<BlogPostEntity> findByAuthorsAndStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(UserEntity userEntity, Pageable pageable);
 
     @Query("SELECT bp FROM BlogPostEntity bp WHERE bp.status = true AND bp.isApproved = true ORDER BY bp.view DESC LIMIT 6")
     List<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc();
