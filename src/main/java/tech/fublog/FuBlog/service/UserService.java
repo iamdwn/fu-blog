@@ -223,6 +223,20 @@ public class UserService {
         } else throw new UserException("User doesn't exists");
     }
 
+    public Long countViewOfBlog(Long userId) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        Long count = 0L;
+        if (userEntity.isPresent()) {
+            Set<BlogPostEntity> entitySet = userEntity.get().getBlogAuthors();
+            if (!entitySet.isEmpty()) {
+                for (BlogPostEntity entity : entitySet) {
+                    count += entity.getView();
+                }
+                return count;
+            } else throw new UserException("This user not wrote any post");
+        } else throw new UserException("User doesn't exists");
+    }
+
     public BlogPostDTO convertPostToDTO(Long postId) {
 
         BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
@@ -288,4 +302,6 @@ public class UserService {
             throw new BlogPostException("not found user with " + userEntity.getId());
 
     }
+
+
 }
