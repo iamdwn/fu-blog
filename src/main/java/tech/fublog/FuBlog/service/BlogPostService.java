@@ -8,6 +8,7 @@ import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.dto.request.BlogPostRequestDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
+import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
 import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.PostTagException;
 import tech.fublog.FuBlog.model.ResponseObject;
@@ -75,14 +76,15 @@ public class BlogPostService {
                     .map(RoleEntity::getName)
                     .collect(Collectors.toList());
 
-            UserDTO userDTO = new UserDTO(userEntity.getFullName(),
-                    userEntity.getPassword(),
-                    userEntity.getEmail(),
+            UserInfoResponseDTO userDTO = new UserInfoResponseDTO(
                     userEntity.getId(),
+                    userEntity.getFullName(),
                     userEntity.getPicture(),
-                    userEntity.getStatus(),
+                    userEntity.getEmail(),
                     roleNames.get(roleNames.size() - 1),
-                    roleNames);
+                    roleNames,
+                    userEntity.getPoint()
+            );
 
             blogPostEntity.setView(blogPostEntity.getView() + 1);
             blogPostRepository.save(blogPostEntity);
@@ -133,14 +135,24 @@ public class BlogPostService {
                     .map(RoleEntity::getName)
                     .collect(Collectors.toList());
 
-            UserDTO userDTO = new UserDTO(userEntity.getFullName(),
-                    userEntity.getPassword(),
-                    userEntity.getEmail(),
+//            UserDTO userDTO = new UserDTO(userEntity.getFullName(),
+//                    userEntity.getPassword(),
+//                    userEntity.getEmail(),
+//                    userEntity.getId(),
+//                    userEntity.getPicture(),
+//                    userEntity.getStatus(),
+//                    roleNames.get(roleNames.size() - 1),
+//                    roleNames);
+
+            UserInfoResponseDTO userDTO = new UserInfoResponseDTO(
                     userEntity.getId(),
+                    userEntity.getFullName(),
                     userEntity.getPicture(),
-                    userEntity.getStatus(),
+                    userEntity.getEmail(),
                     roleNames.get(roleNames.size() - 1),
-                    roleNames);
+                    roleNames,
+                    userEntity.getPoint()
+            );
 
             BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
                     blogPostEntity.getTypePost(),
