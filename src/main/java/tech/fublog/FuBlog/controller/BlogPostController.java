@@ -105,6 +105,30 @@ public class BlogPostController {
         }
     }
 
+    @GetMapping("/getBlogPostByAuthor/{userId}")
+    ResponseEntity<ResponseObject> getBlogPostByAuthor(@PathVariable Long userId) {
+        try {
+            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByAuthor(userId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", dtoList));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/getBlogPostByTag/{tagId}")
+    ResponseEntity<ResponseObject> getBlogPostByTag(@PathVariable Long tagId) {
+        try {
+            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByTag(tagId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", dtoList));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
     @GetMapping("/getBlogDetailsById/{postId}")
     ResponseEntity<ResponseObject> getBlogDetailsById(@PathVariable Long postId) {
         try {

@@ -31,15 +31,18 @@ public class BlogPostService {
     private final TagRepository tagRepository;
     private final VoteRepository voteRepository;
     private final CommentRepository commentRepository;
+    private final PostTagRepository postTagRepository;
 
     @Autowired
-    public BlogPostService(CategoryRepository categoryRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, TagRepository tagRepository, VoteRepository voteRepository, CommentRepository commentRepository) {
+    public BlogPostService(CategoryRepository categoryRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, TagRepository tagRepository, VoteRepository voteRepository, CommentRepository commentRepository,
+                           PostTagRepository postTagRepository) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.blogPostRepository = blogPostRepository;
         this.tagRepository = tagRepository;
         this.voteRepository = voteRepository;
         this.commentRepository = commentRepository;
+        this.postTagRepository = postTagRepository;
     }
 
 
@@ -233,6 +236,33 @@ public class BlogPostService {
 
     }
 
+    public List<BlogPostDTO> getBlogPostByAuthor(Long userId) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            List<BlogPostEntity> entityList = blogPostRepository.findByAuthorsAndStatusTrueAndIsApprovedTrue(userEntity.get());
+            if (!entityList.isEmpty()) {
+                List<BlogPostDTO> dtoList = new ArrayList<>();
+                for (BlogPostEntity entity : entityList) {
+                    dtoList.add(convertBlogPostDTO(entity));
+                }
+                return dtoList;
+            } else return new ArrayList<>();
+        } else throw new BlogPostException("User doesn't exists");
+    }
+
+    public List<BlogPostDTO> getBlogPostByTag(Long tagId) {
+        Optional<TagEntity> tagEntity = tagRepository.findById(tagId);
+        if (tagEntity.isPresent()) {
+            List<PostTagEntity> postTagEntityList = postTagRepository.findByTag(tagEntity.get());
+            if (!postTagEntityList.isEmpty()) {
+                List<BlogPostDTO> dtoList = new ArrayList<>();
+                for (PostTagEntity postTagEntity : postTagEntityList) {
+                    dtoList.add(convertBlogPostDTO(postTagEntity.getPost()));
+                }
+                return dtoList;
+            } else return new ArrayList<>();
+        } else throw new BlogPostException("Tag doesn't exists");
+    }
 
     public void sort(List<BlogPostDTO> blogPostList) {
 
@@ -338,17 +368,8 @@ public class BlogPostService {
         if (categoryEntity.isPresent()) {
             List<CategoryEntity> categoryEntityList = findCategoryToSearch(categoryEntity.get(), new ArrayList<>());
             if (!categoryEntityList.isEmpty()) {
-                List<BlogPostEntity> blogPostEntitySet = new ArrayList<>();
-                Set<BlogPostEntity> blogPostSet = new HashSet<>();
                 Pageable pageable = PageRequest.of(page - 1, size);
-                Page<BlogPostEntity> blogPostEntityPage = blogPostRepository.findByCategoryInAndIsApprovedTrueAndStatusTrue(categoryEntityList, pageable);
-                if (blogPostEntityPage != null) {
-                    blogPostEntitySet.addAll(blogPostEntityPage.getContent());
-                }
-                for (BlogPostEntity entity : blogPostEntitySet) {
-                    blogPostSet.add(entity);
-                }
-                return blogPostEntityPage;
+                return blogPostRepository.findByCategoryInAndIsApprovedTrueAndStatusTrue(categoryEntityList, pageable);
             } else return new PageImpl<>(Collections.emptyList());
         } else throw new BlogPostException("Category doesn't exists");
     }
