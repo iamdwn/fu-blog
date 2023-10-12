@@ -2,11 +2,13 @@ package tech.fublog.FuBlog.controller;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.auth.MessageResponse;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.PostMarkDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
+import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.exception.UserException;
@@ -35,9 +37,13 @@ public class UserController {
 
 
 
-    @GetMapping("/getAll")
-    public List<UserEntity> getAllUser(){
-        return  userRepository.findAllByStatusIsTrue();
+    @GetMapping("/getAll/{page}/{size}")
+    public PaginationResponseDTO getAllUser(
+            @PathVariable int page,
+            @PathVariable int size
+    ){
+        PaginationResponseDTO users = userService.getAllUsers(page, size);
+        return users;
     }
 
     @PostMapping("/mark")

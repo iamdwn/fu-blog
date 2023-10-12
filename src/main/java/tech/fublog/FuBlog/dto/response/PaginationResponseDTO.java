@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaginationResponseDTO {
-    private List<BlogPostDTO> blogPostDTOList;
-    private Long blogPostCount;
+    private List<?> dtoList;
+    private Long elementCount;
     private Long pageCount;
 }
