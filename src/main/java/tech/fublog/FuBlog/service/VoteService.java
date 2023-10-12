@@ -21,7 +21,6 @@ public class VoteService {
     private final VoteRepository voteRepository;
     private final BlogPostRepository blogPostRepository;
     private final UserRepository userRepository;
-
     private final NotificationStorageService notificationStorageService;
 
     @Autowired
@@ -76,7 +75,7 @@ public class VoteService {
             } else {
                 NotificationEntity notificationEntity = new NotificationEntity();
                 notificationEntity.setDelivered(false);
-                notificationEntity.setContent(userEntity.get().getFullName() + "was voted your post");
+                notificationEntity.setContent(userEntity.get().getFullName() + " was voted your post");
                 notificationEntity.setUserId(blogPostEntity.get().getAuthors());
                 notificationEntity.setPostId(voteDTO.getPostId());
                 notificationStorageService.createNotificationStorage(notificationEntity);

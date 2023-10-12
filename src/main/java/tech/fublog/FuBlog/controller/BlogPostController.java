@@ -98,10 +98,12 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("/getBlogPostByAuthor/{userId}")
-    ResponseEntity<ResponseObject> getBlogPostByAuthor(@PathVariable Long userId) {
+    @GetMapping("/getBlogPostByAuthor/{userId}/{page}/{size}")
+    ResponseEntity<ResponseObject> getBlogPostByAuthor(@PathVariable Long userId,
+                                                       @PathVariable int page, @PathVariable int size
+    ) {
         try {
-            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByAuthor(userId);
+            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByAuthor(userId, page, size);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", dtoList));
         } catch (BlogPostException ex) {
@@ -110,10 +112,12 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("/getBlogPostByTag/{tagId}")
-    ResponseEntity<ResponseObject> getBlogPostByTag(@PathVariable Long tagId) {
+    @GetMapping("/getBlogPostByTag/{tagId}/{page}/{size}")
+    ResponseEntity<ResponseObject> getBlogPostByTag(@PathVariable Long tagId,
+                                                    @PathVariable int page, @PathVariable int size
+    ) {
         try {
-            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByTag(tagId);
+            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByTag(tagId, page, size);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", dtoList));
         } catch (BlogPostException ex) {

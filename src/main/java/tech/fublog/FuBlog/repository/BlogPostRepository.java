@@ -61,5 +61,5 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
     //    Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(Pageable pageable);
 
-    List<BlogPostEntity> findByAuthorsAndStatusTrueAndIsApprovedTrue(UserEntity userEntity);
+    Page<BlogPostEntity> findByAuthorsAndStatusTrueAndIsApprovedTrue(UserEntity userEntity, Pageable pageable);
 }

@@ -229,13 +229,14 @@ public class BlogPostService {
 
     }
 
-    public List<BlogPostDTO> getBlogPostByAuthor(Long userId) {
+    public List<BlogPostDTO> getBlogPostByAuthor(Long userId, int page, int size) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
-            List<BlogPostEntity> entityList = blogPostRepository.findByAuthorsAndStatusTrueAndIsApprovedTrue(userEntity.get());
+            Pageable pageable = PageRequest.of(page - 1, size);
+            Page<BlogPostEntity> entityList = blogPostRepository.findByAuthorsAndStatusTrueAndIsApprovedTrue(userEntity.get(), pageable);
             if (!entityList.isEmpty()) {
                 List<BlogPostDTO> dtoList = new ArrayList<>();
-                for (BlogPostEntity entity : entityList) {
+                for (BlogPostEntity entity : entityList.getContent()) {
                     dtoList.add(convertBlogPostDTO(entity));
                 }
                 return dtoList;
@@ -243,13 +244,14 @@ public class BlogPostService {
         } else throw new BlogPostException("User doesn't exists");
     }
 
-    public List<BlogPostDTO> getBlogPostByTag(Long tagId) {
+    public List<BlogPostDTO> getBlogPostByTag(Long tagId, int page, int size) {
         Optional<TagEntity> tagEntity = tagRepository.findById(tagId);
         if (tagEntity.isPresent()) {
-            List<PostTagEntity> postTagEntityList = postTagRepository.findByTag(tagEntity.get());
+            Pageable pageable = PageRequest.of(page - 1, size);
+            Page<PostTagEntity> postTagEntityList = postTagRepository.findByTag(tagEntity.get(), pageable);
             if (!postTagEntityList.isEmpty()) {
                 List<BlogPostDTO> dtoList = new ArrayList<>();
-                for (PostTagEntity postTagEntity : postTagEntityList) {
+                for (PostTagEntity postTagEntity : postTagEntityList.getContent()) {
                     dtoList.add(convertBlogPostDTO(postTagEntity.getPost()));
                 }
                 return dtoList;
