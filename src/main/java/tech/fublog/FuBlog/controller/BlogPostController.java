@@ -24,22 +24,16 @@ import java.util.List;
 public class BlogPostController {
     private final BlogPostService blogPostService;
     private final ApprovalRequestService approvalRequestService;
-        private final VoteService voteService;
-        private final CommentService commentService;
     private final PostTagService postTagService;
 
     @Autowired
     public BlogPostController(BlogPostService blogPostService, ApprovalRequestService approvalRequestService,
-                              VoteService voteService, CommentService commentService,
                               PostTagService postTagService
     ) {
         this.blogPostService = blogPostService;
         this.approvalRequestService = approvalRequestService;
-        this.voteService = voteService;
-        this.commentService = commentService;
         this.postTagService = postTagService;
     }
-
 
 
     @DeleteMapping("/deleteBlogById/{postId}")
@@ -82,13 +76,13 @@ public class BlogPostController {
     }
 
     @GetMapping("getPinnedBlog")
-    public ResponseEntity<ResponseObject> getPinnedBlog(){
-        return  blogPostService.getPinnedBlog();
+    public ResponseEntity<ResponseObject> getPinnedBlog() {
+        return blogPostService.getPinnedBlog();
     }
 
     @PostMapping("pinBlogAction/{postId}")
-    public ResponseEntity<ResponseObject> pinBlog(@PathVariable Long postId){
-        return  blogPostService.pinBlogAction(postId);
+    public ResponseEntity<ResponseObject> pinBlog(@PathVariable Long postId) {
+        return blogPostService.pinBlogAction(postId);
     }
 
 
@@ -98,6 +92,30 @@ public class BlogPostController {
             BlogPostDTO dto = blogPostService.getBlogPostById(postId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", dto));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/getBlogPostByAuthor/{userId}")
+    ResponseEntity<ResponseObject> getBlogPostByAuthor(@PathVariable Long userId) {
+        try {
+            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByAuthor(userId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", dtoList));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/getBlogPostByTag/{tagId}")
+    ResponseEntity<ResponseObject> getBlogPostByTag(@PathVariable Long tagId) {
+        try {
+            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByTag(tagId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", dtoList));
         } catch (BlogPostException ex) {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
@@ -116,10 +134,22 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("/getPopularBlogPost")
-    public ResponseEntity<ResponseObject> getPopularBlog() {
+    @GetMapping("/getPopularBlogPostByView")
+    public ResponseEntity<ResponseObject> getPopularBlogByView() {
         try {
-            List<BlogPostDTO> blogPostEntity = blogPostService.getPopularBlogPost();
+            List<BlogPostDTO> blogPostEntity = blogPostService.getPopularBlogPostByView();
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPostEntity));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/getPopularBlogPostByVote")
+    public ResponseEntity<ResponseObject> getPopularBlogByVote() {
+        try {
+            List<BlogPostDTO> blogPostEntity = blogPostService.getPopularBlogPostByVote();
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", blogPostEntity));
         } catch (BlogPostException ex) {
@@ -148,8 +178,6 @@ public class BlogPostController {
         }
         return ResponseEntity.ok(blogPosts);
     }
-
-
 
     @GetMapping("/sorted/{page}/{size}")
 //    public ResponseEntity<Page<BlogPostEntity>> getSortedBlogPosts(

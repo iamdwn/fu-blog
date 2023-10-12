@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import tech.fublog.FuBlog.entity.CategoryEntity;
+import tech.fublog.FuBlog.entity.UserEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,9 @@ import java.util.Set;
 
 @Repository
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
+
+    List<BlogPostEntity> findAllByOrderByViewDesc();
+
     List<BlogPostEntity> findByIsApproved(Boolean isApproved);
 
     List<BlogPostEntity> findByTitleLike(String title);
@@ -57,4 +61,5 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
     //    Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(Pageable pageable);
 
+    List<BlogPostEntity> findByAuthorsAndStatusTrueAndIsApprovedTrue(UserEntity userEntity);
 }
