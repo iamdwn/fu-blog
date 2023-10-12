@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.entity.TagEntity;
-import tech.fublog.FuBlog.projection.BlogPostProjection;
+import tech.fublog.FuBlog.entity.UserEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +59,9 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(Pageable pageable);
 
-    List<BlogPostEntity> findByPostTagsTag(TagEntity tag);
+    Page<BlogPostEntity> findByPostTagsTag(TagEntity tag, Pageable pageable);
+
+    Page<BlogPostEntity> findByAuthorsAndStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(UserEntity userEntity, Pageable pageable);
 
     @Query("SELECT bp FROM BlogPostEntity bp WHERE bp.status = true AND bp.isApproved = true ORDER BY bp.view DESC LIMIT 6")
     List<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc();

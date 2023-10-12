@@ -1,7 +1,7 @@
 package tech.fublog.FuBlog.dto.response;
 
 
-public class UserInfoResponseDTO {
+public class    UserInfoResponseDTO {
     private String name;
 
     private String picture;
