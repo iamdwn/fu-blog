@@ -39,6 +39,6 @@ public class NotificationEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserEntity userId;
+    private UserEntity user;
 
 }
