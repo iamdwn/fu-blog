@@ -38,12 +38,19 @@ public class UserController {
 
 
     @GetMapping("/getAll/{page}/{size}")
-    public PaginationResponseDTO getAllUser(
+    public ResponseEntity<ResponseObject> getAllUser(
             @PathVariable int page,
             @PathVariable int size
     ){
-        PaginationResponseDTO users = userService.getAllUsers(page, size);
-        return users;
+        try {
+            PaginationResponseDTO users = userService.getAllUsers(page, size);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "found", users));
+        } catch (UserException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
     }
 
     @PostMapping("/mark")
@@ -60,29 +67,51 @@ public class UserController {
 
     @GetMapping("/getMarkPost/{userId}")
     public ResponseEntity<ResponseObject> getMarkPostByUser(@PathVariable Long userId) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseObject("ok", "found", userService.getMarkPostByUser(userId)));
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "found", userService.getMarkPostByUser(userId)));
+        } catch (UserException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
     }
 
     @GetMapping("/getActiveUser")
     public ResponseEntity<ResponseObject> getActiveUser() {
-
-        return userService.getActiveUser();
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "found", userService.getActiveUser()));
+        } catch (UserException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
     }
+
+
     @GetMapping("/getUser/{userId}")
     public ResponseEntity<?> getUserById(@PathVariable Long userId) {
-        UserInfoResponseDTO user;
         try {
-            user = userService.getUserInfo(userId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "found", userService.getUserInfo(userId)));
         } catch (UserException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Don't find user!!!!"));
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
-        return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/deleteUser/{userId}")
     public ResponseEntity<ResponseObject> deleteBlog(@PathVariable Long userId) {
-        return userService.deleteBlogPost(userId);
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "found", userService.deleteBlogPost(userId)));
+        } catch (UserException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
     }
 
     @PutMapping("/updateUser/{userId}")
@@ -93,18 +122,28 @@ public class UserController {
         if (userId == null) {
             return ResponseEntity.badRequest().body("User ID cannot be null");
         }
-        return userService.updateUser(userId, userDTO);
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "found", userService.updateUser(userId, userDTO)));
+        } catch (UserException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
     }
 
-    @GetMapping("/countBlogOfUser/{userId}")
-    public ResponseEntity<?> updateBlog(
+    @GetMapping("/countViewOfBlog/{userId}")
+    public ResponseEntity<ResponseObject> countViewOfBlog(
             @PathVariable Long userId
     ) {
-        if (userId == null) {
-            return ResponseEntity.badRequest().body("User ID cannot be null");
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "found", userService.countViewOfBlog(userId)));
+        } catch (UserException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
-
-        return null;
     }
 
 }
