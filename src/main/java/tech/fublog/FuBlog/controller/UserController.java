@@ -7,6 +7,7 @@ import tech.fublog.FuBlog.auth.MessageResponse;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.PostMarkDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
+import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.exception.UserException;
 import tech.fublog.FuBlog.model.ResponseObject;
@@ -63,18 +64,21 @@ public class UserController {
         return userService.getActiveUser();
     }
     @GetMapping("/getUser/{userId}")
-    public ResponseEntity<?> getUserById(@PathVariable Long userId){
-        UserEntity user = userRepository.findByIdAndStatusIsTrue(userId);
-        if(user != null){
-            return ResponseEntity.ok(user);
+    public ResponseEntity<?> getUserById(@PathVariable Long userId) {
+        UserInfoResponseDTO user;
+        try {
+            user = userService.getUserInfo(userId);
+        } catch (UserException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Don't find user!!!!"));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Don't find user!!!!"));
+        return ResponseEntity.ok(user);
     }
+
     @DeleteMapping("/deleteUser/{userId}")
     public ResponseEntity<ResponseObject> deleteBlog(@PathVariable Long userId) {
-
         return userService.deleteBlogPost(userId);
     }
+
     @PutMapping("/updateUser/{userId}")
     public ResponseEntity<?> updateBlog(
             @PathVariable Long userId,

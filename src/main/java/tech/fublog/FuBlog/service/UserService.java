@@ -87,7 +87,7 @@ public class UserService {
 //                        user.getFullName(),
 //                        user.getEmail());
                 UserInfoResponseDTO userInfoResponseDTO =
-                        new UserInfoResponseDTO(user.getUsername(), user.getPicture(), user.getPoint());
+                        convertUserDTO(user);
 
                 highestPointUser.add(userInfoResponseDTO);
             }
@@ -101,19 +101,25 @@ public class UserService {
 
 
     public UserInfoResponseDTO getUserInfo(Long userId) {
-        UserEntity user = userRepository.findById(userId).orElse(null);
+        UserEntity user = userRepository.findByIdAndStatusIsTrue(userId);
         if (user != null) {
-            return new UserInfoResponseDTO(user.getUsername(), user.getPicture(), user.getPoint());
-        }
-        return null;
-
-
+            return convertUserDTO(user);
+        } else throw new UserException("");
     }
 
 
     public List<UserEntity> getAllUser(){
 //        Pageable pageable = PageRequest.of(page,size);
+        userRepository.findAllByStatusIsTrue();
         return  userRepository.findAll();
+    }
+
+    public List<UserInfoResponseDTO> getAllUsers(){
+        List<UserEntity> userEntity = userRepository.findAllByStatusIsTrue();
+        List<UserInfoResponseDTO> userDTOs = userRepository.findAll().parallelStream()
+                .map(user -> convertUserDTO(user))
+                .collect(Collectors.toList());
+        return userDTOs;
     }
 
     public boolean markPost(Long userId, Long postId) {
@@ -205,7 +211,7 @@ public class UserService {
                     dtoList.add(convertPostToDTO(entity.getId()));
                 }
                 return dtoList;
-            } else return new ArrayList<>();
+            } else throw new UserException("This user not marked any post");
         } else throw new UserException("User doesn't exists");
     }
 
@@ -227,19 +233,7 @@ public class UserService {
                     })
                     .collect(Collectors.toSet());
 
-            List<String> roleNames = roleEntities.stream()
-                    .map(RoleEntity::getName)
-                    .collect(Collectors.toList());
-
-            UserDTO userDTO = new UserDTO(userEntity.getFullName(),
-                    userEntity.getPassword(),
-                    userEntity.getEmail(),
-                    userEntity.getId(),
-                    userEntity.getPicture(),
-                    userEntity.getStatus(),
-                    roleNames.get(roleNames.size() - 1),
-                    roleNames);
-
+            UserInfoResponseDTO userDTO = convertUserDTO(userEntity);
             blogPostEntity.setView(blogPostEntity.getView() + 1);
             blogPostRepository.save(blogPostEntity);
 
@@ -257,13 +251,32 @@ public class UserService {
                     voteRepository.countByPostVote(blogPostEntity),
                     commentRepository.countByPostComment(blogPostEntity)
             );
-//                  Date.from(Instant.ofEpochMilli((blogPostEntity.getCreatedDate().getTime())))
-//                  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
-//                    .parse(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(blogPostEntity.getCreatedDate())));
-
             return blogPostDTO;
         } else
             throw new BlogPostException("not found blogpost with " + postId);
+
+    }
+
+    public UserInfoResponseDTO convertUserDTO(UserEntity userEntity) {
+        if (userEntity != null) {
+
+            Set<RoleEntity> roleEntities = userEntity.getRoles();
+            List<String> roleNames = roleEntities.stream()
+                    .map(RoleEntity::getName)
+                    .collect(Collectors.toList());
+
+            UserInfoResponseDTO userDTO = new UserInfoResponseDTO(
+                    userEntity.getId(),
+                    userEntity.getFullName(),
+                    userEntity.getPicture(),
+                    userEntity.getEmail(),
+                    roleNames.get(roleNames.size() - 1),
+                    roleNames,
+                    userEntity.getPoint()
+            );
+            return userDTO;
+        } else
+            throw new BlogPostException("not found user with " + userEntity.getId());
 
     }
 }
