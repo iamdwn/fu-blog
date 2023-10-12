@@ -1,36 +1,31 @@
 package tech.fublog.FuBlog.controller;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
-import tech.fublog.FuBlog.auth.MessageResponse;
-import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.PostMarkDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
-import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
-import tech.fublog.FuBlog.entity.UserEntity;
+import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.exception.UserException;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.repository.UserRepository;
+import tech.fublog.FuBlog.service.BlogPostService;
 import tech.fublog.FuBlog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth/user")
 @CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
 public class UserController {
     private final UserService userService;
+    private final BlogPostService blogPostService;
 
     private final UserRepository userRepository;
     @Autowired
-    public UserController(UserService userService, UserRepository userRepository) {
+    public UserController(UserService userService, BlogPostService blogPostService, UserRepository userRepository) {
         this.userService = userService;
+        this.blogPostService = blogPostService;
         this.userRepository = userRepository;
     }
 
@@ -128,6 +123,17 @@ public class UserController {
         } catch (UserException ex) {
             System.out.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/countPostMarkByUser/{userId}")
+    ResponseEntity<ResponseObject> countPostMarkByUser(@PathVariable Long userId) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPostService.countPostMarkByUser(userId)));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
