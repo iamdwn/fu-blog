@@ -96,4 +96,15 @@ public class UserController {
         return userService.updateUser(userId, userDTO);
     }
 
+    @GetMapping("/countBlogOfUser/{userId}")
+    public ResponseEntity<?> updateBlog(
+            @PathVariable Long userId
+    ) {
+        if (userId == null) {
+            return ResponseEntity.badRequest().body("User ID cannot be null");
+        }
+
+        return null;
+    }
+
 }
