@@ -11,8 +11,8 @@ import java.util.List;
 @Setter
 public class UserInfoResponseDTO {
     private Long id;
+    private String fullName;
     private String image;
-    private String fullname;
     private String email;
     private String role;
     private List<String> roles;
