@@ -472,6 +472,13 @@ public class BlogPostService {
         } else throw new BlogPostException("User or Category doesn't exists");
     }
 
+    public long countPostMarkByUser(Long userId) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            return userEntity.get().getMarkPosts().size();
+        }
+        return 0L;
+    }
 
     public List<CategoryEntity> findCategoryToSearch(CategoryEntity categoryEntity, List<CategoryEntity> categoryEntityList) {
         List<CategoryEntity> subEntityList = categoryRepository.findByParentCategory(categoryEntity);

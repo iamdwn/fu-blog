@@ -19,11 +19,17 @@ import java.util.stream.Stream;
 
 @Repository
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
+
+    List<BlogPostEntity> findAllByOrderByViewDesc();
+
     List<BlogPostEntity> findByIsApproved(Boolean isApproved);
 
     List<BlogPostEntity> findByTitleLike(String title);
 
+    //    public List<BlogPostEntity> getBlogPostEntitiesByTitle(String title, Pageable pageable);
     public Page<BlogPostEntity> getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(String title, Pageable pageable);
+
+//    List<BlogPostEntity> findAllByCategory(Long id);
 
     Page<BlogPostEntity> findByCategory(CategoryEntity category, Pageable pageable);
 
@@ -54,6 +60,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateAsc(Pageable pageable);
 
+    //    Page<BlogPostEntity> findAllByOrderByViewDesc(Pageable pageable);
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(Pageable pageable);
 
     Page<BlogPostEntity> findByPostTagsTag(TagEntity tag, Pageable pageable);

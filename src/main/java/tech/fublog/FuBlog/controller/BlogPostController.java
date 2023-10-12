@@ -105,18 +105,8 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("/getBlogPostByAuthor/{userId}/{page}/{size}")
-    ResponseEntity<ResponseObject> getBlogPostByAuthor(@PathVariable Long userId,
-    @PathVariable int page, @PathVariable int size) {
-        try {
-            PaginationResponseDTO dtoList = blogPostService.getBlogPostByAuthor(userId, page, size);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "post found", dtoList));
-        } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-        }
-    }
+
+
 
 //    @GetMapping("/getBlogPostByTag/{tagId}")
 //    ResponseEntity<ResponseObject> getBlogPostByTag(@PathVariable Long tagId) {
