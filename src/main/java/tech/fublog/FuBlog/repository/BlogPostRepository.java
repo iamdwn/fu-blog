@@ -48,9 +48,6 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(Pageable pageable);
 
-//    @Query("SELECT b.id AS id, b.createdDate AS createdDate FROM BlogPostEntity b WHERE b.status = true AND b.isApproved = true ORDER BY b.createdDate DESC")
-//    Page<BlogPostProjection> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(Pageable pageable);
-
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateAsc(Pageable pageable);
 
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateDesc(Pageable pageable);

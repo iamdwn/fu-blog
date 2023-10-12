@@ -2,12 +2,16 @@ package tech.fublog.FuBlog.service;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
+import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.PostTagEntity;
@@ -110,16 +114,20 @@ public class UserService {
 
     public List<UserEntity> getAllUser(){
 //        Pageable pageable = PageRequest.of(page,size);
-        userRepository.findAllByStatusIsTrue();
         return  userRepository.findAll();
     }
 
-    public List<UserInfoResponseDTO> getAllUsers(){
-        List<UserEntity> userEntity = userRepository.findAllByStatusIsTrue();
-        List<UserInfoResponseDTO> userDTOs = userRepository.findAll().parallelStream()
-                .map(user -> convertUserDTO(user))
-                .collect(Collectors.toList());
-        return userDTOs;
+    public PaginationResponseDTO getAllUsers(int page, int size){
+        List<UserInfoResponseDTO> userDTOs = new ArrayList<>();
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrue(pageable);
+        for (UserEntity dto : pageResult.getContent()){
+            userDTOs.add(convertUserDTO(dto));
+        }
+
+        Long userCount = pageResult.getTotalElements();
+        Long pageCount = (long) pageResult.getTotalPages();
+        return new PaginationResponseDTO(userDTOs, userCount, pageCount);
     }
 
     public boolean markPost(Long userId, Long postId) {
@@ -256,6 +264,7 @@ public class UserService {
             throw new BlogPostException("not found blogpost with " + postId);
 
     }
+
 
     public UserInfoResponseDTO convertUserDTO(UserEntity userEntity) {
         if (userEntity != null) {

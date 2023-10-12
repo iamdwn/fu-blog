@@ -1,5 +1,7 @@
 package tech.fublog.FuBlog.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import tech.fublog.FuBlog.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -20,8 +22,10 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     List<UserEntity> findAllByOrderByPointDesc();
 
     List<UserEntity> findAllByStatusIsTrue();
+    Page<UserEntity> findAllByStatusIsTrue(Pageable pageable);
 
     UserEntity findByIdAndStatusIsTrue(Long userId);
+
 
 
 }

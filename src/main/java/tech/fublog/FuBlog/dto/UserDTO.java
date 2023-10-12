@@ -23,4 +23,5 @@ public class UserDTO {
     private String role;
     private List<String> roles;
 
+
 }

@@ -12,7 +12,6 @@ import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
 import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.PostTagException;
 import tech.fublog.FuBlog.model.ResponseObject;
-import tech.fublog.FuBlog.projection.BlogPostProjection;
 import tech.fublog.FuBlog.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import tech.fublog.FuBlog.exception.BlogPostException;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class BlogPostService {
