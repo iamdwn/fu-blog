@@ -70,7 +70,7 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Don't find user!!!!"));
     }
-    @DeleteMapping("/deleteBlog/{userId}")
+    @DeleteMapping("/deleteUser/{userId}")
     public ResponseEntity<ResponseObject> deleteBlog(@PathVariable Long userId) {
 
         return userService.deleteBlogPost(userId);
