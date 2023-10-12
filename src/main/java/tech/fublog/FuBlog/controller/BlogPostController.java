@@ -112,6 +112,17 @@ public class BlogPostController {
         }
     }
 
+    @GetMapping("/countPostMarkByUser/{userId}")
+    ResponseEntity<ResponseObject> countPostMarkByUser(@PathVariable Long userId) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPostService.countPostMarkByUser(userId)));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
     @GetMapping("/getBlogPostByTag/{tagId}/{page}/{size}")
     ResponseEntity<ResponseObject> getBlogPostByTag(@PathVariable Long tagId,
                                                     @PathVariable int page, @PathVariable int size

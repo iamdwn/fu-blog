@@ -1,6 +1,7 @@
 package tech.fublog.FuBlog.dto;
 
 import lombok.*;
+import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
 import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.entity.CommentEntity;
 import tech.fublog.FuBlog.entity.UserEntity;

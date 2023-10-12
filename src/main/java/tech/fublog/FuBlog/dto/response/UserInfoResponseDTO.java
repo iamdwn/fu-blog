@@ -20,7 +20,7 @@ public class UserInfoResponseDTO {
     }
 
     public void setPicture(String picture) {
-        this.picture = picture  ;
+        this.picture = picture;
     }
 
     public Double getPoint() {

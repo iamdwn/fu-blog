@@ -8,6 +8,7 @@ import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.dto.request.BlogPostRequestDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
+import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
 import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.PostTagException;
 import tech.fublog.FuBlog.model.ResponseObject;
@@ -74,7 +75,7 @@ public class BlogPostService {
                     .collect(Collectors.toList());
 
             UserDTO userDTO = new UserDTO(userEntity.getFullName(),
-                    userEntity.getPassword(),
+                    /*userEntity.getPassword()*/null,
                     userEntity.getEmail(),
                     userEntity.getId(),
                     userEntity.getPicture(),
@@ -132,13 +133,23 @@ public class BlogPostService {
                     .collect(Collectors.toList());
 
             UserDTO userDTO = new UserDTO(userEntity.getFullName(),
-                    userEntity.getPassword(),
+                    /*userEntity.getPassword()*/null,
                     userEntity.getEmail(),
                     userEntity.getId(),
                     userEntity.getPicture(),
                     userEntity.getStatus(),
                     roleNames.get(roleNames.size() - 1),
                     roleNames);
+
+//            UserInfoResponseDTO userDTO = new UserInfoResponseDTO(
+//                    userEntity.getId(),
+//                    userEntity.getFullName(),
+//                    userEntity.getPicture(),
+//                    userEntity.getEmail(),
+//                    roleNames.get(roleNames.size() - 1),
+//                    roleNames,
+//                    userEntity.getPoint()
+//            );
 
             BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
                     blogPostEntity.getTypePost(),
@@ -232,7 +243,7 @@ public class BlogPostService {
     public List<BlogPostDTO> getBlogPostByAuthor(Long userId, int page, int size) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
-            Pageable pageable = PageRequest.of(page - 1, size);
+            Pageable pageable = PageRequest.of(page - 1, size, Sort.by("createdDate").ascending());
             Page<BlogPostEntity> entityList = blogPostRepository.findByAuthorsAndStatusTrueAndIsApprovedTrue(userEntity.get(), pageable);
             if (!entityList.isEmpty()) {
                 List<BlogPostDTO> dtoList = new ArrayList<>();
@@ -446,6 +457,13 @@ public class BlogPostService {
         } else throw new BlogPostException("User or Category doesn't exists");
     }
 
+    public long countPostMarkByUser(Long userId) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            return userEntity.get().getMarkPosts().size();
+        }
+        return 0L;
+    }
 
     public List<CategoryEntity> findCategoryToSearch(CategoryEntity categoryEntity, List<CategoryEntity> categoryEntityList) {
         List<CategoryEntity> subEntityList = categoryRepository.findByParentCategory(categoryEntity);

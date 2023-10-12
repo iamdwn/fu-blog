@@ -4,6 +4,7 @@ import tech.fublog.FuBlog.dto.VoteDTO;
 import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.VoteException;
 import tech.fublog.FuBlog.repository.BlogPostRepository;
+import tech.fublog.FuBlog.repository.NotificationRepository;
 import tech.fublog.FuBlog.repository.UserRepository;
 import tech.fublog.FuBlog.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +23,16 @@ public class VoteService {
     private final BlogPostRepository blogPostRepository;
     private final UserRepository userRepository;
     private final NotificationStorageService notificationStorageService;
+    private final NotificationRepository notificationRepository;
 
     @Autowired
-    public VoteService(VoteRepository voteRepository, BlogPostRepository blogPostRepository, UserRepository userRepository, NotificationStorageService notificationStorageService) {
+    public VoteService(VoteRepository voteRepository, BlogPostRepository blogPostRepository, UserRepository userRepository, NotificationStorageService notificationStorageService,
+                       NotificationRepository notificationRepository) {
         this.voteRepository = voteRepository;
         this.blogPostRepository = blogPostRepository;
         this.userRepository = userRepository;
         this.notificationStorageService = notificationStorageService;
+        this.notificationRepository = notificationRepository;
     }
 
     public Long countVote(Long postId) {
@@ -73,14 +77,17 @@ public class VoteService {
                 voteRepository.delete(voteEntity);
                 return null;
             } else {
-                NotificationEntity notificationEntity = new NotificationEntity();
-                notificationEntity.setDelivered(false);
-                notificationEntity.setContent(userEntity.get().getFullName() + " was voted your post");
-                notificationEntity.setUserId(blogPostEntity.get().getAuthors());
-                notificationEntity.setPostId(voteDTO.getPostId());
-                notificationStorageService.createNotificationStorage(notificationEntity);
-                Double point = userEntity.get().getPoint();
-                userEntity.get().setPoint(point + 0.5);
+                NotificationEntity notificationEntity = notificationRepository.findByUserIdAndPostId(userEntity.get(), voteDTO.getPostId());
+                if (notificationEntity == null) {
+                    notificationEntity = new NotificationEntity();
+                    notificationEntity.setDelivered(false);
+                    notificationEntity.setContent(userEntity.get().getFullName() + " was voted your post");
+                    notificationEntity.setUserId(blogPostEntity.get().getAuthors());
+                    notificationEntity.setPostId(voteDTO.getPostId());
+                    notificationStorageService.createNotificationStorage(notificationEntity);
+                    Double point = userEntity.get().getPoint();
+                    userEntity.get().setPoint(point + 0.5);
+                }
                 voteEntity = new VoteEntity(voteDTO.getVoteValue(), userEntity.get(), blogPostEntity.get());
                 voteRepository.save(voteEntity);
                 return voteDTO;
