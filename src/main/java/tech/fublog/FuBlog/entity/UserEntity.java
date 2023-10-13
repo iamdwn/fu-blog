@@ -79,7 +79,7 @@ public class UserEntity implements UserDetails {
 //    @JsonIgnore
     private Set<VoteEntity> votes = new HashSet<>();
 
-    @OneToMany(mappedBy = "userId")
+    @OneToMany(mappedBy = "user")
 //    @JsonIgnore
     private Set<NotificationEntity> notificationList = new HashSet<>();
 

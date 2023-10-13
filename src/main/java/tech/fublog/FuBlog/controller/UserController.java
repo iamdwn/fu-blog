@@ -98,7 +98,7 @@ public class UserController {
     }
 
     @DeleteMapping("/deleteUser/{userId}")
-    public ResponseEntity<ResponseObject> deleteBlog(@PathVariable Long userId) {
+    public ResponseEntity<ResponseObject> deleteUser(@PathVariable Long userId) {
         try {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "found", userService.deleteBlogPost(userId)));
@@ -110,7 +110,7 @@ public class UserController {
     }
 
     @PutMapping("/updateUser/{userId}")
-    public ResponseEntity<?> updateBlog(
+    public ResponseEntity<?> updateUser(
             @PathVariable Long userId,
             @RequestBody UserDTO userDTO
     ) {

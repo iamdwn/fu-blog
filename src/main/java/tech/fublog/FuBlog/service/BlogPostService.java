@@ -183,7 +183,6 @@ public class BlogPostService {
             UserEntity userEntity = userRepository.findById(blogPostEntity.getAuthors().getId()).orElse(null);
             blogPostEntity.setView(blogPostEntity.getView() + 1);
             return blogPostRepository.save(blogPostEntity);
-
         } else
             throw new BlogPostException("not found blogpost with " + postId);
     }

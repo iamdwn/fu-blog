@@ -17,13 +17,13 @@ public class  AwardController {
     @Autowired
     private AwardService awardService;
 
-    @GetMapping("viewAwards")
+    @GetMapping("/viewAwards")
     ResponseEntity<ResponseObject> getAllAwards() {
 
         return awardService.getAllAwards();
     }
 
-    @PostMapping("awardPrize")
+    @PostMapping("/awardPrize")
     ResponseEntity<ResponseObject> awardPrize(
             @RequestBody AwardRequestDTO awardRequestDTO) {
 
