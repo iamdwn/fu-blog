@@ -33,7 +33,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
             Pageable pageable
     );
 
-
+//    BlogPostEntity findById(String id);
     Optional<BlogPostEntity> findByPinnedIsTrue();
 
     //    @Query("SELECT e FROM BlogPostEntity e ORDER BY e.createdDate DESC")

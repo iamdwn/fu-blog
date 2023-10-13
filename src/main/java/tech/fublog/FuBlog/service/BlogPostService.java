@@ -32,14 +32,17 @@ public class BlogPostService {
     private final VoteRepository voteRepository;
     private final CommentRepository commentRepository;
 
+    private final PostTagRepository postTagRepository;
+
     @Autowired
-    public BlogPostService(CategoryRepository categoryRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, TagRepository tagRepository, VoteRepository voteRepository, CommentRepository commentRepository) {
+    public BlogPostService(CategoryRepository categoryRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, TagRepository tagRepository, VoteRepository voteRepository, CommentRepository commentRepository, PostTagRepository postTagRepository) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.blogPostRepository = blogPostRepository;
         this.tagRepository = tagRepository;
         this.voteRepository = voteRepository;
         this.commentRepository = commentRepository;
+        this.postTagRepository = postTagRepository;
     }
 
 
@@ -351,6 +354,8 @@ public class BlogPostService {
         //check parentCategoryId != null
         Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(blogPostRequestDTO.getCategoryName(),
                 blogPostRequestDTO.getParentCategoryId());
+
+
         if (userEntity.isPresent()
                 && categoryEntity.isPresent()) {
             BlogPostEntity blogPostEntity = new BlogPostEntity
@@ -365,6 +370,7 @@ public class BlogPostService {
             userEntity.get().setPoint(userEntity.get().getPoint() + 1);
             return blogPostRepository.save(blogPostEntity);
         } else throw new BlogPostException("User or Category doesn't exists");
+
     }
 
 
@@ -374,6 +380,7 @@ public class BlogPostService {
     }
 
     public List<BlogPostEntity> findByTagName(String tagName) {
+        // Tìm Tag theo tên
         TagEntity tag = tagRepository.findByTagName(tagName);
         if (tag != null) {
             return blogPostRepository.findByPostTagsTag(tag);
