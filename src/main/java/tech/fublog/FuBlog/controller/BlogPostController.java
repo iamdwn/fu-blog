@@ -82,12 +82,12 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("getPinnedBlog")
+    @GetMapping("/getPinnedBlog")
     public ResponseEntity<ResponseObject> getPinnedBlog(){
         return  blogPostService.getPinnedBlog();
     }
 
-    @PostMapping("pinBlogAction/{postId}")
+    @PostMapping("/pinBlogAction/{postId}")
     public ResponseEntity<ResponseObject> pinBlog(@PathVariable Long postId){
         return  blogPostService.pinBlogAction(postId);
     }
@@ -165,7 +165,7 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("getAllBlog/{page}/{size}")
+    @GetMapping("/getAllBlog/{page}/{size}")
     public ResponseEntity<ResponseObject> getAllBlog(@PathVariable int page, @PathVariable int size) {
 
         try {
@@ -178,7 +178,7 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("getByTitle/{title}/{page}/{size}")
+    @GetMapping("/getByTitle/{title}/{page}/{size}")
     public ResponseEntity<ResponseObject> getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
         try {
             PaginationResponseDTO blogPosts = blogPostService.getAllBlogPostByTitle(title, page, size);
@@ -190,7 +190,7 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("getByCategory/{categoryId}/{page}/{size}")
+    @GetMapping("/getByCategory/{categoryId}/{page}/{size}")
     public ResponseEntity<ResponseObject> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
 //        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
         try {

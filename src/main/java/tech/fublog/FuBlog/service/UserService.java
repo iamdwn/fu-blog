@@ -80,7 +80,7 @@ public class UserService {
 
 
 
-    public ResponseEntity<ResponseObject> getActiveUser() {
+    public List<UserInfoResponseDTO> getActiveUser() {
         List<UserEntity> userEntities = userRepository.findAllByOrderByPointDesc();
         List<UserInfoResponseDTO> highestPointUser = new ArrayList<>();
 
@@ -97,9 +97,7 @@ public class UserService {
             }
         }
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new tech.fublog.FuBlog.model.ResponseObject("found", "list found",
-                        highestPointUser));
+        return highestPointUser;
     }
 
 

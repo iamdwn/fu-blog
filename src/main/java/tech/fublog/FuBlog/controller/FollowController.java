@@ -78,17 +78,18 @@ public class FollowController {
 
     @PostMapping("/followAction/{action}")
     public ResponseEntity<ResponseObject> insertFollow(@PathVariable String action, @RequestBody FollowRequestDTO followRequestDTO) {
+        boolean result = false;
         try {
             if (action.equals("follow"))
-                followService.insertFollow(followRequestDTO);
+                result = followService.insertFollow(followRequestDTO, result);
             else if (action.equals("unfollow"))
-                followService.unFollow(followRequestDTO);
+                result = followService.unFollow(followRequestDTO, result);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "successfully", ""));
+                    .body(new ResponseObject("ok", "successfully", result));
         } catch (FollowException ex) {
             System.out.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+                    .body(new ResponseObject("failed", ex.getMessage(), result));
         }
     }
 }

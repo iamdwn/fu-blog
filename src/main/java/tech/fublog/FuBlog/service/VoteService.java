@@ -77,7 +77,7 @@ public class VoteService {
                 NotificationEntity notificationEntity = new NotificationEntity();
                 notificationEntity.setDelivered(false);
                 notificationEntity.setContent(userEntity.get().getFullName() + "was voted your post");
-                notificationEntity.setUserId(blogPostEntity.get().getAuthors());
+                notificationEntity.setUser(blogPostEntity.get().getAuthors());
                 notificationEntity.setPostId(voteDTO.getPostId());
                 notificationStorageService.createNotificationStorage(notificationEntity);
                 Double point = userEntity.get().getPoint();
