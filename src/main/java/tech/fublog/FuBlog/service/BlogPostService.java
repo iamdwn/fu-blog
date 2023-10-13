@@ -31,11 +31,11 @@ public class BlogPostService {
     private final TagRepository tagRepository;
     private final VoteRepository voteRepository;
     private final CommentRepository commentRepository;
-
     private final PostTagRepository postTagRepository;
 
     @Autowired
-    public BlogPostService(CategoryRepository categoryRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, TagRepository tagRepository, VoteRepository voteRepository, CommentRepository commentRepository, PostTagRepository postTagRepository) {
+    public BlogPostService(CategoryRepository categoryRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, TagRepository tagRepository, VoteRepository voteRepository, CommentRepository commentRepository,
+                           PostTagRepository postTagRepository) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.blogPostRepository = blogPostRepository;
@@ -109,6 +109,61 @@ public class BlogPostService {
 
     }
 
+    public BlogPostDTO convertBlogPostDTO(BlogPostEntity blogPostEntity) {
+
+//        BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
+
+        if (blogPostEntity != null) {
+            UserEntity userEntity = userRepository.findById(blogPostEntity.getAuthors().getId()).orElse(null);
+
+            Set<RoleEntity> roleEntities = userEntity.getRoles();
+            Set<PostTagEntity> postTagEntity = blogPostEntity.getPostTags();
+            Set<TagDTO> tagDTOs = postTagEntity.stream()
+                    .map(tagEntity -> {
+                        TagDTO tagDTO = new TagDTO();
+                        tagDTO.setTagId(tagEntity.getId());
+                        tagDTO.setTagName(tagEntity.getTag().getTagName());
+                        return tagDTO;
+                    })
+                    .collect(Collectors.toSet());
+
+            List<String> roleNames = roleEntities.stream()
+                    .map(RoleEntity::getName)
+                    .collect(Collectors.toList());
+
+            UserDTO userDTO = new UserDTO(userEntity.getFullName(),
+                    userEntity.getPassword(),
+                    userEntity.getEmail(),
+                    userEntity.getId(),
+                    userEntity.getPicture(),
+                    userEntity.getStatus(),
+                    roleNames.get(roleNames.size() - 1),
+                    roleNames);
+
+            BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
+                    blogPostEntity.getTypePost(),
+                    blogPostEntity.getTitle(),
+                    blogPostEntity.getContent(),
+                    blogPostEntity.getImage(),
+                    blogPostEntity.getCategory().getCategoryName(),
+                    blogPostEntity.getCategory().getParentCategory(),
+                    tagDTOs,
+                    userDTO,
+                    blogPostEntity.getView(),
+                    blogPostEntity.getCreatedDate(),
+                    voteRepository.countByPostVote(blogPostEntity),
+                    commentRepository.countByPostComment(blogPostEntity)
+            );
+//                  Date.from(Instant.ofEpochMilli((blogPostEntity.getCreatedDate().getTime())))
+//                  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
+//                    .parse(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(blogPostEntity.getCreatedDate())));
+
+            return blogPostDTO;
+        } else
+            throw new BlogPostException("not found blogpost with " + blogPostEntity.getId());
+
+    }
+
     public BlogPostEntity getBlogPostDetailsById(Long postId) {
         BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
 
@@ -136,10 +191,7 @@ public class BlogPostService {
 
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "deleted successful", ""));
-        }
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ResponseObject("failed", "deleted failed", ""));
+        } throw new BlogPostException("this blog was deleted or the blog not exist");
     }
 
 
@@ -184,17 +236,44 @@ public class BlogPostService {
 
     }
 
+    public List<BlogPostDTO> getBlogPostByAuthor(Long userId) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            List<BlogPostEntity> entityList = blogPostRepository.findByAuthorsAndStatusTrueAndIsApprovedTrue(userEntity.get());
+            if (!entityList.isEmpty()) {
+                List<BlogPostDTO> dtoList = new ArrayList<>();
+                for (BlogPostEntity entity : entityList) {
+                    dtoList.add(convertBlogPostDTO(entity));
+                }
+                return dtoList;
+            } else return new ArrayList<>();
+        } else throw new BlogPostException("User doesn't exists");
+    }
 
-    //sort theo thứ tự bài BlogPost mới nằm đầu tiên (giảm dần theo NGÀY)
+    public List<BlogPostDTO> getBlogPostByTag(Long tagId) {
+        Optional<TagEntity> tagEntity = tagRepository.findById(tagId);
+        if (tagEntity.isPresent()) {
+            List<PostTagEntity> postTagEntityList = postTagRepository.findByTag(tagEntity.get());
+            if (!postTagEntityList.isEmpty()) {
+                List<BlogPostDTO> dtoList = new ArrayList<>();
+                for (PostTagEntity postTagEntity : postTagEntityList) {
+                    dtoList.add(convertBlogPostDTO(postTagEntity.getPost()));
+                }
+                return dtoList;
+            } else return new ArrayList<>();
+        } else throw new BlogPostException("Tag doesn't exists");
+    }
+
     public void sort(List<BlogPostDTO> blogPostList) {
 
         Collections.sort(blogPostList, new Comparator<BlogPostDTO>() {
             @Override
             public int compare(BlogPostDTO o1, BlogPostDTO o2) {
-
-                if (o1.getCreatedDate().compareTo(o2.getCreatedDate()) < 0) {
+                double point1 = o1.getVoteCount() * 0.4 + o1.getViews() * 0.6;
+                double point2 = o2.getVoteCount() * 0.4 + o2.getViews() * 0.6;
+                if (point1 < point2) {
                     return 1;
-                } else if (o1.getCreatedDate().compareTo(o2.getCreatedDate()) == 0) {
+                } else if (point1 == point2) {
                     return 0;
                 } else {
                     return -1;
@@ -204,24 +283,23 @@ public class BlogPostService {
     }
 
     public ResponseEntity<ResponseObject> getPinnedBlog() {
-        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findByPinnedIsTrue();
-        BlogPostDTO blogPostDTO = getBlogPostById(blogPostEntity.get().getId());
+        BlogPostEntity blogPostEntity = blogPostRepository.findByPinnedIsTrue();
 
-        return !blogPostEntity.isEmpty() ? ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseObject("ok", "found", blogPostDTO))
+        return blogPostEntity != null ? ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", convertBlogPostDTO(blogPostEntity)))
                 : ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ResponseObject("failed", "not found", ""));
     }
 
     public ResponseEntity<ResponseObject> pinBlogAction(Long postId) {
-        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findByPinnedIsTrue();
+        BlogPostEntity blogPostEntity = blogPostRepository.findByPinnedIsTrue();
         Optional<BlogPostEntity> blogPost = blogPostRepository.findById(postId);
 
-        if (blogPostEntity.isPresent()) {
+        if (blogPostEntity != null) {
 
-            blogPostEntity.get().setPinned(false);
-            blogPostRepository.save(blogPostEntity.get());
-            if (blogPostEntity.get().getId().equals(postId)) {
+            blogPostEntity.setPinned(false);
+            blogPostRepository.save(blogPostEntity);
+            if (blogPostEntity.getId().equals(postId)) {
 
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "unpinned successfull", ""));
@@ -234,14 +312,14 @@ public class BlogPostService {
                 .body(new ResponseObject("ok", "pinned successfull", ""));
     }
 
-    public PaginationResponseDTO filterBlogPost(String filter, int page, int size) {
+    public PaginationResponseDTO filterBlogPost(String filter, int pageNumber, int size) {
         List<BlogPostEntity> blogPostList = new ArrayList<>();
-        List<BlogPostEntity> blogPostByCategoryList = new ArrayList<>();
         List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
         List<BlogPostEntity> pageContent;
         Page<BlogPostEntity> pageResult = null;
 
-        Pageable pageable = PageRequest.of(page - 1, size - blogPostList.size());
+        Pageable pageable = PageRequest.of(pageNumber - 1, size - blogPostList.size());
+
 
         if (filter.equalsIgnoreCase("")) {
             pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
@@ -257,83 +335,79 @@ public class BlogPostService {
             pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(pageable);
         } else if (!filter.trim().matches("\\d+")) {
             Sort sort = Sort.by(Sort.Direction.ASC, "title");
-            pageable = PageRequest.of(page - 1, size - blogPostList.size(), sort);
+            pageable = PageRequest.of(pageNumber - 1, size, sort);
             filter = "%" + filter + "%";
             pageResult = blogPostRepository.getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(filter, pageable);
         } else {
             Long cateroryId = Long.parseLong(filter);
-            Optional<CategoryEntity> categoryOptional = categoryRepository.findById(Long.parseLong(filter));
-            pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
+            Optional<CategoryEntity> categoryOptional = categoryRepository.findById(cateroryId);
+//            pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
+
+            pageResult = findBlogByCategory(categoryOptional.get().getCategoryName(),
+                            categoryOptional.get().getParentCategory() == null ? null
+                                    : categoryOptional.get().getParentCategory().getId(), pageNumber, size);
         }
 
-        pageContent = pageResult.getContent();
-
-        if (!pageContent.isEmpty()) {
+        if (pageResult != null) {
+            pageContent = pageResult.getContent();
             for (BlogPostEntity blogPost : pageContent) {
-                blogPostDTOList.add(getBlogPostById(blogPost.getId()));
+                blogPostDTOList.add(convertBlogPostDTO(blogPost));
             }
         }
 
         Long blogPostCount = Long.valueOf(pageResult.getTotalElements());
         Long pageCount = Long.valueOf(pageResult.getTotalPages());
+
         PaginationResponseDTO paginationResponseDTO = new PaginationResponseDTO(blogPostDTOList, blogPostCount, pageCount);
         return paginationResponseDTO;
     }
 
 
-//    public List<Long> getExistBlogPostPreviousPage(String filter, int page, int size) {
-//        List<BlogPostEntity> blogPostList = new ArrayList<>();
-//        List<Long> existBlogPostId = page > 1 ? getExistBlogPostPreviousPage(filter, page - 1, size)
-//                : new ArrayList<>();
+    public Page<BlogPostEntity> findBlogByCategory(String name, Long parentCategoryId, int page, int size) {
+        Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(name, parentCategoryId);
+        if (categoryEntity.isPresent()) {
+            List<CategoryEntity> categoryEntityList = findCategoryToSearch(categoryEntity.get(), new ArrayList<>());
+            if (!categoryEntityList.isEmpty()) {
+                Pageable pageable = PageRequest.of(page - 1, size);
+                return blogPostRepository.findByCategoryInAndIsApprovedTrueAndStatusTrue(categoryEntityList, pageable);
+            } else return new PageImpl<>(Collections.emptyList());
+        } else throw new BlogPostException("Category doesn't exists");
+    }
+
+//    public static Page<BlogPostEntity> filterDuplicateEntities(Page<BlogPostEntity> page) {
+//        List<BlogPostEntity> content = page.getContent();
+//        Set<Long> seenIds = new HashSet<>();
+//        List<BlogPostEntity> uniqueEntities = content.stream()
+//                .filter(entity -> seenIds.add(entity.getId()))
+//                .collect(Collectors.toList());
 //
-//        while (blogPostList.size() < size) {
-//            Pageable pageable = PageRequest.of(page - 1, size - blogPostList.size());
-//            Page<BlogPostEntity> pageResult = null;
-////            Page<BlogPostDTO> pageDTOResult = null;
-//
-//            if (filter.equalsIgnoreCase("")) {
-//                pageResult = blogPostRepository.findAllByStatusIsTrueAndIsApprovedIsTrue(pageable);
-//            } else if ("newest".equalsIgnoreCase(filter)) {
-//                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(pageable);
-//            } else if ("oldest".equalsIgnoreCase(filter)) {
-//                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateAsc(pageable);
-//            } else if ("latestModified".equalsIgnoreCase(filter)) {
-//                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateDesc(pageable);
-//            } else if ("oldestModified".equalsIgnoreCase(filter)) {
-//                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByModifiedDateAsc(pageable);
-//            } else if ("mostViewed".equalsIgnoreCase(filter)) {
-//                pageResult = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(pageable);
-//            } else if (!filter.trim().matches("\\d+")) {
-//                pageResult = blogPostRepository.getBlogPostEntitiesByTitleAndStatusIsTrueAndIsApprovedIsTrue(filter, pageable);
-//            } else {
-//                Optional<CategoryEntity> categoryOptional = categoryRepository.findById(Long.parseLong(filter));
-//                pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
-//            }
-//
-//            List<BlogPostEntity> pageContent = pageResult.getContent();
-//
-//
-//            for (BlogPostEntity blogPost : pageContent) {
-//                if (!existBlogPostId.contains(blogPost.getId())
-//                        && blogPost.getStatus()
-//                        && blogPost.getIsApproved()) {
-//                    blogPostList.add(blogPost);
-//                    existBlogPostId.add(blogPost.getId());
-//                }
-//            }
-//
-//            if (!pageResult.hasNext()) {
-//                break;
-//            }
-//            page++;
-//        }
-//        return existBlogPostId;
+//        return new PageImpl<>(uniqueEntities, page.getPageable(), uniqueEntities.size());
 //    }
 
+    public List<BlogPostDTO> getPopularBlogPostByView() {
+        List<BlogPostDTO> popularBlogPostList = new ArrayList<>();
+        List<BlogPostEntity> blogPostEntity = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc();
+        if (blogPostEntity != null) {
+            for (BlogPostEntity entity : blogPostEntity) {
+                popularBlogPostList.add(convertBlogPostDTO(entity));
+            } return popularBlogPostList;
+        } throw new BlogPostException("not found");
+    }
+
+    public List<BlogPostDTO> getPopularBlogPostByVote() {
+        List<BlogPostDTO> popularBlogPostList = new ArrayList<>();
+        List<BlogPostEntity> blogPostEntity = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByVoteDesc();
+        if (blogPostEntity != null) {
+            for (BlogPostEntity entity : blogPostEntity) {
+                popularBlogPostList.add(convertBlogPostDTO(entity));
+            } return popularBlogPostList;
+        } throw new BlogPostException("not found");
+    }
 
     public PaginationResponseDTO getAllBlogPost(int page, int size) {
         return filterBlogPost("", page, size);
     }
+
 
 
     public PaginationResponseDTO getAllBlogPostByTitle(String title, int page, int size) {
@@ -354,8 +428,6 @@ public class BlogPostService {
         //check parentCategoryId != null
         Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(blogPostRequestDTO.getCategoryName(),
                 blogPostRequestDTO.getParentCategoryId());
-
-
         if (userEntity.isPresent()
                 && categoryEntity.isPresent()) {
             BlogPostEntity blogPostEntity = new BlogPostEntity
@@ -370,9 +442,21 @@ public class BlogPostService {
             userEntity.get().setPoint(userEntity.get().getPoint() + 1);
             return blogPostRepository.save(blogPostEntity);
         } else throw new BlogPostException("User or Category doesn't exists");
-
     }
 
+
+    public List<CategoryEntity> findCategoryToSearch(CategoryEntity categoryEntity, List<CategoryEntity> categoryEntityList) {
+        List<CategoryEntity> subEntityList = categoryRepository.findByParentCategory(categoryEntity);
+        if (subEntityList.isEmpty()) {
+            categoryEntityList.add(categoryEntity);
+        } else {
+            categoryEntityList.add(categoryEntity);
+            for (CategoryEntity entity : subEntityList) {
+                findCategoryToSearch(entity, categoryEntityList);
+            }
+        }
+        return categoryEntityList;
+    }
 
     public Optional<CategoryEntity> findCategoryByNameAndParentId(String name, Long parentCategoryId) {
         CategoryEntity parentCategory = categoryRepository.findParentCategoryById(parentCategoryId);
@@ -380,7 +464,6 @@ public class BlogPostService {
     }
 
     public List<BlogPostEntity> findByTagName(String tagName) {
-        // Tìm Tag theo tên
         TagEntity tag = tagRepository.findByTagName(tagName);
         if (tag != null) {
             return blogPostRepository.findByPostTagsTag(tag);

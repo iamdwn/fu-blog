@@ -97,7 +97,7 @@ public class AuthenticationController {
                     signUpRequest.getUsername(),
                     signUpRequest.getEmail(),
                     encoder.encode(signUpRequest.getPassword()),
-                    "/images/default-avatar.png",
+                    "https://firebasestorage.googleapis.com/v0/b/fublog-6a7cf.appspot.com/o/files%2Fdefault-avatar.png?alt=media&token=876d6a33-39a1-4d03-a81c-cd291144fdef&_gl=1*1allgyf*_ga*MTYyODg2MDg2MC4xNjg0Njg2NjQy*_ga_CW55HF8NVT*MTY5Njk0MzI1My4xMDMuMS4xNjk2OTQzMzk0LjM2LjAuMA&fbclid=IwAR3D93i-DgqUvJPJkuAe0eoNEJV6atVqChekdobAkufvqDgN4qDinZQxoiM",
                     true,
                     true,
                     0.0

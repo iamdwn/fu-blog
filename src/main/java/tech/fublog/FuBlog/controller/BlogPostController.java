@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.controller;
 
+import org.springframework.data.domain.Page;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.request.BlogPostRequestDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
@@ -45,6 +46,7 @@ public class BlogPostController {
     @DeleteMapping("/deleteBlogById/{postId}")
     public ResponseEntity<ResponseObject> deleteBlog(@PathVariable Long postId) {
         try {
+            blogPostService.deleteBlogPost(postId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "deleted successful", ""));
         } catch (BlogPostException ex) {
@@ -103,6 +105,30 @@ public class BlogPostController {
         }
     }
 
+    @GetMapping("/getBlogPostByAuthor/{userId}")
+    ResponseEntity<ResponseObject> getBlogPostByAuthor(@PathVariable Long userId) {
+        try {
+            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByAuthor(userId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", dtoList));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/getBlogPostByTag/{tagId}")
+    ResponseEntity<ResponseObject> getBlogPostByTag(@PathVariable Long tagId) {
+        try {
+            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByTag(tagId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", dtoList));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
     @GetMapping("/getBlogDetailsById/{postId}")
     ResponseEntity<ResponseObject> getBlogDetailsById(@PathVariable Long postId) {
         try {
@@ -115,6 +141,28 @@ public class BlogPostController {
         }
     }
 
+    @GetMapping("/getPopularBlogPostByView")
+    public ResponseEntity<ResponseObject> getPopularBlogByView() {
+        try {
+            List<BlogPostDTO> blogPostEntity = blogPostService.getPopularBlogPostByView();
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPostEntity));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+    @GetMapping("/getPopularBlogPostByVote")
+    public ResponseEntity<ResponseObject> getPopularBlogByVote() {
+        try {
+            List<BlogPostDTO> blogPostEntity = blogPostService.getPopularBlogPostByVote();
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPostEntity));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
 
     @GetMapping("getAllBlog/{page}/{size}")
     public PaginationResponseDTO getAllBlog(@PathVariable int page, @PathVariable int size) {

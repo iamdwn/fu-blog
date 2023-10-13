@@ -39,12 +39,14 @@ public class ApprovalRequestService {
     }
 
     public List<ApprovalRequestResponseDTO> getAllApprovalRequest() {
-        List<ApprovalRequestEntity> list = approvalRequestRepository.findAll();
+        List<ApprovalRequestEntity> list = approvalRequestRepository.findAllByApprovedIsFalse();
         List<ApprovalRequestResponseDTO> dtoList = new ArrayList<>();
         for (ApprovalRequestEntity entity : list) {
-            ApprovalRequestResponseDTO dto =
-                    new ApprovalRequestResponseDTO(entity.getBlogPost().getId(), entity.getRequest().getId());
-            dtoList.add(dto);
+            if (!entity.isApproved()) {
+                ApprovalRequestResponseDTO dto =
+                        new ApprovalRequestResponseDTO(entity.getBlogPost().getId(), entity.getRequest().getId());
+                dtoList.add(dto);
+            }
         }
         return dtoList;
     }
@@ -82,15 +84,14 @@ public class ApprovalRequestService {
                 blogPostRepository.save(blogPostEntity.get());
                 approvalRequestRepository.save(approvalRequestEntity);
                 for (TagDTO tag : approvalRequestRequestDTO.getTagList()) {
-
                     String tagName = tag.getTagName();
                     TagEntity tagEntity = tagRepository.findByTagName(tagName);
                     PostTagEntity postTagEntity = new PostTagEntity();
-                    if(tagEntity != null){
+                    if (tagEntity != null) {
                         postTagEntity.setTag(tagEntity);
                         postTagEntity.setPost(blogPostEntity.get());
                         postTagRepository.save(postTagEntity);
-                    }else{
+                    } else {
                         TagEntity postTag = new TagEntity();
                         postTag.setTagName(tagName);
                         tagRepository.save(postTag);
