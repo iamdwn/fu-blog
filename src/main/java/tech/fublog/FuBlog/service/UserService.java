@@ -43,7 +43,6 @@ public class UserService {
         this.commentRepository = commentRepository;
     }
 
-
     @Autowired
     private RoleRepository roleRepository;
 
