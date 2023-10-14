@@ -76,6 +76,7 @@ public class VoteService {
             } else {
                 NotificationEntity notificationEntity = new NotificationEntity();
                 notificationEntity.setDelivered(false);
+                notificationEntity.setIsRead(false);
                 notificationEntity.setContent(userEntity.get().getFullName() + "was voted your post");
                 notificationEntity.setUser(blogPostEntity.get().getAuthors());
                 notificationEntity.setPostId(voteDTO.getPostId());
