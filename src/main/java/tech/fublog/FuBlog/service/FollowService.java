@@ -26,16 +26,14 @@ public class FollowService {
         this.followRepository = followRepository;
     }
 
-    public boolean insertFollow(FollowRequestDTO followRequestDTO, boolean result) {
+    public void insertFollow(FollowRequestDTO followRequestDTO) {
         Optional<UserEntity> userFollower = userRepository.findById(followRequestDTO.getFollower());
         Optional<UserEntity> userFollowing = userRepository.findById(followRequestDTO.getFollowing());
         if (userFollower.isPresent() && userFollowing.isPresent()) {
             FollowEntity followEntity = followRepository.findByFollowerAndFollowing(userFollower.get(), userFollowing.get());
             if (followEntity == null) {
-                result = true;
                 followEntity = new FollowEntity(userFollower.get(), userFollowing.get());
                 followRepository.save(followEntity);
-                return result;
             } else throw new FollowException("You already follow this user");
         } else throw new FollowException("User doesn't exists");
     }
@@ -70,16 +68,27 @@ public class FollowService {
         } else throw new FollowException("User doesn't exists");
     }
 
-    public boolean unFollow(FollowRequestDTO followRequestDTO, boolean result) {
+    public void unFollow(FollowRequestDTO followRequestDTO) {
         Optional<UserEntity> userFollower = userRepository.findById(followRequestDTO.getFollower());
         Optional<UserEntity> userFollowing = userRepository.findById(followRequestDTO.getFollowing());
         if (userFollower.isPresent() && userFollowing.isPresent()) {
             FollowEntity followEntity = followRepository.findByFollowerAndFollowing(userFollower.get(), userFollowing.get());
             if (followEntity != null) {
-                result = true;
                 followRepository.delete(followEntity);
-                return result;
             } else throw new FollowException("You hasn't follow this user");
+        } else throw new FollowException("User doesn't exists");
+    }
+
+    public boolean checkFollow(FollowRequestDTO followRequestDTO) {
+        boolean result = true;
+        Optional<UserEntity> userFollower = userRepository.findById(followRequestDTO.getFollower());
+        Optional<UserEntity> userFollowing = userRepository.findById(followRequestDTO.getFollowing());
+        if (userFollower.isPresent() && userFollowing.isPresent()) {
+            FollowEntity followEntity = followRepository.findByFollowerAndFollowing(userFollower.get(), userFollowing.get());
+            if (followEntity == null) {
+                result = false;
+            }
+            return result;
         } else throw new FollowException("User doesn't exists");
     }
 
