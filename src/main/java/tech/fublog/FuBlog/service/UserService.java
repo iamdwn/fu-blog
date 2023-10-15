@@ -128,8 +128,7 @@ public class UserService {
         return new PaginationResponseDTO(userDTOs, userCount, pageCount);
     }
 
-    public boolean markPost(Long userId, Long postId) {
-        boolean result = false;
+    public void markPost(Long userId, Long postId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
             Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
@@ -140,18 +139,29 @@ public class UserService {
                     entitySet.add(blogPostEntity.get());
                     userEntity.get().setMarkPosts(entitySet);
                     userRepository.save(userEntity.get());
-                    result = true;
                 } else {
                     entitySet = userEntity.get().getMarkPosts();
                     if (entitySet.add(blogPostEntity.get())) {
                         userEntity.get().setMarkPosts(entitySet);
                         userRepository.save(userEntity.get());
-                        result = true;
                     } else throw new UserException("You already marked this post!");
                 }
-            }
+            } else throw new UserException("Blog doesn't exists!");
         }
-        return result;
+    }
+
+    public void unMarkPost(Long userId, Long postId) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+            if (blogPostEntity.isPresent()) {
+                if (!userEntity.get().getMarkPosts().isEmpty()) {
+                    userEntity.get().getMarkPosts().removeIf(entity -> entity.getId().equals(postId));
+                    userEntity.get().setMarkPosts(userEntity.get().getMarkPosts());
+                    userRepository.save(userEntity.get());
+                }
+            } else throw new UserException("Blog doesn't exists!");
+        } else throw new UserException("User doesn't exists");
     }
 
     public UserEntity getUserById(Long userId) {
@@ -233,6 +243,23 @@ public class UserService {
                 return count;
             } else throw new UserException("This user not wrote any post");
         } else throw new UserException("User doesn't exists");
+    }
+
+    public boolean checkMarkPost(Long userId, Long postId) {
+        boolean result = false;
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+            if (blogPostEntity.isPresent()) {
+                if (!userEntity.get().getMarkPosts().isEmpty()) {
+                    for (BlogPostEntity entity : userEntity.get().getMarkPosts()) {
+                        if (entity.getId().equals(blogPostEntity.get().getId()))
+                            result = true;
+                    }
+                }
+                return result;
+            } else throw new UserException("Blog doesn't exists!");
+        } else throw new UserException("User doesn't exists!");
     }
 
     public BlogPostDTO convertPostToDTO(Long postId) {

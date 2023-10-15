@@ -26,7 +26,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     UserEntity findByIdAndStatusIsTrue(Long userId);
 
-
-
 }
 
