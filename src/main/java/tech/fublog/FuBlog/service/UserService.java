@@ -183,7 +183,7 @@ public class UserService {
                 roleEntities.add(userRole);
 
                 UserEntity user = this.getUserById(userId);
-                user.setFullName(userDTO.getFullname());
+                user.setFullName(userDTO.getFullName());
                 user.setEmail(userDTO.getEmail());
                 user.setPicture(userDTO.getPicture());
                 user.setRoles(roleEntities);
@@ -193,7 +193,7 @@ public class UserService {
                         .body(new ResponseObject("ok", "updated successful", user));
             }else{
                 UserEntity user = this.getUserById(userId);
-                user.setFullName(userDTO.getFullname());
+                user.setFullName(userDTO.getFullName());
                 user.setEmail(userDTO.getEmail());
                 user.setPicture(userDTO.getPicture());
                 user.setStatus(userDTO.getStatus());

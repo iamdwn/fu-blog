@@ -2,7 +2,6 @@ package tech.fublog.FuBlog.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Service;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -65,7 +64,6 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc(Pageable pageable);
 
     Page<BlogPostEntity> findByPostTagsTag(TagEntity tag, Pageable pageable);
-
 
     Page<BlogPostEntity> findByAuthorsAndStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(UserEntity userEntity, Pageable pageable);
 

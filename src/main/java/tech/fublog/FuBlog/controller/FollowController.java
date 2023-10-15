@@ -78,18 +78,34 @@ public class FollowController {
 
     @PostMapping("/followAction/{action}")
     public ResponseEntity<ResponseObject> insertFollow(@PathVariable String action, @RequestBody FollowRequestDTO followRequestDTO) {
-        boolean result = false;
         try {
             if (action.equals("follow"))
-                result = followService.insertFollow(followRequestDTO, result);
+                followService.insertFollow(followRequestDTO);
             else if (action.equals("unfollow"))
-                result = followService.unFollow(followRequestDTO, result);
+                followService.unFollow(followRequestDTO);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "successfully", result));
+                    .body(new ResponseObject("ok", "successfully", ""));
         } catch (FollowException ex) {
             System.out.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseObject("failed", ex.getMessage(), result));
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/checkFollowAction")
+    public ResponseEntity<ResponseObject> checkFollow(@RequestBody FollowRequestDTO followRequestDTO) {
+        try {
+            boolean result = followService.checkFollow(followRequestDTO);
+            if (result)
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "You already follow this user", true));
+            else
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "You hasn't follow this user", false));
+        } catch (FollowException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
 }
