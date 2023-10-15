@@ -52,14 +52,12 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
 
-
     public UserEntity saveUser(UserEntity user) {
 //        String pass = hashing.hasdPassword(user.getHashed_password());
 //        user.setHashed_password(pass);
         user.setHashedpassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
-
 
 
     public RoleEntity saveRole(RoleEntity role) {
@@ -69,10 +67,9 @@ public class UserService {
 
     public void addToUser(String username, String rolename) {
         UserEntity user = userRepository.findByUsername(username).get();
-        RoleEntity role  = roleRepository.findByName(rolename);
+        RoleEntity role = roleRepository.findByName(rolename);
         user.getRoles().add(role);
     }
-
 
 
     public ResponseEntity<ResponseObject> getActiveUser() {
@@ -98,7 +95,6 @@ public class UserService {
     }
 
 
-
     public UserInfoResponseDTO getUserInfo(Long userId) {
         UserEntity user = userRepository.findById(userId).orElse(null);
         if (user != null) {
@@ -110,13 +106,12 @@ public class UserService {
     }
 
 
-    public List<UserEntity> getAllUser(){
+    public List<UserEntity> getAllUser() {
 //        Pageable pageable = PageRequest.of(page,size);
-        return  userRepository.findAll();
+        return userRepository.findAll();
     }
 
-    public boolean markPost(Long userId, Long postId) {
-        boolean result = false;
+    public void markPost(Long userId, Long postId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
             Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
@@ -127,24 +122,36 @@ public class UserService {
                     entitySet.add(blogPostEntity.get());
                     userEntity.get().setMarkPosts(entitySet);
                     userRepository.save(userEntity.get());
-                    result = true;
                 } else {
                     entitySet = userEntity.get().getMarkPosts();
                     if (entitySet.add(blogPostEntity.get())) {
                         userEntity.get().setMarkPosts(entitySet);
                         userRepository.save(userEntity.get());
-                        result = true;
                     } else throw new UserException("You already marked this post!");
                 }
-            }
+            } else throw new UserException("Blog doesn't exists!");
         }
-        return result;
+    }
+
+    public void unMarkPost(Long userId, Long postId) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+            if (blogPostEntity.isPresent()) {
+                if (!userEntity.get().getMarkPosts().isEmpty()) {
+                    userEntity.get().getMarkPosts().removeIf(entity -> entity.getId().equals(postId));
+                    userEntity.get().setMarkPosts(userEntity.get().getMarkPosts());
+                    userRepository.save(userEntity.get());
+                }
+            } else throw new UserException("Blog doesn't exists!");
+        } else throw new UserException("User doesn't exists");
     }
 
     public UserEntity getUserById(Long userId) {
 
         return userRepository.findById(userId).orElse(null);
     }
+
     public ResponseEntity<ResponseObject> deleteBlogPost(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
 
@@ -160,11 +167,12 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ResponseObject("Not found", "Post not found", ""));
     }
+
     public ResponseEntity<ResponseObject> updateUser(Long userId, UserDTO userDTO) {
 
         Optional<UserEntity> userEntity = userRepository.findById(userId);
-        if(userEntity.isPresent()){
-            if(userDTO.getRole() != null) {
+        if (userEntity.isPresent()) {
+            if (userDTO.getRole() != null) {
                 Set<RoleEntity> roleEntities = new HashSet<>();
                 RoleEntity userRole = roleRepository.findByName(userDTO.getRole().toUpperCase());
                 roleEntities.add(userRole);
@@ -178,7 +186,7 @@ public class UserService {
                 userRepository.save(user);
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "updated successful", user));
-            }else{
+            } else {
                 UserEntity user = this.getUserById(userId);
                 user.setFullName(userDTO.getFullname());
                 user.setEmail(userDTO.getEmail());
@@ -206,6 +214,23 @@ public class UserService {
                 return dtoList;
             } else return new ArrayList<>();
         } else throw new UserException("User doesn't exists");
+    }
+
+    public boolean checkMarkPost(Long userId, Long postId) {
+        boolean result = false;
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+            if (blogPostEntity.isPresent()) {
+                if (!userEntity.get().getMarkPosts().isEmpty()) {
+                    for (BlogPostEntity entity : userEntity.get().getMarkPosts()) {
+                        if (entity.getId().equals(blogPostEntity.get().getId()))
+                            result = true;
+                    }
+                }
+                return result;
+            } else throw new UserException("Blog doesn't exists!");
+        } else throw new UserException("User doesn't exists!");
     }
 
     public BlogPostDTO convertPostToDTO(Long postId) {

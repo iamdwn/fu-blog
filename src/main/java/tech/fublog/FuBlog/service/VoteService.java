@@ -77,7 +77,7 @@ public class VoteService {
                 voteRepository.delete(voteEntity);
                 return null;
             } else {
-                NotificationEntity notificationEntity = notificationRepository.findByUserIdAndPostId(userEntity.get(), voteDTO.getPostId());
+                NotificationEntity notificationEntity = notificationRepository.findByUserIdAndPostIdAndContentLike(blogPostEntity.get().getAuthors(), voteDTO.getPostId(), userEntity.get().getFullName() + " was voted your post");
                 if (notificationEntity == null) {
                     notificationEntity = new NotificationEntity();
                     notificationEntity.setDelivered(false);

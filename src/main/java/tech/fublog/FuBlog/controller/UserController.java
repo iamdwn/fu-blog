@@ -25,6 +25,7 @@ public class UserController {
     private final UserService userService;
 
     private final UserRepository userRepository;
+
     @Autowired
     public UserController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
@@ -32,18 +33,38 @@ public class UserController {
     }
 
 
-
-
     @GetMapping("/getAll")
-    public List<UserEntity> getAllUser(){
-        return  userRepository.findAllByStatusIsTrue();
+    public List<UserEntity> getAllUser() {
+        return userRepository.findAllByStatusIsTrue();
     }
 
-    @PostMapping("/mark")
-    public ResponseEntity<ResponseObject> markPost(@RequestBody PostMarkDTO postMarkDTO) {
+    @PostMapping("/markAction/{action}")
+    public ResponseEntity<ResponseObject> markBook(@PathVariable String action, @RequestBody PostMarkDTO postMarkDTO) {
         try {
+            if (action.equals("mark")) {
+                userService.markPost(postMarkDTO.getUserId(), postMarkDTO.getPostId());
+            } else if (action.equals("unMark")) {
+                userService.unMarkPost(postMarkDTO.getUserId(), postMarkDTO.getPostId());
+            }
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "found", userService.markPost(postMarkDTO.getUserId(), postMarkDTO.getPostId())));
+                    .body(new ResponseObject("ok", "successfully", ""));
+        } catch (UserException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/checkMark")
+    public ResponseEntity<ResponseObject> checkMarkPost(@RequestBody PostMarkDTO postMarkDTO) {
+        try {
+            boolean result = userService.checkMarkPost(postMarkDTO.getUserId(), postMarkDTO.getPostId());
+            if (result)
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "You already marked this post", true));
+            else
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "You hasn't marked this post", false));
         } catch (UserException ex) {
             System.out.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -62,19 +83,22 @@ public class UserController {
 
         return userService.getActiveUser();
     }
+
     @GetMapping("/getUser/{userId}")
-    public ResponseEntity<?> getUserById(@PathVariable Long userId){
+    public ResponseEntity<?> getUserById(@PathVariable Long userId) {
         UserEntity user = userRepository.findByIdAndStatusIsTrue(userId);
-        if(user != null){
+        if (user != null) {
             return ResponseEntity.ok(user);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Don't find user!!!!"));
     }
+
     @DeleteMapping("/deleteBlog/{userId}")
     public ResponseEntity<ResponseObject> deleteBlog(@PathVariable Long userId) {
 
         return userService.deleteBlogPost(userId);
     }
+
     @PutMapping("/updateUser/{userId}")
     public ResponseEntity<?> updateBlog(
             @PathVariable Long userId,
