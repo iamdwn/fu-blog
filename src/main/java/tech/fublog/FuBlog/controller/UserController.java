@@ -48,11 +48,33 @@ public class UserController {
         }
     }
 
-    @PostMapping("/mark")
-    public ResponseEntity<ResponseObject> markPost(@RequestBody PostMarkDTO postMarkDTO) {
+    @PostMapping("/markAction/{action}")
+    public ResponseEntity<ResponseObject> markBook(@PathVariable String action, @RequestBody PostMarkDTO postMarkDTO) {
         try {
+            if (action.equals("mark")) {
+                userService.markPost(postMarkDTO.getUserId(), postMarkDTO.getPostId());
+            } else if (action.equals("unMark")) {
+                userService.unMarkPost(postMarkDTO.getUserId(), postMarkDTO.getPostId());
+            }
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "found", userService.markPost(postMarkDTO.getUserId(), postMarkDTO.getPostId())));
+                    .body(new ResponseObject("ok", "successfully", ""));
+        } catch (UserException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/checkMark")
+    public ResponseEntity<ResponseObject> checkMarkPost(@RequestBody PostMarkDTO postMarkDTO) {
+        try {
+            boolean result = userService.checkMarkPost(postMarkDTO.getUserId(), postMarkDTO.getPostId());
+            if (result)
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "You already marked this post", true));
+            else
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "You hasn't marked this post", false));
         } catch (UserException ex) {
             System.out.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -62,14 +84,8 @@ public class UserController {
 
     @GetMapping("/getMarkPost/{userId}")
     public ResponseEntity<ResponseObject> getMarkPostByUser(@PathVariable Long userId) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "found", userService.getMarkPostByUser(userId)));
-        } catch (UserException ex) {
-            System.out.println(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", userService.getMarkPostByUser(userId)));
     }
 
     @GetMapping("/getActiveUser")
