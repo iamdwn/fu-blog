@@ -29,7 +29,10 @@ public class FollowService {
     public void insertFollow(FollowRequestDTO followRequestDTO) {
         Optional<UserEntity> userFollower = userRepository.findById(followRequestDTO.getFollower());
         Optional<UserEntity> userFollowing = userRepository.findById(followRequestDTO.getFollowing());
-        if (userFollower.isPresent() && userFollowing.isPresent()) {
+        if (userFollower.isPresent()
+                && userFollower.get().getStatus()
+                && userFollowing.isPresent()
+                && userFollowing.get().getStatus()) {
             FollowEntity followEntity = followRepository.findByFollowerAndFollowing(userFollower.get(), userFollowing.get());
             if (followEntity == null) {
                 followEntity = new FollowEntity(userFollower.get(), userFollowing.get());
@@ -40,7 +43,8 @@ public class FollowService {
 
     public List<FollowResponseDTO> viewFollower(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
-        if (userEntity.isPresent()) {
+        if (userEntity.isPresent()
+                && userEntity.get().getStatus()) {
             Set<FollowEntity> set = userEntity.get().getFollowingList();
             if (!set.isEmpty()) {
                 List<FollowResponseDTO> dtoList = new ArrayList<>();

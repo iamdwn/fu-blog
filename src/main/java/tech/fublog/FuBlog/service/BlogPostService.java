@@ -216,7 +216,7 @@ public class BlogPostService {
 
         if (blogPostEntity.isPresent()
                 && categoryEntity.isPresent()
-                && userEntity.isPresent()) {
+                && userEntity.get().getStatus()) {
 
             BlogPostEntity blogPost = this.getBlogById(blogPostRequestDTO.getPostId());
 
@@ -456,6 +456,7 @@ public class BlogPostService {
         Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(blogPostRequestDTO.getCategoryName(),
                 blogPostRequestDTO.getParentCategoryId());
         if (userEntity.isPresent()
+                && userEntity.get().getStatus()
                 && categoryEntity.isPresent()) {
             BlogPostEntity blogPostEntity = new BlogPostEntity
                     (blogPostRequestDTO.getTypePost(),

@@ -68,7 +68,9 @@ public class VoteService {
     public VoteDTO insertVote(VoteDTO voteDTO) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(voteDTO.getPostId());
         Optional<UserEntity> userEntity = userRepository.findById(voteDTO.getUserId());
-        if (blogPostEntity.isPresent() && userEntity.isPresent()) {
+        if (blogPostEntity.isPresent()
+                && userEntity.isPresent()
+                && userEntity.get().getStatus()) {
             VoteEntity voteEntity = voteRepository.findByUserVoteAndPostVote(userEntity.get(), blogPostEntity.get());
             if (voteEntity != null) {
                 voteRepository.delete(voteEntity);

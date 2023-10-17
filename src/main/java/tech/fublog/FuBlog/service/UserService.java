@@ -57,14 +57,12 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
 
-
     public UserEntity saveUser(UserEntity user) {
 //        String pass = hashing.hasdPassword(user.getHashed_password());
 //        user.setHashed_password(pass);
         user.setHashedpassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
-
 
 
     public RoleEntity saveRole(RoleEntity role) {
@@ -74,10 +72,9 @@ public class UserService {
 
     public void addToUser(String username, String rolename) {
         UserEntity user = userRepository.findByUsername(username).get();
-        RoleEntity role  = roleRepository.findByName(rolename);
+        RoleEntity role = roleRepository.findByName(rolename);
         user.getRoles().add(role);
     }
-
 
 
     public List<UserInfoResponseDTO> getActiveUser() {
@@ -101,7 +98,6 @@ public class UserService {
     }
 
 
-
     public UserInfoResponseDTO getUserInfo(Long userId) {
         UserEntity user = userRepository.findByIdAndStatusIsTrue(userId);
         if (user != null) {
@@ -110,16 +106,16 @@ public class UserService {
     }
 
 
-    public List<UserEntity> getAllUser(){
+    public List<UserEntity> getAllUser() {
 //        Pageable pageable = PageRequest.of(page,size);
-        return  userRepository.findAll();
+        return userRepository.findAll();
     }
 
-    public PaginationResponseDTO getAllUsers(int page, int size){
+    public PaginationResponseDTO getAllUsers(int page, int size) {
         List<UserInfoResponseDTO> userDTOs = new ArrayList<>();
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrue(pageable);
-        for (UserEntity dto : pageResult.getContent()){
+        for (UserEntity dto : pageResult.getContent()) {
             userDTOs.add(convertUserDTO(dto));
         }
 
@@ -130,7 +126,8 @@ public class UserService {
 
     public void markPost(Long userId, Long postId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
-        if (userEntity.isPresent()) {
+        if (userEntity.isPresent()
+                && userEntity.get().getStatus()) {
             Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
             if (blogPostEntity.isPresent()) {
                 Set<BlogPostEntity> entitySet;
@@ -152,7 +149,8 @@ public class UserService {
 
     public void unMarkPost(Long userId, Long postId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
-        if (userEntity.isPresent()) {
+        if (userEntity.isPresent()
+                && userEntity.get().getStatus()) {
             Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
             if (blogPostEntity.isPresent()) {
                 if (!userEntity.get().getMarkPosts().isEmpty()) {
@@ -168,6 +166,7 @@ public class UserService {
 
         return userRepository.findById(userId).orElse(null);
     }
+
     public ResponseEntity<ResponseObject> deleteBlogPost(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
 
@@ -183,11 +182,12 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ResponseObject("Not found", "Post not found", ""));
     }
+
     public ResponseEntity<ResponseObject> updateUser(Long userId, UserDTO userDTO) {
 
         Optional<UserEntity> userEntity = userRepository.findById(userId);
-        if(userEntity.isPresent()){
-            if(userDTO.getRole() != null) {
+        if (userEntity.isPresent()) {
+            if (userDTO.getRole() != null) {
                 Set<RoleEntity> roleEntities = new HashSet<>();
                 RoleEntity userRole = roleRepository.findByName(userDTO.getRole().toUpperCase());
                 roleEntities.add(userRole);
@@ -201,7 +201,7 @@ public class UserService {
                 userRepository.save(user);
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "updated successful", user));
-            }else{
+            } else {
                 UserEntity user = this.getUserById(userId);
                 user.setFullName(userDTO.getFullName());
                 user.setEmail(userDTO.getEmail());
