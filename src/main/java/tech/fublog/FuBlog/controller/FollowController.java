@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tech.fublog.FuBlog.service.JwtService;
 
 import java.util.List;
 
@@ -18,10 +19,12 @@ import java.util.List;
 //@CrossOrigin(origins = "*")
 public class FollowController {
     private final FollowService followService;
+    private final JwtService jwtService;
 
     @Autowired
-    public FollowController(FollowService followService) {
+    public FollowController(FollowService followService, JwtService jwtService) {
         this.followService = followService;
+        this.jwtService = jwtService;
     }
 
     @GetMapping("/follower/view/{userId}")
@@ -77,12 +80,15 @@ public class FollowController {
     }
 
     @PostMapping("/followAction/{action}")
-    public ResponseEntity<ResponseObject> insertFollow(@PathVariable String action, @RequestBody FollowRequestDTO followRequestDTO) {
+    public ResponseEntity<ResponseObject> insertFollow(@RequestHeader("Authorization") String token,
+                                                       @PathVariable String action, @RequestBody FollowRequestDTO followRequestDTO) {
         try {
-            if (action.equals("follow"))
-                followService.insertFollow(followRequestDTO);
-            else if (action.equals("unfollow"))
-                followService.unFollow(followRequestDTO);
+            if (jwtService.extractTokenToGetUser(token).isEmpty()) {
+                if (action.equals("follow"))
+                    followService.insertFollow(followRequestDTO);
+                else if (action.equals("unfollow"))
+                    followService.unFollow(followRequestDTO);
+            } else throw new FollowException("");
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "successfully", ""));
         } catch (FollowException ex) {
@@ -91,6 +97,7 @@ public class FollowController {
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
+
 
     @PutMapping("/checkFollowAction")
     public ResponseEntity<ResponseObject> checkFollow(@RequestBody FollowRequestDTO followRequestDTO) {
