@@ -92,7 +92,7 @@ public class FollowController {
         }
     }
 
-    @GetMapping("/checkFollowAction")
+    @PutMapping("/checkFollowAction")
     public ResponseEntity<ResponseObject> checkFollow(@RequestBody FollowRequestDTO followRequestDTO) {
         try {
             boolean result = followService.checkFollow(followRequestDTO);

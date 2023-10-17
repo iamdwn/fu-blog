@@ -65,7 +65,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/checkMark")
+    @PutMapping("/checkMark")
     public ResponseEntity<ResponseObject> checkMarkPost(@RequestBody PostMarkDTO postMarkDTO) {
         try {
             boolean result = userService.checkMarkPost(postMarkDTO.getUserId(), postMarkDTO.getPostId());
