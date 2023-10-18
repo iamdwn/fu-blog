@@ -5,11 +5,19 @@ pipeline {
     
     stages {
 
-        stage('Packaging/Pushing imagae') {
+        stage('Packaging') {
+
+            steps {
+                
+                sh 'docker build --pull --rm -f Dockerfile -t fublogapi:latest .'
+                
+            }
+        }
+
+        stage('Push to DockerHub') {
 
             steps {
                 withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
-                    sh 'docker build --pull --rm -f Dockerfile -t fublogapi:latest .'
                     sh 'docker tag fublogapi:latest chalsfptu/fublogapi:latest'
                     sh 'docker push chalsfptu/fublogapi:latest'
                 }
