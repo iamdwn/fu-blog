@@ -1,16 +1,14 @@
 package tech.fublog.FuBlog.controller;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.auth.MessageResponse;
-import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.PostMarkDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.exception.UserException;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.repository.UserRepository;
+import tech.fublog.FuBlog.service.JwtService;
 import tech.fublog.FuBlog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,19 +22,21 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
+    private final JwtService jwtService;
+
     private final UserRepository userRepository;
+
     @Autowired
-    public UserController(UserService userService, UserRepository userRepository) {
+    public UserController(UserService userService, JwtService jwtService, UserRepository userRepository) {
         this.userService = userService;
+        this.jwtService = jwtService;
         this.userRepository = userRepository;
     }
 
 
-
-
     @GetMapping("/getAll")
-    public List<UserEntity> getAllUser(){
-        return  userRepository.findAllByStatusIsTrue();
+    public List<UserEntity> getAllUser() {
+        return userRepository.findAllByStatusIsTrue();
     }
 
     @PostMapping("/mark")
@@ -62,19 +62,22 @@ public class UserController {
 
         return userService.getActiveUser();
     }
+
     @GetMapping("/getUser/{userId}")
-    public ResponseEntity<?> getUserById(@PathVariable Long userId){
+    public ResponseEntity<?> getUserById(@PathVariable Long userId) {
         UserEntity user = userRepository.findByIdAndStatusIsTrue(userId);
-        if(user != null){
+        if (user != null) {
             return ResponseEntity.ok(user);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Don't find user!!!!"));
     }
+
     @DeleteMapping("/deleteBlog/{userId}")
     public ResponseEntity<ResponseObject> deleteBlog(@PathVariable Long userId) {
 
         return userService.deleteBlogPost(userId);
     }
+
     @PutMapping("/updateUser/{userId}")
     public ResponseEntity<?> updateBlog(
             @PathVariable Long userId,
@@ -86,4 +89,27 @@ public class UserController {
         return userService.updateUser(userId, userDTO);
     }
 
+    @GetMapping("/getUserBanned")
+    public ResponseEntity<ResponseObject> getUserBanned(@RequestHeader("Authorization") String token) {
+        List<String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
+        if (roles != null) {
+            if (!roles.isEmpty()) {
+                for (String role : roles) {
+                    if(!role.toUpperCase().equals("USER")){
+                        List<UserEntity> usersBanned = userRepository.findAllByStatusIsFalse();
+                        return ResponseEntity.status(HttpStatus.OK)
+                                .body(new ResponseObject("ok", "found", usersBanned ));
+                    }
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "Role is not sp!!", "" ));
+                }
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "Role is empty!!", "" ));
+            }
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "Role is null!!", "" ));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("failed", "token is wrong or role is not sp!!", ""));
+    }
 }

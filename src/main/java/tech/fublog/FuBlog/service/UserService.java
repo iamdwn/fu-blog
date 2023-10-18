@@ -9,10 +9,7 @@ import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
-import tech.fublog.FuBlog.entity.BlogPostEntity;
-import tech.fublog.FuBlog.entity.PostTagEntity;
-import tech.fublog.FuBlog.entity.RoleEntity;
-import tech.fublog.FuBlog.entity.UserEntity;
+import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.exception.UserException;
 import tech.fublog.FuBlog.hash.Hashing;
@@ -69,7 +66,7 @@ public class UserService {
 
 
     public void addToUser(String username, String rolename) {
-        UserEntity user = userRepository.findByUsername(username).get();
+        UserEntity user = userRepository.findByUsernameAndStatusTrue(username).get();
         RoleEntity role  = roleRepository.findByName(rolename);
         user.getRoles().add(role);
     }
@@ -217,6 +214,7 @@ public class UserService {
             UserEntity userEntity = userRepository.findById(blogPostEntity.getAuthors().getId()).orElse(null);
 
             Set<RoleEntity> roleEntities = userEntity.getRoles();
+//            Set<CategoryEntity> categoryEntities = userEntity.getCategories();
             Set<PostTagEntity> postTagEntity = blogPostEntity.getPostTags();
             Set<TagDTO> tagDTOs = postTagEntity.stream()
                     .map(tagEntity -> {
@@ -230,6 +228,10 @@ public class UserService {
             List<String> roleNames = roleEntities.stream()
                     .map(RoleEntity::getName)
                     .collect(Collectors.toList());
+
+//            List<String> categoryNames = categoryEntities.stream()
+//                    .map(CategoryEntity::getName)
+//                    .collect(Collectors.toList());
 
             UserDTO userDTO = new UserDTO(userEntity.getFullName(),
                     userEntity.getPassword(),
@@ -248,7 +250,7 @@ public class UserService {
                     blogPostEntity.getTitle(),
                     blogPostEntity.getContent(),
                     blogPostEntity.getImage(),
-                    blogPostEntity.getCategory().getCategoryName(),
+                    blogPostEntity.getCategory().getName(),
                     blogPostEntity.getCategory().getParentCategory(),
                     tagDTOs,
                     userDTO,

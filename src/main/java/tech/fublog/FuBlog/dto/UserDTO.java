@@ -20,6 +20,7 @@ public class UserDTO {
     private Boolean status;
     private String role;
     private List<String> roles;
+//    private List<String> categories;
 
 
 }

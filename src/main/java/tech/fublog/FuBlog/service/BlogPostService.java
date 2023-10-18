@@ -60,6 +60,7 @@ public class BlogPostService {
             UserEntity userEntity = userRepository.findById(blogPostEntity.getAuthors().getId()).orElse(null);
 
             Set<RoleEntity> roleEntities = userEntity.getRoles();
+//            Set<CategoryEntity> categoryEntities = userEntity.getCategories();
             Set<PostTagEntity> postTagEntity = blogPostEntity.getPostTags();
             Set<TagDTO> tagDTOs = postTagEntity.stream()
                     .map(tagEntity -> {
@@ -73,6 +74,10 @@ public class BlogPostService {
             List<String> roleNames = roleEntities.stream()
                     .map(RoleEntity::getName)
                     .collect(Collectors.toList());
+
+//            List<String> categoryNames = categoryEntities.stream()
+//                    .map(CategoryEntity::getName)
+//                    .collect(Collectors.toList());
 
             UserDTO userDTO = new UserDTO(userEntity.getFullName(),
                     userEntity.getPassword(),
@@ -91,7 +96,7 @@ public class BlogPostService {
                     blogPostEntity.getTitle(),
                     blogPostEntity.getContent(),
                     blogPostEntity.getImage(),
-                    blogPostEntity.getCategory().getCategoryName(),
+                    blogPostEntity.getCategory().getName(),
                     blogPostEntity.getCategory().getParentCategory(),
                     tagDTOs,
                     userDTO,
@@ -118,6 +123,7 @@ public class BlogPostService {
             UserEntity userEntity = userRepository.findById(blogPostEntity.getAuthors().getId()).orElse(null);
 
             Set<RoleEntity> roleEntities = userEntity.getRoles();
+//            Set<CategoryEntity> categoryEntities = userEntity.getCategories();
             Set<PostTagEntity> postTagEntity = blogPostEntity.getPostTags();
             Set<TagDTO> tagDTOs = postTagEntity.stream()
                     .map(tagEntity -> {
@@ -131,6 +137,10 @@ public class BlogPostService {
             List<String> roleNames = roleEntities.stream()
                     .map(RoleEntity::getName)
                     .collect(Collectors.toList());
+
+//            List<String> categoryNames = categoryEntities.stream()
+//                    .map(CategoryEntity::getName)
+//                    .collect(Collectors.toList());
 
             UserDTO userDTO = new UserDTO(userEntity.getFullName(),
                     userEntity.getPassword(),
@@ -146,7 +156,7 @@ public class BlogPostService {
                     blogPostEntity.getTitle(),
                     blogPostEntity.getContent(),
                     blogPostEntity.getImage(),
-                    blogPostEntity.getCategory().getCategoryName(),
+                    blogPostEntity.getCategory().getName(),
                     blogPostEntity.getCategory().getParentCategory(),
                     tagDTOs,
                     userDTO,
@@ -344,7 +354,7 @@ public class BlogPostService {
             Optional<CategoryEntity> categoryOptional = categoryRepository.findById(cateroryId);
 //            pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
 
-            pageResult = findBlogByCategory(categoryOptional.get().getCategoryName(),
+            pageResult = findBlogByCategory(categoryOptional.get().getName(),
                             categoryOptional.get().getParentCategory() == null ? null
                                     : categoryOptional.get().getParentCategory().getId(), pageNumber, size);
         }
@@ -461,7 +471,7 @@ public class BlogPostService {
 
     public Optional<CategoryEntity> findCategoryByNameAndParentId(String name, Long parentCategoryId) {
         CategoryEntity parentCategory = categoryRepository.findParentCategoryById(parentCategoryId);
-        return categoryRepository.findByCategoryNameAndParentCategory(name, parentCategory);
+        return categoryRepository.findByNameAndParentCategory(name, parentCategory);
     }
 
     public List<BlogPostEntity> findByTagName(String tagName) {

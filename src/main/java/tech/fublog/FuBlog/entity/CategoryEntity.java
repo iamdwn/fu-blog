@@ -11,7 +11,7 @@ import java.util.*;
 @Data
 @Getter
 @Setter
-@AllArgsConstructor
+//@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Category")
 @EntityListeners(AuditingEntityListener.class)
@@ -21,11 +21,11 @@ public class CategoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private String categoryName;
+    @Column(name = "category_name") // Ánh xạ cột trong cơ sở dữ liệu
+    private String name;
 
     @OneToMany(mappedBy = "category")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<BlogPostEntity> blogPosts = new HashSet<>();
 
     @ManyToOne
@@ -33,9 +33,17 @@ public class CategoryEntity {
     @JoinColumn(name = "parentCategoryId")
     private CategoryEntity parentCategory;
 
+    @ManyToMany(mappedBy = "categories")
+    @JsonIgnore
+    private Set<UserEntity> user = new HashSet<>();
+
+    public CategoryEntity(String name) {
+        this.name = name;
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, name);
     }
 
     @Override
@@ -43,6 +51,7 @@ public class CategoryEntity {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         CategoryEntity category = (CategoryEntity) obj;
-        return Objects.equals(id, category.getId());
+        return Objects.equals(id, category.getId()) &&
+                Objects.equals(name, category.getName());
     }
 }

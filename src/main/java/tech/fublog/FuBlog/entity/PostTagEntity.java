@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,10 +21,12 @@ public class PostTagEntity {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "post_id")
     private BlogPostEntity post;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "tag_id")
     private TagEntity tag;
 
