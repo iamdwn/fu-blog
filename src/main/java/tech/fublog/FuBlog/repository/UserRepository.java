@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
-    Optional<UserEntity> findByUsername(String userName);
+    Optional<UserEntity> findByUsernameAndStatusTrue(String userName);
 
     Boolean existsByUsername(String username);
 
@@ -21,10 +21,12 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     List<UserEntity> findAllByOrderByPointDesc();
 
-    List<UserEntity> findAllByStatusIsTrue();
     Page<UserEntity> findAllByStatusIsTrue(Pageable pageable);
 
     UserEntity findByIdAndStatusIsTrue(Long userId);
+    List<UserEntity> findAllByStatusIsFalse();
+
+
 
 }
 

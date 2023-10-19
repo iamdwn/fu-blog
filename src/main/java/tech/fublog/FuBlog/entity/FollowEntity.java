@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -20,10 +21,12 @@ public class FollowEntity {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "follower_Id")
     private UserEntity follower;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "following_Id")
     private UserEntity following;
 

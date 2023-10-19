@@ -13,9 +13,9 @@ import java.util.Optional;
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
 
-    Optional<CategoryEntity> findByCategoryName(String categoryName);
+    Optional<CategoryEntity> findByName(String categoryName);
 
-    Optional<CategoryEntity> findByCategoryNameAndParentCategory(String categoryName, CategoryEntity categoryEntity);
+    Optional<CategoryEntity> findByNameAndParentCategory(String categoryName, CategoryEntity categoryEntity);
 
     List<CategoryEntity> findByParentCategory(CategoryEntity categoryEntity);
 
@@ -24,7 +24,7 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
 
     List<CategoryEntity> findByParentCategoryIsNull();
 
-    Optional<CategoryEntity> findByCategoryNameAndParentCategoryIsNull(String categoryName);
+    Optional<CategoryEntity> findByNameAndParentCategoryIsNull(String categoryName);
 
     CategoryEntity findParentCategoryById(Long id);
 }

@@ -2,8 +2,10 @@ package tech.fublog.FuBlog.service;
 
 import tech.fublog.FuBlog.auth.AuthenticationReponse;
 import tech.fublog.FuBlog.auth.AuthenticationRequest;
+import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
+import tech.fublog.FuBlog.repository.CategoryCustomRepo;
 import tech.fublog.FuBlog.repository.RoleCustomRepo;
 import tech.fublog.FuBlog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,27 +24,43 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     private final RoleCustomRepo roleCustomRepo;
+    private final CategoryCustomRepo categoryCustomRepo;
     private final JwtService jwtService;
 
     public AuthenticationReponse authenticate(AuthenticationRequest authenticationRequest){
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
-        UserEntity user = userRepository.findByUsername(authenticationRequest.getUsername()).orElseThrow();
+        UserEntity user = userRepository.findByUsernameAndStatusTrue(authenticationRequest.getUsername()).orElseThrow();
         String fullname = user.getFullName();
         String password = user.getHashedpassword();
         String email = user.getEmail();
         Long id = user.getId();
         String picture = user.getPicture();
         List<RoleEntity> role = null;
+        List<CategoryEntity> category = null;
         if(user != null){
             role = roleCustomRepo.getRole(user);
+            category = categoryCustomRepo.getCategory(user);
         }
+
+
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        Set<RoleEntity> set = new HashSet<>();
-        role.stream().forEach(c -> set.add(new RoleEntity(c.getName())));
-        user.setRoles(set);
-        set.stream().forEach(i -> authorities.add(new SimpleGrantedAuthority(i.getName())));
+        Set<RoleEntity> setRole = new HashSet<>();
+        role.stream().forEach(r -> setRole.add(new RoleEntity(r.getName())));
+//        System.out.println(setRole);
+        Set<CategoryEntity> setCategory = new HashSet<>();
+        category.stream().forEach(c -> setCategory.add(new CategoryEntity((c.getName()))));
+//        System.out.println(category);
+//        System.out.println(setCategory);
+        user.setCategories(setCategory);
+        user.setRoles(setRole);
+        setRole.stream().forEach(i -> authorities.add(new SimpleGrantedAuthority(i.getName())));
+        setCategory.stream().forEach(a -> authorities.add(new SimpleGrantedAuthority(a.getName())));
         var jwtToken = jwtService.generateToken(user, authorities);
         var jwtRefreshToken = jwtService.generateRefreshToken(user, authorities);
+
+        return AuthenticationReponse.builder().token(jwtToken).refreshToken(jwtRefreshToken).build();
+
+    }
 //        AuthenticationReponse authenticationReponse = new AuthenticationReponse();
 //        authenticationReponse.setToken(jwtToken);
 //        authenticationReponse.setRefreshToken(jwtRefreshToken);
@@ -51,11 +69,6 @@ public class AuthenticationService {
 //        authenticationReponse.setEmail(email);
 //        authenticationReponse.setId(id);
 //        authenticationReponse.setPassword(password);
-//
 //        return authenticationReponse;
-        return AuthenticationReponse.builder().token(jwtToken).refreshToken(jwtRefreshToken).build();
-
-    }
-
 
 }

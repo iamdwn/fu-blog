@@ -33,6 +33,9 @@ public class  JwtService {
 //                .withClaim("picture", user.getPicture())
                 .withExpiresAt(new Date(System.currentTimeMillis() + 3600*1000))
                 .withClaim("roles", authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+//                .withClaim("categories", authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+
+//                .withClaim("categories", user.getCategories().stream().toList())
                 .sign(algorithm);
     }
 

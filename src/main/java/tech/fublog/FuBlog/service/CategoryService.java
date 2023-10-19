@@ -48,7 +48,7 @@ public class CategoryService {
     private CategoryDTO convertCategoryToDTO(CategoryEntity categoryEntity) {
         CategoryDTO CategoryDTO = new CategoryDTO();
         CategoryDTO.setCategoryId(categoryEntity.getId());
-        CategoryDTO.setCategoryName(categoryEntity.getCategoryName());
+        CategoryDTO.setCategoryName(categoryEntity.getName());
         if (categoryEntity.getParentCategory() != null)
             CategoryDTO.setParentCategoryId(categoryEntity.getParentCategory().getId());
         return CategoryDTO;
@@ -57,7 +57,7 @@ public class CategoryService {
     private CategoryResponseDTO convertResponseCategoryToDTO(CategoryEntity categoryEntity) {
         CategoryResponseDTO responseCategoryDTO = new CategoryResponseDTO();
         responseCategoryDTO.setCategoryId(categoryEntity.getId());
-        responseCategoryDTO.setCategoryName(categoryEntity.getCategoryName());
+        responseCategoryDTO.setCategoryName(categoryEntity.getName());
         if (categoryEntity.getParentCategory() != null)
             responseCategoryDTO.setParentCategoryId(categoryEntity.getParentCategory().getId());
         List<CategoryEntity> subCategory = categoryRepository.findByParentCategory(categoryEntity);

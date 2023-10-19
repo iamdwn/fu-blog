@@ -13,10 +13,7 @@ import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
-import tech.fublog.FuBlog.entity.BlogPostEntity;
-import tech.fublog.FuBlog.entity.PostTagEntity;
-import tech.fublog.FuBlog.entity.RoleEntity;
-import tech.fublog.FuBlog.entity.UserEntity;
+import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.exception.UserException;
 import tech.fublog.FuBlog.hash.Hashing;
@@ -57,6 +54,7 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
 
+
     public UserEntity saveUser(UserEntity user) {
 //        String pass = hashing.hasdPassword(user.getHashed_password());
 //        user.setHashed_password(pass);
@@ -65,19 +63,21 @@ public class UserService {
     }
 
 
+
     public RoleEntity saveRole(RoleEntity role) {
         return null;
     }
 
 
     public void addToUser(String username, String rolename) {
-        UserEntity user = userRepository.findByUsername(username).get();
-        RoleEntity role = roleRepository.findByName(rolename);
+        UserEntity user = userRepository.findByUsernameAndStatusTrue(username).get();
+        RoleEntity role  = roleRepository.findByName(rolename);
         user.getRoles().add(role);
     }
 
 
-    public List<UserInfoResponseDTO> getActiveUser() {
+
+    public ResponseEntity<ResponseObject> getActiveUser() {
         List<UserEntity> userEntities = userRepository.findAllByOrderByPointDesc();
         List<UserInfoResponseDTO> highestPointUser = new ArrayList<>();
 
@@ -94,8 +94,11 @@ public class UserService {
             }
         }
 
-        return highestPointUser;
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new tech.fublog.FuBlog.model.ResponseObject("found", "list found",
+                        highestPointUser));
     }
+
 
 
     public UserInfoResponseDTO getUserInfo(Long userId) {
@@ -106,9 +109,9 @@ public class UserService {
     }
 
 
-    public List<UserEntity> getAllUser() {
+    public List<UserEntity> getAllUser(){
 //        Pageable pageable = PageRequest.of(page,size);
-        return userRepository.findAll();
+        return  userRepository.findAll();
     }
 
     public PaginationResponseDTO getAllUsers(int page, int size) {
@@ -289,7 +292,7 @@ public class UserService {
                     blogPostEntity.getTitle(),
                     blogPostEntity.getContent(),
                     blogPostEntity.getImage(),
-                    blogPostEntity.getCategory().getCategoryName(),
+                    blogPostEntity.getCategory().getName(),
                     blogPostEntity.getCategory().getParentCategory(),
                     tagDTOs,
                     userDTO,

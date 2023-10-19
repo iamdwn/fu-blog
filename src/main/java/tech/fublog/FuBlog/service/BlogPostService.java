@@ -92,7 +92,7 @@ public class BlogPostService {
                     blogPostEntity.getTitle(),
                     blogPostEntity.getContent(),
                     blogPostEntity.getImage(),
-                    blogPostEntity.getCategory().getCategoryName(),
+                    blogPostEntity.getCategory().getName(),
                     blogPostEntity.getCategory().getParentCategory(),
                     tagDTOs,
                     userDTO,
@@ -157,7 +157,7 @@ public class BlogPostService {
                     blogPostEntity.getTitle(),
                     blogPostEntity.getContent(),
                     blogPostEntity.getImage(),
-                    blogPostEntity.getCategory().getCategoryName(),
+                    blogPostEntity.getCategory().getName(),
                     blogPostEntity.getCategory().getParentCategory(),
                     tagDTOs,
                     userDTO,
@@ -258,7 +258,7 @@ public class BlogPostService {
             if (!pageResult.isEmpty()) {
                 List<BlogPostEntity> pageContent = pageResult.getContent();
                 blogPostDTOList = new ArrayList<>();
-                for (BlogPostEntity entity : pageResult) {
+                for (BlogPostEntity entity : pageContent) {
                     blogPostDTOList.add(convertBlogPostDTO(entity));
                 }
             }
@@ -360,7 +360,7 @@ public class BlogPostService {
             Optional<CategoryEntity> categoryOptional = categoryRepository.findById(cateroryId);
 //            pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
 
-            pageResult = findBlogByCategory(categoryOptional.get().getCategoryName(),
+            pageResult = findBlogByCategory(categoryOptional.get().getName(),
                     categoryOptional.get().getParentCategory() == null ? null
                             : categoryOptional.get().getParentCategory().getId(), pageNumber, size);
         }
@@ -495,7 +495,7 @@ public class BlogPostService {
 
     public Optional<CategoryEntity> findCategoryByNameAndParentId(String name, Long parentCategoryId) {
         CategoryEntity parentCategory = categoryRepository.findParentCategoryById(parentCategoryId);
-        return categoryRepository.findByCategoryNameAndParentCategory(name, parentCategory);
+        return categoryRepository.findByNameAndParentCategory(name, parentCategory);
     }
 
     public PaginationResponseDTO findByTagName(String tagName, int pageNumber, int size) {
