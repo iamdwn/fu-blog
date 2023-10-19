@@ -4,15 +4,19 @@ import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.dto.PostMarkDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
+import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.exception.UserException;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.repository.UserRepository;
 import tech.fublog.FuBlog.service.BlogPostService;
+import tech.fublog.FuBlog.service.JwtService;
 import tech.fublog.FuBlog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth/user")
@@ -21,22 +25,24 @@ public class UserController {
     private final UserService userService;
     private final BlogPostService blogPostService;
 
+    private final JwtService jwtService;
+
     private final UserRepository userRepository;
+
     @Autowired
-    public UserController(UserService userService, BlogPostService blogPostService, UserRepository userRepository) {
+    public UserController(UserService userService, BlogPostService blogPostService, JwtService jwtService, UserRepository userRepository) {
         this.userService = userService;
         this.blogPostService = blogPostService;
+        this.jwtService = jwtService;
         this.userRepository = userRepository;
     }
-
-
 
 
     @GetMapping("/getAll/{page}/{size}")
     public ResponseEntity<ResponseObject> getAllUser(
             @PathVariable int page,
             @PathVariable int size
-    ){
+    ) {
         try {
             PaginationResponseDTO users = userService.getAllUsers(page, size);
             return ResponseEntity.status(HttpStatus.OK)
@@ -114,16 +120,37 @@ public class UserController {
     }
 
     @DeleteMapping("/deleteUser/{userId}")
-    public ResponseEntity<ResponseObject> deleteUser(@PathVariable Long userId) {
-        try {
+    public ResponseEntity<ResponseObject> deleteUser(@RequestHeader("Authorization") String token,
+                                                     @PathVariable Long userId) {
+
+        List<String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
+        if (roles != null) {
+            if (!roles.isEmpty()) {
+                for (String role : roles) {
+                    if (!role.toUpperCase().equals("USER")) {
+                        try {
+                            return ResponseEntity.status(HttpStatus.OK)
+                                    .body(new ResponseObject("ok", "found", userService.deleteBlogPost(userId)));
+                        } catch (UserException ex) {
+                            System.out.println(ex.getMessage());
+                            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+                        }
+                    }
+                    return ResponseEntity.status(HttpStatus .OK)
+                            .body(new ResponseObject("ok", "Role is not sp!!", ""));
+                }
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "Role is empty!!", ""));
+            }
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "found", userService.deleteBlogPost(userId)));
-        } catch (UserException ex) {
-            System.out.println(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+                    .body(new ResponseObject("ok", "Role is null!!", ""));
         }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("failed", "token is wrong or role is not sp!!", ""));
+
     }
+
 
     @PutMapping("/updateUser/{userId}")
     public ResponseEntity<?> updateUser(
@@ -166,6 +193,30 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
+    }
+
+    @GetMapping("/getUserBanned")
+    public ResponseEntity<ResponseObject> getUserBanned(@RequestHeader("Authorization") String token) {
+        List<String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
+        if (roles != null) {
+            if (!roles.isEmpty()) {
+                for (String role : roles) {
+                    if (!role.toUpperCase().equals("USER")) {
+                        List<UserEntity> usersBanned = userRepository.findAllByStatusIsFalse();
+                        return ResponseEntity.status(HttpStatus.OK)
+                                .body(new ResponseObject("ok", "found", usersBanned));
+                    }
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "Role is not sp!!", ""));
+                }
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "Role is empty!!", ""));
+            }
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "Role is null!!", ""));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("failed", "token is wrong or role is not sp!!", ""));
     }
 
 }

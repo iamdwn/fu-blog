@@ -1,6 +1,5 @@
 package tech.fublog.FuBlog.controller;
 
-import org.springframework.data.domain.Page;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.request.BlogPostRequestDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
@@ -25,22 +24,23 @@ import java.util.List;
 public class BlogPostController {
     private final BlogPostService blogPostService;
     private final ApprovalRequestService approvalRequestService;
-        private final VoteService voteService;
-        private final CommentService commentService;
+    private final VoteService voteService;
+    private final CommentService commentService;
+    private final JwtService jwtService;
     private final PostTagService postTagService;
 
     @Autowired
     public BlogPostController(BlogPostService blogPostService, ApprovalRequestService approvalRequestService,
                               VoteService voteService, CommentService commentService,
-                              PostTagService postTagService
+                              JwtService jwtService, PostTagService postTagService
     ) {
         this.blogPostService = blogPostService;
         this.approvalRequestService = approvalRequestService;
         this.voteService = voteService;
         this.commentService = commentService;
+        this.jwtService = jwtService;
         this.postTagService = postTagService;
     }
-
 
 
     @DeleteMapping("/deleteBlogById/{postId}")
@@ -83,13 +83,33 @@ public class BlogPostController {
     }
 
     @GetMapping("/getPinnedBlog")
-    public ResponseEntity<ResponseObject> getPinnedBlog(){
-        return  blogPostService.getPinnedBlog();
+    public ResponseEntity<ResponseObject> getPinnedBlog() {
+                        return blogPostService.getPinnedBlog();
     }
 
     @PostMapping("/pinBlogAction/{postId}")
-    public ResponseEntity<ResponseObject> pinBlog(@PathVariable Long postId){
-        return  blogPostService.pinBlogAction(postId);
+    public ResponseEntity<ResponseObject> pinBlog(@RequestHeader("Authorization") String token,
+                                                  @PathVariable Long postId) {
+
+        List<String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
+        if (roles != null) {
+            if (!roles.isEmpty()) {
+                for (String role : roles) {
+                    if (!role.toUpperCase().equals("USER")) {
+                        return blogPostService.pinBlogAction(postId);
+                    }
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "Role is not sp!!", ""));
+                }
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "Role is empty!!", ""));
+            }
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "Role is null!!", ""));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("failed", "token is wrong or role is not sp!!", ""));
+
     }
 
 
@@ -107,7 +127,7 @@ public class BlogPostController {
 
     @GetMapping("/getBlogPostByAuthor/{userId}/{page}/{size}")
     ResponseEntity<ResponseObject> getBlogPostByAuthor(@PathVariable Long userId,
-    @PathVariable int page, @PathVariable int size) {
+                                                       @PathVariable int page, @PathVariable int size) {
         try {
             PaginationResponseDTO dtoList = blogPostService.getBlogPostByAuthor(userId, page, size);
             return ResponseEntity.status(HttpStatus.OK)
@@ -153,6 +173,7 @@ public class BlogPostController {
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
+
     @GetMapping("/getPopularBlogPostByVote")
     public ResponseEntity<ResponseObject> getPopularBlogByVote() {
         try {
@@ -221,7 +242,7 @@ public class BlogPostController {
 
     @GetMapping("/bytag/{page}/{size}")
     public ResponseEntity<ResponseObject> getBlogPostsByTag(@RequestParam(name = "tag") String tagName,
-                                                                   @PathVariable int page, @PathVariable int size) {
+                                                            @PathVariable int page, @PathVariable int size) {
         try {
             PaginationResponseDTO blogPosts = blogPostService.findByTagName(tagName, page, size);
             return ResponseEntity.status(HttpStatus.OK)

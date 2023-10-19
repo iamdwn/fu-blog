@@ -19,9 +19,6 @@ import java.util.stream.Stream;
 
 @Repository
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
-
-    List<BlogPostEntity> findAllByOrderByViewDesc();
-
     List<BlogPostEntity> findByIsApproved(Boolean isApproved);
 
     List<BlogPostEntity> findByTitleLike(String title);
@@ -35,7 +32,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
 
     @Query("SELECT bp FROM BlogPostEntity bp WHERE bp.category IN:categoryEntityList AND " +
-            "bp.isApproved = true AND bp.status = true ORDER BY bp.category.categoryName asc ")
+            "bp.isApproved = true AND bp.status = true ORDER BY bp.category.name asc ")
     Page<BlogPostEntity> findByCategoryInAndIsApprovedTrueAndStatusTrue(@Param("categoryEntityList") List<CategoryEntity> categoryEntityList,
                                                                         Pageable pageable);
 

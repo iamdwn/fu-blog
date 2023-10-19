@@ -50,6 +50,9 @@ public class UserEntity implements UserDetails {
     @Column
     private Double point;
 
+    @Column
+    private String reason;
+
     @ManyToMany
     @JsonIgnore
     @JoinTable(name = "user_mark_post",
@@ -59,7 +62,7 @@ public class UserEntity implements UserDetails {
 
 
     @OneToMany(mappedBy = "authors")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<BlogPostEntity> blogAuthors = new HashSet<>();
 //    @OneToMany(mappedBy = "authorsModified")
 //    private Set<BlogPostEntity> blogAuthorsModified = new HashSet<>();
@@ -102,6 +105,13 @@ public class UserEntity implements UserDetails {
             joinColumns = @JoinColumn(name = "Users_Id"),
             inverseJoinColumns = @JoinColumn(name = "Roles_Id"))
     private Set<RoleEntity> roles = new HashSet<>();
+
+    @ManyToMany
+    @JsonIgnore
+    @JoinTable(name = "user_category",
+            joinColumns = @JoinColumn(name = "Users_Id"),
+            inverseJoinColumns = @JoinColumn(name = "Categories_Id"))
+    private Set<CategoryEntity> categories = new HashSet<>();
 
     public UserEntity(String fullName, String username, String email, String hashedpassword, String picture, Boolean status,Boolean isVerify,Double point) {
         this.fullName = fullName;
