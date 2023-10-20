@@ -1,8 +1,13 @@
 package tech.fublog.FuBlog.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tech.fublog.FuBlog.dto.response.NotificationDTO;
 import tech.fublog.FuBlog.entity.NotificationEntity;
+import tech.fublog.FuBlog.exception.BlogPostException;
+import tech.fublog.FuBlog.exception.NotificationException;
+import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.NotificationStorageService;
 
 import java.util.List;
@@ -20,8 +25,15 @@ public class NotificationStorageController {
     }
 
     @GetMapping("/{userID}")
-    public ResponseEntity<List<NotificationEntity>> getNotificationsByUserID(@PathVariable Long userID) {
-        return ResponseEntity.ok(notifService.getNotificationsByUserID(userID));
+    public ResponseEntity<ResponseObject> getNotificationsByUserID(@PathVariable Long userID) {
+        try {
+        List<NotificationDTO> notis = notifService.getNotificationsByUserID(userID);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "notification found", notis));
+        } catch (NotificationException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
     }
 
     @PatchMapping("/read/{notifID}")
