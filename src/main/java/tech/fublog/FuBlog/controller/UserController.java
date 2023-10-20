@@ -120,34 +120,15 @@ public class UserController {
     }
 
     @DeleteMapping("/deleteUser/{userId}")
-    public ResponseEntity<ResponseObject> deleteUser(@RequestHeader("Authorization") String token,
-                                                     @PathVariable Long userId) {
-
-        List<String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
-        if (roles != null) {
-            if (!roles.isEmpty()) {
-                for (String role : roles) {
-                    if (!role.toUpperCase().equals("USER")) {
-                        try {
-                            return ResponseEntity.status(HttpStatus.OK)
-                                    .body(new ResponseObject("ok", "found", userService.deleteBlogPost(userId)));
-                        } catch (UserException ex) {
-                            System.out.println(ex.getMessage());
-                            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-                        }
-                    }
-                    return ResponseEntity.status(HttpStatus .OK)
-                            .body(new ResponseObject("ok", "Role is not sp!!", ""));
-                }
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "Role is empty!!", ""));
-            }
+    public ResponseEntity<ResponseObject> deleteUser(@PathVariable Long userId) {
+        try {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "Role is null!!", ""));
+                    .body(new ResponseObject("ok", "found", userService.deleteBlogPost(userId)));
+        } catch (UserException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseObject("failed", "token is wrong or role is not sp!!", ""));
 
     }
 

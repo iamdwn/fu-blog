@@ -83,8 +83,28 @@ public class BlogPostController {
     }
 
     @GetMapping("/getPinnedBlog")
-    public ResponseEntity<ResponseObject> getPinnedBlog() {
+    public ResponseEntity<ResponseObject> getPinnedBlog(@RequestHeader("Authorization") String token) {
+
+        List<String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
+        if (roles != null) {
+            if (!roles.isEmpty()) {
+                for (String role : roles) {
+                    if (!role.toUpperCase().equals("USER")
+                            && !role.toUpperCase().equals("LECTURE")) {
                         return blogPostService.getPinnedBlog();
+                    }
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "Role is not sp!!", ""));
+                }
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "Role is empty!!", ""));
+            }
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "Role is null!!", ""));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("failed", "token is wrong or role is not sp!!", ""));
+
     }
 
     @PostMapping("/pinBlogAction/{postId}")
@@ -95,7 +115,8 @@ public class BlogPostController {
         if (roles != null) {
             if (!roles.isEmpty()) {
                 for (String role : roles) {
-                    if (!role.toUpperCase().equals("USER")) {
+                    if (!role.toUpperCase().equals("USER")
+                            && !role.toUpperCase().equals("LECTURE")) {
                         return blogPostService.pinBlogAction(postId);
                     }
                     return ResponseEntity.status(HttpStatus.OK)
