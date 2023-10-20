@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.service;
 
+import tech.fublog.FuBlog.Utility.DTOConverter;
 import tech.fublog.FuBlog.dto.CategoryDTO;
 import tech.fublog.FuBlog.dto.response.CategoryResponseDTO;
 import tech.fublog.FuBlog.entity.CategoryEntity;
@@ -24,7 +25,7 @@ public class CategoryService {
         if (!list.isEmpty()) {
             List<CategoryResponseDTO> dtoList = new ArrayList<>();
             for (CategoryEntity entity : list) {
-                CategoryResponseDTO dto = convertResponseCategoryToDTO(entity);
+                CategoryResponseDTO dto = DTOConverter.convertResponseCategoryToDTO(entity);
                 dtoList.add(dto);
             }
             return dtoList;
@@ -37,7 +38,7 @@ public class CategoryService {
         if (!list.isEmpty()) {
             List<CategoryDTO> dtoList = new ArrayList<>();
             for (CategoryEntity entity : list) {
-                CategoryDTO dto = convertCategoryToDTO(entity);
+                CategoryDTO dto = DTOConverter.convertCategoryToDTO(entity);
                 dtoList.add(dto);
             }
             return dtoList;
@@ -45,28 +46,5 @@ public class CategoryService {
         return new ArrayList<>();
     }
 
-    private CategoryDTO convertCategoryToDTO(CategoryEntity categoryEntity) {
-        CategoryDTO CategoryDTO = new CategoryDTO();
-        CategoryDTO.setCategoryId(categoryEntity.getId());
-        CategoryDTO.setCategoryName(categoryEntity.getName());
-        if (categoryEntity.getParentCategory() != null)
-            CategoryDTO.setParentCategoryId(categoryEntity.getParentCategory().getId());
-        return CategoryDTO;
-    }
 
-    private CategoryResponseDTO convertResponseCategoryToDTO(CategoryEntity categoryEntity) {
-        CategoryResponseDTO responseCategoryDTO = new CategoryResponseDTO();
-        responseCategoryDTO.setCategoryId(categoryEntity.getId());
-        responseCategoryDTO.setCategoryName(categoryEntity.getName());
-        if (categoryEntity.getParentCategory() != null)
-            responseCategoryDTO.setParentCategoryId(categoryEntity.getParentCategory().getId());
-        List<CategoryEntity> subCategory = categoryRepository.findByParentCategory(categoryEntity);
-        List<CategoryResponseDTO> subcategoryDTOResponse = new ArrayList<>();
-        for (CategoryEntity sub : subCategory) {
-            CategoryResponseDTO subResponseCategoryDTOs = convertResponseCategoryToDTO(sub);
-            subcategoryDTOResponse.add(subResponseCategoryDTOs);
-        }
-        responseCategoryDTO.setSubCategory(subcategoryDTOResponse);
-        return responseCategoryDTO;
-    }
 }
