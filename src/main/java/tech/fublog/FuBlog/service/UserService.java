@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import tech.fublog.FuBlog.Utility.*;
+
 
 @Service
 @Transactional
@@ -88,7 +90,7 @@ public class UserService {
 //                        user.getFullName(),
 //                        user.getEmail());
                 UserInfoResponseDTO userInfoResponseDTO =
-                        convertUserDTO(user);
+                        DTOConverter.convertUserDTO(user);
 
                 highestPointUser.add(userInfoResponseDTO);
             }
@@ -104,7 +106,7 @@ public class UserService {
     public UserInfoResponseDTO getUserInfo(Long userId) {
         UserEntity user = userRepository.findByIdAndStatusIsTrue(userId);
         if (user != null) {
-            return convertUserDTO(user);
+            return DTOConverter.convertUserDTO(user);
         } else throw new UserException("");
     }
 
@@ -119,7 +121,7 @@ public class UserService {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrue(pageable);
         for (UserEntity dto : pageResult.getContent()) {
-            userDTOs.add(convertUserDTO(dto));
+            userDTOs.add(DTOConverter.convertUserDTO(dto));
         }
 
         Long userCount = pageResult.getTotalElements();
@@ -227,7 +229,7 @@ public class UserService {
             if (!entitySet.isEmpty()) {
                 List<BlogPostDTO> dtoList = new ArrayList<>();
                 for (BlogPostEntity entity : entitySet) {
-                    dtoList.add(convertPostToDTO(entity.getId()));
+                    dtoList.add(DTOConverter.convertPostToDTO(entity.getId()));
                 }
                 return dtoList;
             } else throw new UserException("This user not marked any post");
@@ -264,72 +266,5 @@ public class UserService {
             } else throw new UserException("Blog doesn't exists!");
         } else throw new UserException("User doesn't exists!");
     }
-
-    public BlogPostDTO convertPostToDTO(Long postId) {
-
-        BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
-
-        if (blogPostEntity != null) {
-            UserEntity userEntity = userRepository.findById(blogPostEntity.getAuthors().getId()).orElse(null);
-
-            Set<RoleEntity> roleEntities = userEntity.getRoles();
-            Set<PostTagEntity> postTagEntity = blogPostEntity.getPostTags();
-            Set<TagDTO> tagDTOs = postTagEntity.stream()
-                    .map(tagEntity -> {
-                        TagDTO tagDTO = new TagDTO();
-                        tagDTO.setTagId(tagEntity.getId());
-                        tagDTO.setTagName(tagEntity.getTag().getTagName());
-                        return tagDTO;
-                    })
-                    .collect(Collectors.toSet());
-
-            UserInfoResponseDTO userDTO = convertUserDTO(userEntity);
-            blogPostEntity.setView(blogPostEntity.getView() + 1);
-            blogPostRepository.save(blogPostEntity);
-
-            BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
-                    blogPostEntity.getTypePost(),
-                    blogPostEntity.getTitle(),
-                    blogPostEntity.getContent(),
-                    blogPostEntity.getImage(),
-                    blogPostEntity.getCategory().getName(),
-                    blogPostEntity.getCategory().getParentCategory(),
-                    tagDTOs,
-                    userDTO,
-                    blogPostEntity.getView(),
-                    blogPostEntity.getCreatedDate(),
-                    voteRepository.countByPostVote(blogPostEntity),
-                    commentRepository.countByPostComment(blogPostEntity)
-            );
-            return blogPostDTO;
-        } else
-            throw new BlogPostException("not found blogpost with " + postId);
-
-    }
-
-
-    public UserInfoResponseDTO convertUserDTO(UserEntity userEntity) {
-        if (userEntity != null) {
-
-            Set<RoleEntity> roleEntities = userEntity.getRoles();
-            List<String> roleNames = roleEntities.stream()
-                    .map(RoleEntity::getName)
-                    .collect(Collectors.toList());
-
-            UserInfoResponseDTO userDTO = new UserInfoResponseDTO(
-                    userEntity.getId(),
-                    userEntity.getFullName(),
-                    userEntity.getPicture(),
-                    userEntity.getEmail(),
-                    roleNames.get(roleNames.size() - 1),
-                    roleNames,
-                    userEntity.getPoint()
-            );
-            return userDTO;
-        } else
-            throw new BlogPostException("not found user with " + userEntity.getId());
-
-    }
-
 
 }

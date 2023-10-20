@@ -1,6 +1,7 @@
 package tech.fublog.FuBlog.service;
 
 
+import tech.fublog.FuBlog.Utility.DTOConverter;
 import tech.fublog.FuBlog.dto.request.CommentRequestDTO;
 import tech.fublog.FuBlog.dto.response.CommentResponseDTO;
 import tech.fublog.FuBlog.entity.CommentEntity;
@@ -46,7 +47,7 @@ public class CommentService {
             if (!list.isEmpty()) {
                 List<CommentResponseDTO> dtoList = new ArrayList<>();
                 for (CommentEntity entity : list) {
-                    CommentResponseDTO dto = convertResponseDTO(entity);
+                    CommentResponseDTO dto = DTOConverter.convertResponseDTO(entity);
                     dtoList.add(dto);
                 }
                 return dtoList;
@@ -80,25 +81,4 @@ public class CommentService {
         else throw new CommentException("Blog doesn't exists");
     }
 
-    private CommentResponseDTO convertResponseDTO(CommentEntity commentEntity) {
-
-        if (commentEntity.getStatus()) {
-            CommentResponseDTO commentResponseDTO = new CommentResponseDTO();
-            commentResponseDTO.setCommentId(commentEntity.getId());
-            if (commentEntity.getParentComment() != null)
-                commentResponseDTO.setParentCommentId(commentEntity.getParentComment().getId());
-            commentResponseDTO.setContent(commentEntity.getContent());
-            commentResponseDTO.setPostId(commentEntity.getPostComment().getId());
-            commentResponseDTO.setUserId(commentEntity.getUserComment().getId());
-            commentResponseDTO.setStatus(commentEntity.getStatus());
-            List<CommentEntity> subComment = commentRepository.findByParentComment(commentEntity);
-            List<CommentResponseDTO> dtoList = new ArrayList<>();
-            for (CommentEntity sub : subComment) {
-                CommentResponseDTO subCommentResponseDTOs = convertResponseDTO(sub);
-                dtoList.add(subCommentResponseDTOs);
-            }
-            commentResponseDTO.setSubComment(dtoList);
-            return commentResponseDTO;
-        } else return null;
-    }
 }

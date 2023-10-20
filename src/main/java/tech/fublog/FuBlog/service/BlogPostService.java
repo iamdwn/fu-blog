@@ -3,6 +3,7 @@ package tech.fublog.FuBlog.service;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import tech.fublog.FuBlog.Utility.DTOConverter;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
@@ -111,70 +112,6 @@ public class BlogPostService {
 
     }
 
-    public BlogPostDTO convertBlogPostDTO(BlogPostEntity blogPostEntity) {
-
-//        BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
-
-        if (blogPostEntity != null) {
-            UserEntity userEntity = userRepository.findById(blogPostEntity.getAuthors().getId()).orElse(null);
-
-            Set<RoleEntity> roleEntities = userEntity.getRoles();
-            Set<PostTagEntity> postTagEntity = blogPostEntity.getPostTags();
-            Set<TagDTO> tagDTOs = postTagEntity.stream()
-                    .map(tagEntity -> {
-                        TagDTO tagDTO = new TagDTO();
-                        tagDTO.setTagId(tagEntity.getId());
-                        tagDTO.setTagName(tagEntity.getTag().getTagName());
-                        return tagDTO;
-                    })
-                    .collect(Collectors.toSet());
-
-            List<String> roleNames = roleEntities.stream()
-                    .map(RoleEntity::getName)
-                    .collect(Collectors.toList());
-
-//            UserDTO userDTO = new UserDTO(userEntity.getFullName(),
-//                    userEntity.getPassword(),
-//                    userEntity.getEmail(),
-//                    userEntity.getId(),
-//                    userEntity.getPicture(),
-//                    userEntity.getStatus(),
-//                    roleNames.get(roleNames.size() - 1),
-//                    roleNames);
-
-            UserInfoResponseDTO userDTO = new UserInfoResponseDTO(
-                    userEntity.getId(),
-                    userEntity.getFullName(),
-                    userEntity.getPicture(),
-                    userEntity.getEmail(),
-                    roleNames.get(roleNames.size() - 1),
-                    roleNames,
-                    userEntity.getPoint()
-            );
-
-            BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
-                    blogPostEntity.getTypePost(),
-                    blogPostEntity.getTitle(),
-                    blogPostEntity.getContent(),
-                    blogPostEntity.getImage(),
-                    blogPostEntity.getCategory().getName(),
-                    blogPostEntity.getCategory().getParentCategory(),
-                    tagDTOs,
-                    userDTO,
-                    blogPostEntity.getView(),
-                    blogPostEntity.getCreatedDate(),
-                    voteRepository.countByPostVote(blogPostEntity),
-                    commentRepository.countByPostComment(blogPostEntity)
-            );
-//                  Date.from(Instant.ofEpochMilli((blogPostEntity.getCreatedDate().getTime())))
-//                  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
-//                    .parse(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(blogPostEntity.getCreatedDate())));
-
-            return blogPostDTO;
-        } else
-            throw new BlogPostException("not found blogpost with " + blogPostEntity.getId());
-
-    }
 
     public BlogPostEntity getBlogPostDetailsById(Long postId) {
         BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
@@ -259,7 +196,7 @@ public class BlogPostService {
                 List<BlogPostEntity> pageContent = pageResult.getContent();
                 blogPostDTOList = new ArrayList<>();
                 for (BlogPostEntity entity : pageContent) {
-                    blogPostDTOList.add(convertBlogPostDTO(entity));
+                    blogPostDTOList.add(DTOConverter.convertPostToDTO(entity.getId()));
                 }
             }
         } else throw new BlogPostException("User doesn't exists");
@@ -304,7 +241,7 @@ public class BlogPostService {
         BlogPostEntity blogPostEntity = blogPostRepository.findByPinnedIsTrue();
 
         return blogPostEntity != null ? ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseObject("ok", "found", convertBlogPostDTO(blogPostEntity)))
+                .body(new ResponseObject("ok", "found", DTOConverter.convertPostToDTO(blogPostEntity.getId())))
                 : ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ResponseObject("failed", "not found", ""));
     }
@@ -368,7 +305,7 @@ public class BlogPostService {
         if (pageResult != null) {
             pageContent = pageResult.getContent();
             for (BlogPostEntity blogPost : pageContent) {
-                blogPostDTOList.add(convertBlogPostDTO(blogPost));
+                blogPostDTOList.add(DTOConverter.convertPostToDTO(blogPost.getId()));
             }
         }
 
@@ -414,7 +351,7 @@ public class BlogPostService {
         List<BlogPostEntity> blogPostEntity = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByViewDesc();
         if (blogPostEntity != null) {
             for (BlogPostEntity entity : blogPostEntity) {
-                popularBlogPostList.add(convertBlogPostDTO(entity));
+                popularBlogPostList.add(DTOConverter.convertPostToDTO(entity.getId()));
             }
             return popularBlogPostList;
         }
@@ -426,7 +363,7 @@ public class BlogPostService {
         List<BlogPostEntity> blogPostEntity = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByVoteDesc();
         if (blogPostEntity != null) {
             for (BlogPostEntity entity : blogPostEntity) {
-                popularBlogPostList.add(convertBlogPostDTO(entity));
+                popularBlogPostList.add(DTOConverter.convertPostToDTO(entity.getId()));
             }
             return popularBlogPostList;
         }
@@ -513,7 +450,7 @@ public class BlogPostService {
         if (pageResult != null) {
             pageContent = pageResult.getContent();
             for (BlogPostEntity blogPost : pageContent) {
-                blogPostDTOList.add(convertBlogPostDTO(blogPost));
+                blogPostDTOList.add(DTOConverter.convertPostToDTO(blogPost.getId()));
             }
         }
         Long blogPostCount = pageResult.getTotalElements();
