@@ -85,10 +85,6 @@ public class UserService {
 
         for (UserEntity user : userEntities) {
             if (user.getPoint().equals(userEntities.get(0).getPoint())) {
-//                UserDTO userDTO = new UserDTO(
-//                        user.getUsername(),
-//                        user.getFullName(),
-//                        user.getEmail());
                 UserInfoResponseDTO userInfoResponseDTO =
                         DTOConverter.convertUserDTO(user);
 
@@ -120,6 +116,32 @@ public class UserService {
         List<UserInfoResponseDTO> userDTOs = new ArrayList<>();
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrue(pageable);
+        for (UserEntity dto : pageResult.getContent()) {
+            userDTOs.add(DTOConverter.convertUserDTO(dto));
+        }
+
+        Long userCount = pageResult.getTotalElements();
+        Long pageCount = (long) pageResult.getTotalPages();
+        return new PaginationResponseDTO(userDTOs, userCount, pageCount);
+    }
+
+    public PaginationResponseDTO getAllUserByPoint(int page, int size) {
+        List<UserInfoResponseDTO> userDTOs = new ArrayList<>();
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueOrderByPointDesc(pageable);
+        for (UserEntity dto : pageResult.getContent()) {
+            userDTOs.add(DTOConverter.convertUserDTO(dto));
+        }
+
+        Long userCount = pageResult.getTotalElements();
+        Long pageCount = (long) pageResult.getTotalPages();
+        return new PaginationResponseDTO(userDTOs, userCount, pageCount);
+    }
+
+    public PaginationResponseDTO getAllUserByAward(String award, int page, int size) {
+        List<UserInfoResponseDTO> userDTOs = new ArrayList<>();
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueAndUserAwardsOrderByPointDesc (award, pageable);
         for (UserEntity dto : pageResult.getContent()) {
             userDTOs.add(DTOConverter.convertUserDTO(dto));
         }
