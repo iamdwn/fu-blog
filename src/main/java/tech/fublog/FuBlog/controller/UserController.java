@@ -211,7 +211,7 @@ public class UserController {
     @GetMapping("/getAllUserByDiamond/{page}/{size}")
     public ResponseEntity<ResponseObject> getAllUserByDiamond(@PathVariable int page,
                                                             @PathVariable int size) {
-        PaginationResponseDTO userList = userService.getAllUserByAward("coc vang", page, size);
+        PaginationResponseDTO userList = userService.getAllUserByAward("diamondt chec", page, size);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseObject("ok", "found", userList));
     }
@@ -219,7 +219,7 @@ public class UserController {
     @GetMapping("/getAllUserByGold/{page}/{size}")
     public ResponseEntity<ResponseObject> getAllUserByGold(@PathVariable int page,
                                                             @PathVariable int size) {
-        PaginationResponseDTO userList = userService.getAllUserByAward("COC VANG", page, size);
+        PaginationResponseDTO userList = userService.getAllUserByAward("gold", page, size);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseObject("ok", "found", userList));
     }
@@ -227,7 +227,7 @@ public class UserController {
     @GetMapping("/getAllUserBySilver/{page}/{size}")
     public ResponseEntity<ResponseObject> getAllUserBySilver(@PathVariable int page,
                                                             @PathVariable int size) {
-        PaginationResponseDTO userList = userService.getAllUserByAward("dep trai", page, size);
+        PaginationResponseDTO userList = userService.getAllUserByAward("silver", page, size);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseObject("ok", "found", userList));
     }
