@@ -98,6 +98,15 @@ public class UserEntity implements UserDetails {
 //    @JsonIgnore
     private Set<UserAwardEntity> userAwards = new HashSet<>();
 
+    @OneToMany(mappedBy = "reporterId")
+    private Set<UserReportEntity> userReportsCreated = new HashSet<>();
+
+    @OneToMany(mappedBy = "reportedUserId")
+    private Set<UserReportEntity> userReportsReceived = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<BlogPostReportEntity> userReportsBlog = new HashSet<>();
+
 
     @ManyToMany
     @JsonIgnore
