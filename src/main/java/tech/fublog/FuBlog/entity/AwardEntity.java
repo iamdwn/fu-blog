@@ -27,6 +27,9 @@ public class AwardEntity {
     @Column(columnDefinition = "LONGTEXT")
     private String description;
 
+    @Column
+    private Double point;
+
     @OneToMany(mappedBy = "award")
 //    @JsonIgnore
     private List<UserAwardEntity> userAwards = new ArrayList<>();
