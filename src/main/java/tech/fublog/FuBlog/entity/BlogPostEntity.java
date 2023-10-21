@@ -82,6 +82,12 @@ public class BlogPostEntity {
 //    @JsonIgnore
     private Set<PostTagEntity> postTags = new HashSet<>();
 
+    @OneToMany(mappedBy = "blog")
+    private Set<BlogPostReportEntity> BlogReported = new HashSet<>();
+
+
+
+
     @ManyToMany(mappedBy = "markPosts")
     @JsonIgnore
     private Set<UserEntity> userMarks = new HashSet<>();

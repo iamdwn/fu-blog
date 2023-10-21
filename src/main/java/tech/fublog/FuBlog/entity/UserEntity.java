@@ -62,7 +62,6 @@ public class UserEntity implements UserDetails {
 
 
     @OneToMany(mappedBy = "authors")
-//    @JsonIgnore
     private Set<BlogPostEntity> blogAuthors = new HashSet<>();
 //    @OneToMany(mappedBy = "authorsModified")
 //    private Set<BlogPostEntity> blogAuthorsModified = new HashSet<>();
@@ -71,32 +70,34 @@ public class UserEntity implements UserDetails {
 //    private Set<ApprovalRequestEntity> requested = new HashSet<>();
 
     @OneToMany(mappedBy = "review")
-//    @JsonIgnore
     private Set<ApprovalRequestEntity> reviewed = new HashSet<>();
 
     @OneToMany(mappedBy = "userComment")
-//    @JsonIgnore
     private Set<CommentEntity> comments = new HashSet<>();
 
     @OneToMany(mappedBy = "userVote")
-//    @JsonIgnore
     private Set<VoteEntity> votes = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
-//    @JsonIgnore
     private Set<NotificationEntity> notificationList = new HashSet<>();
 
     @OneToMany(mappedBy = "following")
-//    @JsonIgnore
     private Set<FollowEntity> followingList = new HashSet<>();
 
     @OneToMany(mappedBy = "follower")
-//    @JsonIgnore
     private Set<FollowEntity> followersList = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
-//    @JsonIgnore
     private Set<UserAwardEntity> userAwards = new HashSet<>();
+
+    @OneToMany(mappedBy = "reporterId")
+    private Set<UserReportEntity> userReportsCreated = new HashSet<>();
+
+    @OneToMany(mappedBy = "reportedUserId")
+    private Set<UserReportEntity> userReportsReceived = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<BlogPostReportEntity> userReportsBlog = new HashSet<>();
 
 
     @ManyToMany

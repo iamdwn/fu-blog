@@ -34,7 +34,6 @@ public class  JwtService {
                 .withExpiresAt(new Date(System.currentTimeMillis() + 3600*1000))
                 .withClaim("roles", authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
 //                .withClaim("categories", authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-
 //                .withClaim("categories", user.getCategories().stream().toList())
                 .sign(algorithm);
     }
@@ -90,6 +89,20 @@ public class  JwtService {
             return roles;
         }
         return null;
+    }
+    public Boolean checkTokenIsTrue(String token){
+        String[] parts = token.split("\\.");
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Invalid Token format");
+        }
+        JSONObject payload = new JSONObject(decode(parts[1]));
+        String signature = parts[2];
+        String headerAndPayloadHashed = hmacSha256(parts[0] + "." + parts[1], Secret_key);
+        boolean exp = payload.getLong("exp") > (System.currentTimeMillis() / 1000);
+        if (exp && signature.equals(headerAndPayloadHashed)) {
+            return true;
+        }
+        return false;
     }
 
     private static String decode(String encodedString) {
