@@ -200,4 +200,36 @@ public class UserController {
                 .body(new ResponseObject("failed", "token is wrong or role is not sp!!", ""));
     }
 
+    @GetMapping("/getAllUserByPoint/{page}/{size}")
+    public ResponseEntity<ResponseObject> getAllUserByPoint(@PathVariable int page,
+                                                            @PathVariable int size) {
+        PaginationResponseDTO userList = userService.getAllUserByPoint(page, size);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", userList));
+    }
+
+    @GetMapping("/getAllUserByDiamond/{page}/{size}")
+    public ResponseEntity<ResponseObject> getAllUserByDiamond(@PathVariable int page,
+                                                            @PathVariable int size) {
+        PaginationResponseDTO userList = userService.getAllUserByAward("coc vang", page, size);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", userList));
+    }
+
+    @GetMapping("/getAllUserByGold/{page}/{size}")
+    public ResponseEntity<ResponseObject> getAllUserByGold(@PathVariable int page,
+                                                            @PathVariable int size) {
+        PaginationResponseDTO userList = userService.getAllUserByAward("COC VANG", page, size);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", userList));
+    }
+
+    @GetMapping("/getAllUserBySilver/{page}/{size}")
+    public ResponseEntity<ResponseObject> getAllUserBySilver(@PathVariable int page,
+                                                            @PathVariable int size) {
+        PaginationResponseDTO userList = userService.getAllUserByAward("dep trai", page, size);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", userList));
+    }
+
 }
