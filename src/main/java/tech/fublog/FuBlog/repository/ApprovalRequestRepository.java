@@ -1,11 +1,19 @@
 package tech.fublog.FuBlog.repository;
 
+import org.springframework.data.jpa.repository.Query;
 import tech.fublog.FuBlog.entity.ApprovalRequestEntity;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequestEntity, Long> {
     ApprovalRequestEntity findByBlogPost(BlogPostEntity blogPost);
+
+    @Query("SELECT a FROM ApprovalRequestEntity a WHERE a.isApproved = false ")
+    List<ApprovalRequestEntity> findAllByApprovedIsFalse();
+
+
 }

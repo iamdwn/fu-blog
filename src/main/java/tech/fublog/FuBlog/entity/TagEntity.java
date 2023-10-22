@@ -25,7 +25,7 @@ public class TagEntity {
     private String tagName;
 
     @OneToMany(mappedBy = "tag")
-    @JsonIgnore
+//    @JsonIgnore
     private List<PostTagEntity> postTags = new ArrayList<>();
 
     //    @ManyToMany

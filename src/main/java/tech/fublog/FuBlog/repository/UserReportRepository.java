@@ -1,10 +1,9 @@
 package tech.fublog.FuBlog.repository;
 
-import tech.fublog.FuBlog.entity.TagEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import tech.fublog.FuBlog.entity.UserReportEntity;
 
 @Repository
-public interface TagRepository extends JpaRepository<TagEntity, Long> {
-    TagEntity findByTagName(String tagName);
+public interface UserReportRepository extends JpaRepository<UserReportEntity, Long> {
 }

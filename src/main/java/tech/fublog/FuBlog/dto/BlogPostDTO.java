@@ -25,13 +25,13 @@ public class BlogPostDTO {
     private String categoryName;
     private CategoryEntity parentCategoryId;
     private Set<TagDTO> tagList;
-    private UserDTO user;
+    private UserInfoResponseDTO user;
     private Long views;
     private Date createdDate;
     private Long voteCount;
     private Long commentCount;
 
-    public BlogPostDTO(String typePost, String title, String content, String categoryName, CategoryEntity parentCategoryId, Set<TagDTO> tagList, UserDTO user, Long views, Date createdDate, Long voteCount, Long commentCount) {
+    public BlogPostDTO(String typePost, String title, String content, String categoryName, CategoryEntity parentCategoryId, Set<TagDTO> tagList, UserInfoResponseDTO user, Long views, Date createdDate, Long voteCount, Long commentCount) {
         this.typePost = typePost;
         this.title = title;
         this.content = content;

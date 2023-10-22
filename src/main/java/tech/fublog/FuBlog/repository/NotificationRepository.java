@@ -3,7 +3,6 @@ package tech.fublog.FuBlog.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import tech.fublog.FuBlog.entity.NotificationEntity;
-import tech.fublog.FuBlog.entity.UserEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,8 +14,8 @@ public interface NotificationRepository extends JpaRepository<NotificationEntity
 
     List<NotificationEntity> findByUserId(Long id);
 
+
     List<NotificationEntity> findByUserIdAndIsDeliveredFalse(Long id);
 
-    NotificationEntity findByUserIdAndPostIdAndContentLike(UserEntity userEntity, Long postId, String content);
 
 }

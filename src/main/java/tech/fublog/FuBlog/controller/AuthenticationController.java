@@ -10,8 +10,10 @@ import tech.fublog.FuBlog.auth.AuthenticationRequest;
 import tech.fublog.FuBlog.auth.MessageResponse;
 import tech.fublog.FuBlog.auth.SignupRequest;
 import tech.fublog.FuBlog.dto.UserDTO;
+import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
+import tech.fublog.FuBlog.repository.CategoryCustomRepo;
 import tech.fublog.FuBlog.repository.RoleCustomRepo;
 import tech.fublog.FuBlog.repository.RoleRepository;
 import tech.fublog.FuBlog.repository.UserRepository;
@@ -39,6 +41,9 @@ public class AuthenticationController {
 
     private final JwtService jwtService;
 
+
+    CategoryCustomRepo categoryCustomRepo;
+
     @Autowired
     UserRepository userRepository;
 
@@ -63,7 +68,7 @@ public class AuthenticationController {
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest authenticationRequest){
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-        Optional<UserEntity> o_user = userRepository.findByUsername(authenticationRequest.getUsername());
+        Optional<UserEntity> o_user = userRepository.findByUsernameAndStatusTrue(authenticationRequest.getUsername());
         if(o_user.isPresent()){
             String encodedPasswordFromDatabase  = o_user.get().getPassword();
 //            if (!userRepository.existsByUsername(authenticationRequest.getUsername()))
@@ -137,7 +142,7 @@ public class AuthenticationController {
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-        Optional<UserEntity> o_user = userRepository.findByUsername(signUpRequest.getEmail());
+        Optional<UserEntity> o_user = userRepository.findByUsernameAndStatusTrue(signUpRequest.getEmail());
         if (o_user.isPresent()) {
             String encodedPasswordFromDatabase = o_user.get().getPassword();
             if (!passwordEncoder.matches(signUpRequest.getPassword(), encodedPasswordFromDatabase)) {
@@ -169,9 +174,7 @@ public class AuthenticationController {
 
         String username = jwtService.extractTokenToGetUser(token.substring(7));
         List <String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
-        System.out.println(roles);
-
-        Optional<UserEntity> user = userRepository.findByUsername(username);
+        Optional<UserEntity> user = userRepository.findByUsernameAndStatusTrue(username);
 //        AuthenticationReponse authenticationReponse = new AuthenticationReponse();
 //        authenticationReponse.setFullname(user.get().getFullName());
 //        authenticationReponse.setPicture(user.get().getPicture());
@@ -181,12 +184,13 @@ public class AuthenticationController {
 
 //        return authenticationReponse;
         UserDTO userDTO = new UserDTO();
-        userDTO.setFullname(user.get().getFullName());
+        userDTO.setFullName(user.get().getFullName());
         userDTO.setPicture(user.get().getPicture());
         userDTO.setEmail(user.get().getEmail());
         userDTO.setId(user.get().getId());
         userDTO.setPassword(user.get().getHashedpassword());
         userDTO.setRoles(roles);
+//        userDTO.setCategories();
         return userDTO;
 
     }
@@ -195,7 +199,7 @@ public class AuthenticationController {
         String username = jwtService.extractTokenToGetUser(refreshToken.substring(7));
 //        Optional<UserEntity> user = userRepository.findByUsername(username);
         if (username != null) {
-            UserEntity user = userRepository.findByUsername(username).orElseThrow();
+            UserEntity user = userRepository.findByUsernameAndStatusTrue(username).orElseThrow();
             List<RoleEntity> role = null;
             if (user != null) {
                 role = roleCustomRepo.getRole(user);

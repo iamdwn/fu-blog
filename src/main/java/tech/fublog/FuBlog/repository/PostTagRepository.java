@@ -1,7 +1,5 @@
 package tech.fublog.FuBlog.repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.PostTagEntity;
 import tech.fublog.FuBlog.entity.TagEntity;
@@ -16,7 +14,7 @@ import java.util.Set;
 public interface PostTagRepository extends JpaRepository<PostTagEntity, Long> {
     Optional<PostTagEntity> findByPostAndTag(BlogPostEntity blogPostEntity, TagEntity tagEntity);
 
-    Page<PostTagEntity> findByTag(TagEntity tagEntity, Pageable pageable);
+    List<PostTagEntity> findByTag(TagEntity tagEntity);
 
     Set<PostTagEntity> findByIdNotNull();
 

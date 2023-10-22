@@ -21,7 +21,7 @@ public class convertDTO {
     private CategoryResponseDTO convertCategoryToDTO(CategoryEntity categoryEntity) {
         CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO();
         categoryResponseDTO.setCategoryId(categoryEntity.getId());
-        categoryResponseDTO.setCategoryName(categoryEntity.getCategoryName());
+        categoryResponseDTO.setCategoryName(categoryEntity.getName());
         List<CategoryEntity> subCategory = categoryRepository.findByParentCategory(categoryEntity);
         List<CategoryResponseDTO> subcategoryDTOResponse = new ArrayList<>();
         for (CategoryEntity sub : subCategory) {

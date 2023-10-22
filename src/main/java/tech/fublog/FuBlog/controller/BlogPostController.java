@@ -24,16 +24,24 @@ import java.util.List;
 public class BlogPostController {
     private final BlogPostService blogPostService;
     private final ApprovalRequestService approvalRequestService;
+    private final VoteService voteService;
+    private final CommentService commentService;
+    private final JwtService jwtService;
     private final PostTagService postTagService;
 
     @Autowired
     public BlogPostController(BlogPostService blogPostService, ApprovalRequestService approvalRequestService,
-                              PostTagService postTagService
+                              VoteService voteService, CommentService commentService,
+                              JwtService jwtService, PostTagService postTagService
     ) {
         this.blogPostService = blogPostService;
         this.approvalRequestService = approvalRequestService;
+        this.voteService = voteService;
+        this.commentService = commentService;
+        this.jwtService = jwtService;
         this.postTagService = postTagService;
     }
+
 
 
     @DeleteMapping("/deleteBlogById/{postId}")
@@ -75,14 +83,55 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("getPinnedBlog")
-    public ResponseEntity<ResponseObject> getPinnedBlog() {
-        return blogPostService.getPinnedBlog();
+    @GetMapping("/getPinnedBlog")
+    public ResponseEntity<ResponseObject> getPinnedBlog(@RequestHeader("Authorization") String token) {
+
+        List<String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
+        if (roles != null) {
+            if (!roles.isEmpty()) {
+                for (String role : roles) {
+                    if (!role.toUpperCase().equals("USER")
+                            && !role.toUpperCase().equals("LECTURE")) {
+                        return blogPostService.getPinnedBlog();
+                    }
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "Role is not sp!!", ""));
+                }
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "Role is empty!!", ""));
+            }
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "Role is null!!", ""));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("failed", "token is wrong or role is not sp!!", ""));
+
     }
 
-    @PostMapping("pinBlogAction/{postId}")
-    public ResponseEntity<ResponseObject> pinBlog(@PathVariable Long postId) {
-        return blogPostService.pinBlogAction(postId);
+    @PostMapping("/pinBlogAction/{postId}")
+    public ResponseEntity<ResponseObject> pinBlog(@RequestHeader("Authorization") String token,
+                                                  @PathVariable Long postId) {
+
+        List<String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
+        if (roles != null) {
+            if (!roles.isEmpty()) {
+                for (String role : roles) {
+                    if (!role.toUpperCase().equals("USER")
+                            && !role.toUpperCase().equals("LECTURE")) {
+                        return blogPostService.pinBlogAction(postId);
+                    }
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "Role is not sp!!", ""));
+                }
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "Role is empty!!", ""));
+            }
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "Role is null!!", ""));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("failed", "token is wrong or role is not sp!!", ""));
+
     }
 
 
@@ -100,10 +149,9 @@ public class BlogPostController {
 
     @GetMapping("/getBlogPostByAuthor/{userId}/{page}/{size}")
     ResponseEntity<ResponseObject> getBlogPostByAuthor(@PathVariable Long userId,
-                                                       @PathVariable int page, @PathVariable int size
-    ) {
+                                                       @PathVariable int page, @PathVariable int size) {
         try {
-            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByAuthor(userId, page, size);
+            PaginationResponseDTO dtoList = blogPostService.getBlogPostByAuthor(userId, page, size);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", dtoList));
         } catch (BlogPostException ex) {
@@ -112,30 +160,17 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("/countPostMarkByUser/{userId}")
-    ResponseEntity<ResponseObject> countPostMarkByUser(@PathVariable Long userId) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "post found", blogPostService.countPostMarkByUser(userId)));
-        } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-        }
-    }
-
-    @GetMapping("/getBlogPostByTag/{tagId}/{page}/{size}")
-    ResponseEntity<ResponseObject> getBlogPostByTag(@PathVariable Long tagId,
-                                                    @PathVariable int page, @PathVariable int size
-    ) {
-        try {
-            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByTag(tagId, page, size);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "post found", dtoList));
-        } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-        }
-    }
+//    @GetMapping("/getBlogPostByTag/{tagId}")
+//    ResponseEntity<ResponseObject> getBlogPostByTag(@PathVariable Long tagId) {
+//        try {
+//            List<BlogPostDTO> dtoList = blogPostService.getBlogPostByTag(tagId);
+//            return ResponseEntity.status(HttpStatus.OK)
+//                    .body(new ResponseObject("ok", "post found", dtoList));
+//        } catch (BlogPostException ex) {
+//            return ResponseEntity.status(HttpStatus.OK)
+//                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+//        }
+//    }
 
     @GetMapping("/getBlogDetailsById/{postId}")
     ResponseEntity<ResponseObject> getBlogDetailsById(@PathVariable Long postId) {
@@ -173,40 +208,71 @@ public class BlogPostController {
         }
     }
 
-    @GetMapping("getAllBlog/{page}/{size}")
-    public PaginationResponseDTO getAllBlog(@PathVariable int page, @PathVariable int size) {
-        return blogPostService.getAllBlogPost(page, size);
-    }
+    @GetMapping("/getAllBlog/{page}/{size}")
+    public ResponseEntity<ResponseObject> getAllBlog(@PathVariable int page, @PathVariable int size) {
 
-    @GetMapping("getByTitle/{title}/{page}/{size}")
-    public PaginationResponseDTO getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
-        return blogPostService.getAllBlogPostByTitle(title, page, size);
-    }
-
-    @GetMapping("getByCategory/{categoryId}/{page}/{size}")
-    public ResponseEntity<PaginationResponseDTO> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
-//        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
-        PaginationResponseDTO blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
-
-        if (blogPosts == null) {
-            return ResponseEntity.notFound().build();
+        try {
+            PaginationResponseDTO blogPosts = blogPostService.getAllBlogPost(page, size);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPosts));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
-        return ResponseEntity.ok(blogPosts);
+    }
+
+    @GetMapping("/getByTitle/{title}/{page}/{size}")
+    public ResponseEntity<ResponseObject> getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
+        try {
+            PaginationResponseDTO blogPosts = blogPostService.getAllBlogPostByTitle(title, page, size);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPosts));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/getByCategory/{categoryId}/{page}/{size}")
+    public ResponseEntity<ResponseObject> getBlogPostsByCategoryId(@PathVariable Long categoryId, @PathVariable int page, @PathVariable int size) {
+//        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+        try {
+            PaginationResponseDTO blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPosts));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
     }
 
     @GetMapping("/sorted/{page}/{size}")
 //    public ResponseEntity<Page<BlogPostEntity>> getSortedBlogPosts(
-    public ResponseEntity<PaginationResponseDTO> getSortedBlogPosts(
+    public ResponseEntity<ResponseObject> getSortedBlogPosts(
             @RequestParam(name = "sortBy", defaultValue = "newest") String sortBy,
             @PathVariable int page, @PathVariable int size) {
 //        Page<BlogPostEntity> blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
-        PaginationResponseDTO blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
-
-        if (blogPostEntities == null) {
-            return ResponseEntity.notFound().build();
+        try {
+            PaginationResponseDTO blogPosts = blogPostService.getSortedBlogPosts(sortBy, page, size);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPosts));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
+    }
 
-        return ResponseEntity.ok(blogPostEntities);
+    @GetMapping("/bytag/{page}/{size}")
+    public ResponseEntity<ResponseObject> getBlogPostsByTag(@RequestParam(name = "tag") String tagName,
+                                                            @PathVariable int page, @PathVariable int size) {
+        try {
+            PaginationResponseDTO blogPosts = blogPostService.findByTagName(tagName, page, size);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPosts));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
     }
 
 }

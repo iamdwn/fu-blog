@@ -4,6 +4,7 @@ import lombok.*;
 import tech.fublog.FuBlog.dto.TagDTO;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -20,11 +21,11 @@ public class BlogPostRequestDTO {
     private String categoryName;
     private Long parentCategoryId;
     private Long userId;
-    private Set<TagDTO> tagList;
+    private List<TagDTO> tagList;
 //    private Long views;
     private Date createDate = new Date();
 
-    public BlogPostRequestDTO(String typePost, String title, String content, String categoryName, Long parentCategoryId, Set<TagDTO> tagList, Long userId, String image) {
+    public BlogPostRequestDTO(String typePost, String title, String content, String categoryName, Long parentCategoryId, List<TagDTO> tagList, Long userId, String image) {
         this.typePost = typePost;
         this.title = title;
         this.content = content;
@@ -35,7 +36,7 @@ public class BlogPostRequestDTO {
         this.image = image;
     }
 
-    public BlogPostRequestDTO(Long postId, String typePost, String title, String content, String categoryName, Long parentCategoryId, Long userId, Set<TagDTO> tagList) {
+    public BlogPostRequestDTO(Long postId, String typePost, String title, String content, String categoryName, Long parentCategoryId, Long userId, List<TagDTO> tagList) {
         this.postId = postId;
         this.typePost = typePost;
         this.title = title;

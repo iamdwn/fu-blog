@@ -4,7 +4,6 @@ import tech.fublog.FuBlog.dto.VoteDTO;
 import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.VoteException;
 import tech.fublog.FuBlog.repository.BlogPostRepository;
-import tech.fublog.FuBlog.repository.NotificationRepository;
 import tech.fublog.FuBlog.repository.UserRepository;
 import tech.fublog.FuBlog.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,17 +21,15 @@ public class VoteService {
     private final VoteRepository voteRepository;
     private final BlogPostRepository blogPostRepository;
     private final UserRepository userRepository;
+
     private final NotificationStorageService notificationStorageService;
-    private final NotificationRepository notificationRepository;
 
     @Autowired
-    public VoteService(VoteRepository voteRepository, BlogPostRepository blogPostRepository, UserRepository userRepository, NotificationStorageService notificationStorageService,
-                       NotificationRepository notificationRepository) {
+    public VoteService(VoteRepository voteRepository, BlogPostRepository blogPostRepository, UserRepository userRepository, NotificationStorageService notificationStorageService) {
         this.voteRepository = voteRepository;
         this.blogPostRepository = blogPostRepository;
         this.userRepository = userRepository;
         this.notificationStorageService = notificationStorageService;
-        this.notificationRepository = notificationRepository;
     }
 
     public Long countVote(Long postId) {
@@ -71,23 +68,23 @@ public class VoteService {
     public VoteDTO insertVote(VoteDTO voteDTO) {
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(voteDTO.getPostId());
         Optional<UserEntity> userEntity = userRepository.findById(voteDTO.getUserId());
-        if (blogPostEntity.isPresent() && userEntity.isPresent()) {
+        if (blogPostEntity.isPresent()
+                && userEntity.isPresent()
+                && userEntity.get().getStatus()) {
             VoteEntity voteEntity = voteRepository.findByUserVoteAndPostVote(userEntity.get(), blogPostEntity.get());
             if (voteEntity != null) {
                 voteRepository.delete(voteEntity);
                 return null;
             } else {
-                NotificationEntity notificationEntity = notificationRepository.findByUserIdAndPostIdAndContentLike(blogPostEntity.get().getAuthors(), voteDTO.getPostId(), userEntity.get().getFullName() + " was voted your post");
-                if (notificationEntity == null) {
-                    notificationEntity = new NotificationEntity();
-                    notificationEntity.setDelivered(false);
-                    notificationEntity.setContent(userEntity.get().getFullName() + " was voted your post");
-                    notificationEntity.setUserId(blogPostEntity.get().getAuthors());
-                    notificationEntity.setPostId(voteDTO.getPostId());
-                    notificationStorageService.createNotificationStorage(notificationEntity);
-                    Double point = userEntity.get().getPoint();
-                    userEntity.get().setPoint(point + 0.5);
-                }
+                NotificationEntity notificationEntity = new NotificationEntity();
+                notificationEntity.setDelivered(false);
+                notificationEntity.setIsRead(false);
+                notificationEntity.setContent(userEntity.get().getFullName() + "was voted your post");
+                notificationEntity.setUser(blogPostEntity.get().getAuthors());
+                notificationEntity.setPostId(voteDTO.getPostId());
+                notificationStorageService.createNotificationStorage(notificationEntity);
+                Double point = userEntity.get().getPoint();
+                userEntity.get().setPoint(point + 0.5);
                 voteEntity = new VoteEntity(voteDTO.getVoteValue(), userEntity.get(), blogPostEntity.get());
                 voteRepository.save(voteEntity);
                 return voteDTO;

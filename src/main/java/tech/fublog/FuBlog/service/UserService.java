@@ -2,17 +2,18 @@ package tech.fublog.FuBlog.service;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
+import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
-import tech.fublog.FuBlog.entity.BlogPostEntity;
-import tech.fublog.FuBlog.entity.PostTagEntity;
-import tech.fublog.FuBlog.entity.RoleEntity;
-import tech.fublog.FuBlog.entity.UserEntity;
+import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.exception.UserException;
 import tech.fublog.FuBlog.hash.Hashing;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import tech.fublog.FuBlog.Utility.*;
 
 
 @Service
@@ -42,6 +45,7 @@ public class UserService {
         this.voteRepository = voteRepository;
         this.commentRepository = commentRepository;
     }
+
 
     @Autowired
     private RoleRepository roleRepository;
@@ -66,7 +70,7 @@ public class UserService {
 
 
     public void addToUser(String username, String rolename) {
-        UserEntity user = userRepository.findByUsername(username).get();
+        UserEntity user = userRepository.findByUsernameAndStatusTrue(username).get();
         RoleEntity role = roleRepository.findByName(rolename);
         user.getRoles().add(role);
     }
@@ -78,12 +82,8 @@ public class UserService {
 
         for (UserEntity user : userEntities) {
             if (user.getPoint().equals(userEntities.get(0).getPoint())) {
-//                UserDTO userDTO = new UserDTO(
-//                        user.getUsername(),
-//                        user.getFullName(),
-//                        user.getEmail());
                 UserInfoResponseDTO userInfoResponseDTO =
-                        new UserInfoResponseDTO(user.getUsername(), user.getPicture(), user.getPoint());
+                        DTOConverter.convertUserDTO(user);
 
                 highestPointUser.add(userInfoResponseDTO);
             }
@@ -96,13 +96,10 @@ public class UserService {
 
 
     public UserInfoResponseDTO getUserInfo(Long userId) {
-        UserEntity user = userRepository.findById(userId).orElse(null);
+        UserEntity user = userRepository.findByIdAndStatusIsTrue(userId);
         if (user != null) {
-            return new UserInfoResponseDTO(user.getUsername(), user.getPicture(), user.getPoint());
-        }
-        return null;
-
-
+            return DTOConverter.convertUserDTO(user);
+        } else throw new UserException("");
     }
 
 
@@ -111,9 +108,49 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public PaginationResponseDTO getAllUsers(int page, int size) {
+        List<UserInfoResponseDTO> userDTOs = new ArrayList<>();
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrue(pageable);
+        for (UserEntity dto : pageResult.getContent()) {
+            userDTOs.add(DTOConverter.convertUserDTO(dto));
+        }
+
+        Long userCount = pageResult.getTotalElements();
+        Long pageCount = (long) pageResult.getTotalPages();
+        return new PaginationResponseDTO(userDTOs, userCount, pageCount);
+    }
+
+    public PaginationResponseDTO getAllUserByPoint(int page, int size) {
+        List<UserInfoResponseDTO> userDTOs = new ArrayList<>();
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueOrderByPointDesc(pageable);
+        for (UserEntity dto : pageResult.getContent()) {
+            userDTOs.add(DTOConverter.convertUserDTO(dto));
+        }
+
+        Long userCount = pageResult.getTotalElements();
+        Long pageCount = (long) pageResult.getTotalPages();
+        return new PaginationResponseDTO(userDTOs, userCount, pageCount);
+    }
+
+    public PaginationResponseDTO getAllUserByAward(String award, int page, int size) {
+        List<UserInfoResponseDTO> userDTOs = new ArrayList<>();
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueAndUserAwardsOrderByPointDesc(award, pageable);
+        for (UserEntity dto : pageResult.getContent()) {
+            userDTOs.add(DTOConverter.convertUserDTO(dto));
+        }
+
+        Long userCount = pageResult.getTotalElements();
+        Long pageCount = (long) pageResult.getTotalPages();
+        return new PaginationResponseDTO(userDTOs, userCount, pageCount);
+    }
+
     public void markPost(Long userId, Long postId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
-        if (userEntity.isPresent()) {
+        if (userEntity.isPresent()
+                && userEntity.get().getStatus()) {
             Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
             if (blogPostEntity.isPresent()) {
                 Set<BlogPostEntity> entitySet;
@@ -135,7 +172,8 @@ public class UserService {
 
     public void unMarkPost(Long userId, Long postId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
-        if (userEntity.isPresent()) {
+        if (userEntity.isPresent()
+                && userEntity.get().getStatus()) {
             Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
             if (blogPostEntity.isPresent()) {
                 if (!userEntity.get().getMarkPosts().isEmpty()) {
@@ -178,7 +216,7 @@ public class UserService {
                 roleEntities.add(userRole);
 
                 UserEntity user = this.getUserById(userId);
-                user.setFullName(userDTO.getFullname());
+                user.setFullName(userDTO.getFullName());
                 user.setEmail(userDTO.getEmail());
                 user.setPicture(userDTO.getPicture());
                 user.setRoles(roleEntities);
@@ -188,7 +226,7 @@ public class UserService {
                         .body(new ResponseObject("ok", "updated successful", user));
             } else {
                 UserEntity user = this.getUserById(userId);
-                user.setFullName(userDTO.getFullname());
+                user.setFullName(userDTO.getFullName());
                 user.setEmail(userDTO.getEmail());
                 user.setPicture(userDTO.getPicture());
                 user.setStatus(userDTO.getStatus());
@@ -202,17 +240,32 @@ public class UserService {
                 .body(new ResponseObject("failed", "updated failed", ""));
     }
 
-    public List<BlogPostDTO> getMarkPostByUser(Long userId) {
+    public List<BlogPostDTO> getMarkPostByUser(Long userId, int page, int size) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
-            Set<BlogPostEntity> entitySet = userEntity.get().getMarkPosts();
-            if (!entitySet.isEmpty()) {
+            Pageable pageable = PageRequest.of(page - 1, size);
+            Page<BlogPostEntity> pageList = blogPostRepository.findByUserMarksAndStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(userEntity.get(), pageable);
+            if (!pageList.isEmpty()) {
                 List<BlogPostDTO> dtoList = new ArrayList<>();
-                for (BlogPostEntity entity : entitySet) {
-                    dtoList.add(convertPostToDTO(entity.getId()));
+                for (BlogPostEntity entity : pageList.getContent()) {
+                    dtoList.add(DTOConverter.convertPostToDTO(entity.getId()));
                 }
                 return dtoList;
-            } else return new ArrayList<>();
+            } else throw new UserException("This user not marked any post");
+        } else throw new UserException("User doesn't exists");
+    }
+
+    public Long countViewOfBlog(Long userId) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        Long count = 0L;
+        if (userEntity.isPresent()) {
+            Set<BlogPostEntity> entitySet = userEntity.get().getBlogAuthors();
+            if (!entitySet.isEmpty()) {
+                for (BlogPostEntity entity : entitySet) {
+                    count += entity.getView();
+                }
+                return count;
+            } else throw new UserException("This user not wrote any post");
         } else throw new UserException("User doesn't exists");
     }
 
@@ -233,61 +286,5 @@ public class UserService {
         } else throw new UserException("User doesn't exists!");
     }
 
-    public BlogPostDTO convertPostToDTO(Long postId) {
 
-        BlogPostEntity blogPostEntity = blogPostRepository.findById(postId).orElse(null);
-
-        if (blogPostEntity != null) {
-            UserEntity userEntity = userRepository.findById(blogPostEntity.getAuthors().getId()).orElse(null);
-
-            Set<RoleEntity> roleEntities = userEntity.getRoles();
-            Set<PostTagEntity> postTagEntity = blogPostEntity.getPostTags();
-            Set<TagDTO> tagDTOs = postTagEntity.stream()
-                    .map(tagEntity -> {
-                        TagDTO tagDTO = new TagDTO();
-                        tagDTO.setTagId(tagEntity.getId());
-                        tagDTO.setTagName(tagEntity.getTag().getTagName());
-                        return tagDTO;
-                    })
-                    .collect(Collectors.toSet());
-
-            List<String> roleNames = roleEntities.stream()
-                    .map(RoleEntity::getName)
-                    .collect(Collectors.toList());
-
-            UserDTO userDTO = new UserDTO(userEntity.getFullName(),
-                    userEntity.getPassword(),
-                    userEntity.getEmail(),
-                    userEntity.getId(),
-                    userEntity.getPicture(),
-                    userEntity.getStatus(),
-                    roleNames.get(roleNames.size() - 1),
-                    roleNames);
-
-            blogPostEntity.setView(blogPostEntity.getView() + 1);
-            blogPostRepository.save(blogPostEntity);
-
-            BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
-                    blogPostEntity.getTypePost(),
-                    blogPostEntity.getTitle(),
-                    blogPostEntity.getContent(),
-                    blogPostEntity.getImage(),
-                    blogPostEntity.getCategory().getCategoryName(),
-                    blogPostEntity.getCategory().getParentCategory(),
-                    tagDTOs,
-                    userDTO,
-                    blogPostEntity.getView(),
-                    blogPostEntity.getCreatedDate(),
-                    voteRepository.countByPostVote(blogPostEntity),
-                    commentRepository.countByPostComment(blogPostEntity)
-            );
-//                  Date.from(Instant.ofEpochMilli((blogPostEntity.getCreatedDate().getTime())))
-//                  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
-//                    .parse(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(blogPostEntity.getCreatedDate())));
-
-            return blogPostDTO;
-        } else
-            throw new BlogPostException("not found blogpost with " + postId);
-
-    }
 }

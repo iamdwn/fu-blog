@@ -44,7 +44,7 @@ public class BlogPostEntity {
     private Long approvedBy;
 
     @Column
-    private  Boolean status = true;
+    private Boolean status = true;
 
     @Column
     private Boolean isApproved  = false;
@@ -59,6 +59,7 @@ public class BlogPostEntity {
     private Boolean pinned;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
 
@@ -71,15 +72,18 @@ public class BlogPostEntity {
     private Set<VoteEntity> votes = new HashSet<>();
 
     @OneToMany(mappedBy = "blogPost")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<ApprovalRequestEntity> approvalRequests = new HashSet<>();
 
     @OneToMany(mappedBy = "postComment")
     private Set<CommentEntity> postComments = new HashSet<>();
 
     @OneToMany(mappedBy = "post")
-    @JsonIgnore
+//    @JsonIgnore
     private Set<PostTagEntity> postTags = new HashSet<>();
+
+    @OneToMany(mappedBy = "blog")
+    private Set<BlogPostReportEntity> BlogReported = new HashSet<>();
 
     @ManyToMany(mappedBy = "markPosts")
     @JsonIgnore

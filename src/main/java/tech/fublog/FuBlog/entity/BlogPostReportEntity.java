@@ -1,8 +1,12 @@
 package tech.fublog.FuBlog.entity;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -12,35 +16,30 @@ import java.util.Date;
 @Data
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Notification")
+@Table(name = "BlogReport")
 @EntityListeners(AuditingEntityListener.class)
-public class NotificationEntity {
-
+public class BlogPostReportEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long notificationId;
-
-    @Column(columnDefinition = "LONGTEXT")
-    private String content;
+    private Long reportId;
 
     @Column
-    private Boolean isRead;
-
-    @Column
-    private boolean isDelivered;
-
-    @Column
-    private Long postId;
+    private String reason;
 
     @Column
     @CreatedDate
-    private Date createdDate;
+    private Date createdDate = new Date();
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "reporter_blog_id")
     private UserEntity user;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "reported_blog_id")
+    private BlogPostEntity blog;
+
 
 }
