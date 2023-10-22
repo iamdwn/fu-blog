@@ -29,7 +29,8 @@ public class PushNotificationController {
 //        return service.getNotificationsByUserToID(userID);
 //    }
     @GetMapping("/{userID}")
-    public Flux<ServerSentEvent<List<NotificationDTO>>> streamLastMessage(@PathVariable Long userID) {
+    public Flux<ServerSentEvent<List<NotificationDTO>>> streamLastMessage(@RequestHeader("Authorization") String token,
+                                                                          @PathVariable Long userID) {
         return service.getNotificationsByUserToID(userID);
     }
 }

@@ -1,6 +1,7 @@
 package tech.fublog.FuBlog.controller;
 
 import org.springframework.http.HttpStatus;
+import tech.fublog.FuBlog.Utility.TokenChecker;
 import tech.fublog.FuBlog.dto.request.ApprovalRequestRequestDTO;
 import tech.fublog.FuBlog.dto.response.ApprovalRequestResponseDTO;
 import tech.fublog.FuBlog.entity.UserEntity;
@@ -39,53 +40,34 @@ public class ApprovalRequestController {
     @GetMapping("/view")
     public ResponseEntity<ResponseObject> getAllRequest(@RequestHeader("Authorization") String token) {
 
-        List<String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
-        if (roles != null) {
-            if (!roles.isEmpty()) {
-                for (String role : roles) {
-                    if(!role.toUpperCase().equals("USER")){
-                        List<ApprovalRequestResponseDTO> dtoList = approvalRequestService.getAllApprovalRequest();
-                        return ResponseEntity.status(HttpStatus.OK)
-                                .body(new ResponseObject("ok", "found", dtoList));
-                    }
-                    return ResponseEntity.status(HttpStatus.OK)
-                            .body(new ResponseObject("ok", "Role is not sp!!", "" ));
-                }
+        try {
+            if (TokenChecker.checkRole(token, true)) {
+                List<ApprovalRequestResponseDTO> dtoList = approvalRequestService.getAllApprovalRequest();
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "Role is empty!!", "" ));
+                        .body(new ResponseObject("ok", "found", dtoList));
             }
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "Role is null!!", "" ));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseObject("failed", "token is wrong or role is not sp!!", ""));
 
     }
 
     @PutMapping("/approve")
     public ResponseEntity<ResponseObject> approveBlog(@RequestHeader("Authorization") String token,
-            @RequestBody ApprovalRequestRequestDTO approvalRequestRequestDTO) {
-
-
-        List<String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
-        if (roles != null) {
-            if (!roles.isEmpty()) {
-                for (String role : roles) {
-                    if(!role.toUpperCase().equals("USER")){
-                        return approvalRequestService.approveBlogPost(approvalRequestRequestDTO);
-                    }
-                    return ResponseEntity.status(HttpStatus.OK)
-                            .body(new ResponseObject("ok", "Role is not sp!!", "" ));
-                }
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "Role is empty!!", "" ));
+                                                      @RequestBody ApprovalRequestRequestDTO approvalRequestRequestDTO) {
+        try {
+            if (TokenChecker.checkRole(token, true)) {
+                return approvalRequestService.approveBlogPost(approvalRequestRequestDTO);
             }
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "Role is null!!", "" ));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseObject("failed", "token is wrong or role is not sp!!", ""));
-
     }
 
 }
