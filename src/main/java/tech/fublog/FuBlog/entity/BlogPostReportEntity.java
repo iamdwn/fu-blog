@@ -41,5 +41,9 @@ public class BlogPostReportEntity {
     @JoinColumn(name = "reported_blog_id")
     private BlogPostEntity blog;
 
-
+    public BlogPostReportEntity(String reason, UserEntity user, BlogPostEntity blog) {
+        this.reason = reason;
+        this.user = user;
+        this.blog = blog;
+    }
 }

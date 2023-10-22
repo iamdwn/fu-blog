@@ -9,9 +9,9 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserReportDTO {
+public class BlogReportDTO {
     private String reason;
-    private Long reporterId;
-    private Long reportedUserId;
+    private Long userId;
+    private Long blogId;
     private Date createdDate;
 }

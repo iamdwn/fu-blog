@@ -83,7 +83,7 @@ public class FollowController {
     public ResponseEntity<ResponseObject> insertFollow(@RequestHeader("Authorization") String token,
                                                        @PathVariable String action, @RequestBody FollowRequestDTO followRequestDTO) {
         try {
-            if (jwtService.extractTokenToGetUser(token.substring(7)).isEmpty()) {
+            if (!jwtService.extractTokenToGetUser(token.substring(7)).isEmpty()) {
                 if (action.equals("follow"))
                     followService.insertFollow(followRequestDTO);
                 else if (action.equals("unfollow"))

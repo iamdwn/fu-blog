@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.CategoryDTO;
 import tech.fublog.FuBlog.dto.TagDTO;
+import tech.fublog.FuBlog.dto.request.BlogReportDTO;
 import tech.fublog.FuBlog.dto.request.UserReportDTO;
 import tech.fublog.FuBlog.dto.response.CategoryResponseDTO;
 import tech.fublog.FuBlog.dto.response.CommentResponseDTO;
@@ -151,6 +152,10 @@ public class DTOConverter {
     }
 
     public static UserReportDTO convertUserReportDTO(UserReportEntity userReportEntity) {
-        return new UserReportDTO(userReportEntity.getReason(), userReportEntity.getReporterId().getId(), userReportEntity.getReporterId().getId());
+        return new UserReportDTO(userReportEntity.getReason(), userReportEntity.getReporterId().getId(), userReportEntity.getReportedUserId().getId(), userReportEntity.getCreatedDate());
+    }
+
+    public static BlogReportDTO convertBlogReportDTO(BlogPostReportEntity blogPostReportEntity) {
+        return new BlogReportDTO(blogPostReportEntity.getReason(), blogPostReportEntity.getUser().getId(), blogPostReportEntity.getBlog().getId(), blogPostReportEntity.getCreatedDate());
     }
 }

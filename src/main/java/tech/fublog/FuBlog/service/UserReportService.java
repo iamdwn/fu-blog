@@ -2,8 +2,12 @@ package tech.fublog.FuBlog.service;
 
 import org.springframework.stereotype.Service;
 import tech.fublog.FuBlog.dto.request.UserReportDTO;
+import tech.fublog.FuBlog.entity.BlogPostEntity;
+import tech.fublog.FuBlog.entity.BlogPostReportEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.entity.UserReportEntity;
+import tech.fublog.FuBlog.exception.BlogReportException;
+import tech.fublog.FuBlog.exception.UserReportException;
 import tech.fublog.FuBlog.repository.UserReportRepository;
 import tech.fublog.FuBlog.repository.UserRepository;
 import tech.fublog.FuBlog.Utility.DTOConverter;
@@ -24,27 +28,43 @@ public class UserReportService {
         this.userRepository = userRepository;
     }
 
-    public boolean createReport(UserReportDTO userReportDTO) {
+    public void createReportUser(UserReportDTO userReportDTO) {
         Optional<UserEntity> reporterUser = userRepository.findById(userReportDTO.getReporterId());
         Optional<UserEntity> reportedUser = userRepository.findById(userReportDTO.getReportedUserId());
+        if (userReportDTO.getReporterId().equals(userReportDTO.getReportedUserId()))
+            throw new UserReportException("You can not report yourself");
         if (reportedUser.isPresent()
                 && reporterUser.isPresent()) {
-            UserReportEntity userReportEntity = new UserReportEntity(userReportDTO.getReason(), reporterUser.get(), reportedUser.get());
-            userReportRepository.save(userReportEntity);
-            return true;
-        }
-        return false;
+            UserReportEntity userReportEntity = userReportRepository.findByReporterIdAndReportedUserId(reporterUser.get(), reportedUser.get());
+            if (userReportEntity == null) {
+                userReportEntity = new UserReportEntity(userReportDTO.getReason(), reporterUser.get(), reportedUser.get());
+                userReportRepository.save(userReportEntity);
+            } else throw new UserReportException("You already report this user");
+        } else throw new UserReportException("User doesn't valid");
     }
 
-    public List<UserReportDTO> getAllReport() {
-        List<UserReportEntity> entityList = userReportRepository.findAll();
+    public List<UserReportDTO> viewAllReportUser() {
+        List<UserReportEntity> entityList = userReportRepository.findByOrderByCreatedDateDesc();
+        List<UserReportDTO> dtoList = new ArrayList<>();
         if (!entityList.isEmpty()) {
-            List<UserReportDTO> dtoList = new ArrayList<>();
             for (UserReportEntity entity : entityList) {
                 dtoList.add(DTOConverter.convertUserReportDTO(entity));
             }
-            return dtoList;
         }
-        return new ArrayList<>();
+        return dtoList;
+    }
+
+    public boolean checkReport(Long reporterId, Long reportedId) {
+        boolean result = false;
+        Optional<UserEntity> reporterUser = userRepository.findById(reporterId);
+        Optional<UserEntity> reportedUser = userRepository.findById(reportedId);
+        if (reporterUser.isPresent()
+                && reportedUser.isPresent()) {
+            UserReportEntity userReportEntity = userReportRepository.findByReporterIdAndReportedUserId(reporterUser.get(), reportedUser.get());
+            if (userReportEntity != null) {
+                result = true;
+            }
+            return result;
+        } else throw new BlogReportException("User or Blog doesn't valid!");
     }
 }
