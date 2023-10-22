@@ -88,6 +88,12 @@ public class UserController {
         }
     }
 
+    @GetMapping("/getBlogByBookMarkUser/{userId}/{page}/{size}")
+    public ResponseEntity<ResponseObject> getBlogByBookMarkUser(@PathVariable Long userId, @PathVariable int page, @PathVariable int size) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", userService.getBlogByBookMarkUser(userId, page, size)));
+    }
+
     @GetMapping("/getMarkPost/{userId}")
     public ResponseEntity<ResponseObject> getMarkPostByUser(@PathVariable Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -131,7 +137,6 @@ public class UserController {
         }
 
     }
-
 
     @PutMapping("/updateUser/{userId}")
     public ResponseEntity<?> updateUser(
