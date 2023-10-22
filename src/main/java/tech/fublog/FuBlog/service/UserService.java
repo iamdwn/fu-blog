@@ -56,14 +56,12 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
 
-
     public UserEntity saveUser(UserEntity user) {
 //        String pass = hashing.hasdPassword(user.getHashed_password());
 //        user.setHashed_password(pass);
         user.setHashedpassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
-
 
 
     public RoleEntity saveRole(RoleEntity role) {
@@ -73,10 +71,9 @@ public class UserService {
 
     public void addToUser(String username, String rolename) {
         UserEntity user = userRepository.findByUsernameAndStatusTrue(username).get();
-        RoleEntity role  = roleRepository.findByName(rolename);
+        RoleEntity role = roleRepository.findByName(rolename);
         user.getRoles().add(role);
     }
-
 
 
     public ResponseEntity<ResponseObject> getActiveUser() {
@@ -98,7 +95,6 @@ public class UserService {
     }
 
 
-
     public UserInfoResponseDTO getUserInfo(Long userId) {
         UserEntity user = userRepository.findByIdAndStatusIsTrue(userId);
         if (user != null) {
@@ -107,9 +103,9 @@ public class UserService {
     }
 
 
-    public List<UserEntity> getAllUser(){
+    public List<UserEntity> getAllUser() {
 //        Pageable pageable = PageRequest.of(page,size);
-        return  userRepository.findAll();
+        return userRepository.findAll();
     }
 
     public PaginationResponseDTO getAllUsers(int page, int size) {
@@ -141,7 +137,7 @@ public class UserService {
     public PaginationResponseDTO getAllUserByAward(String award, int page, int size) {
         List<UserInfoResponseDTO> userDTOs = new ArrayList<>();
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueAndUserAwardsOrderByPointDesc (award, pageable);
+        Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueAndUserAwardsOrderByPointDesc(award, pageable);
         for (UserEntity dto : pageResult.getContent()) {
             userDTOs.add(DTOConverter.convertUserDTO(dto));
         }
@@ -254,6 +250,24 @@ public class UserService {
                     dtoList.add(DTOConverter.convertPostToDTO(entity.getId()));
                 }
                 return dtoList;
+            } else throw new UserException("This user not marked any post");
+        } else throw new UserException("User doesn't exists");
+    }
+
+    public PaginationResponseDTO getBlogByBookMarkUser(Long userId, int page, int size) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            Pageable pageable = PageRequest.of(page - 1, size);
+            Page<BlogPostEntity> pageList = blogPostRepository.findByUserMarksAndStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(userEntity.get(), pageable);
+            if (!pageList.isEmpty()) {
+                List<BlogPostDTO> dtoList = new ArrayList<>();
+                for (BlogPostEntity entity : pageList.getContent()) {
+                    dtoList.add(DTOConverter.convertPostToDTO(entity.getId()));
+                }
+
+                Long blogPostCount = pageList.getTotalElements();
+                Long pageCount = (long) pageList.getTotalPages();
+                return new PaginationResponseDTO(dtoList, blogPostCount, pageCount);
             } else throw new UserException("This user not marked any post");
         } else throw new UserException("User doesn't exists");
     }

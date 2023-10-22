@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.controller;
 
+import tech.fublog.FuBlog.Utility.TokenChecker;
 import tech.fublog.FuBlog.dto.request.CommentRequestDTO;
 import tech.fublog.FuBlog.dto.response.CommentResponseDTO;
 import tech.fublog.FuBlog.model.ResponseObject;
@@ -25,16 +26,21 @@ public class CommentController {
     }
 
     @PostMapping("/insert")
-    public ResponseEntity<ResponseObject> insertComment(@RequestBody CommentResponseDTO commentDTO) {
-        try {
-            commentService.insertComment(commentDTO);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "Comment have been inserted", ""));
-        } catch (CommentException ex) {
-            System.out.println(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-        }
+    public ResponseEntity<ResponseObject> insertComment(@RequestHeader("Authorization") String token,
+                                                        @RequestBody CommentResponseDTO commentDTO) {
+            try {
+                if (TokenChecker.checkToken(token)) {
+                    commentService.insertComment(commentDTO);
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "Comment have been inserted", ""));
+                }
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseObject("failed", "not found", ""));
+            } catch (RuntimeException ex) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseObject("failed", ex.getMessage(), ""));
+            }
+
     }
 
     @GetMapping("/view/{postId}")
@@ -51,30 +57,37 @@ public class CommentController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ResponseObject> updateComment(@RequestBody CommentRequestDTO commentRequestDTO) {
-        try {
-            commentService.updateComment(commentRequestDTO);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "Comment have been updated", ""));
-        } catch (CommentException ex) {
-            System.out.println(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-        }
+    public ResponseEntity<ResponseObject> updateComment(@RequestHeader("Authorization") String token,
+                                                        @RequestBody CommentRequestDTO commentRequestDTO) {
+            try {
+                if (TokenChecker.checkToken(token)) {
+                    commentService.updateComment(commentRequestDTO);
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "Comment have been updated", ""));
+                }
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseObject("failed", "not found", ""));
+            } catch (RuntimeException ex) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseObject("failed", ex.getMessage(), ""));
+            }
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<ResponseObject> deleteComment(
-            @RequestBody CommentRequestDTO commentRequestDTO) {
-        try {
-            commentService.deleteComment(commentRequestDTO);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "Comment have been deleted", ""));
-        } catch (CommentException ex) {
-            System.out.println(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-        }
+    public ResponseEntity<ResponseObject> deleteComment(@RequestHeader("Authorization") String token,
+                                                        @RequestBody CommentRequestDTO commentRequestDTO) {
+            try {
+                if (TokenChecker.checkToken(token)) {
+                    commentService.deleteComment(commentRequestDTO);
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "Comment have been deleted", ""));
+                }
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseObject("failed", "not found", ""));
+            } catch (RuntimeException ex) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseObject("failed", ex.getMessage(), ""));
+            }
     }
 
     @GetMapping("/count/{postId}")

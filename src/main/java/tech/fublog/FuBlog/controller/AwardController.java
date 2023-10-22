@@ -1,7 +1,9 @@
 package tech.fublog.FuBlog.controller;
 
 import org.springframework.http.HttpStatus;
+import tech.fublog.FuBlog.Utility.TokenChecker;
 import tech.fublog.FuBlog.dto.request.AwardRequestDTO;
+import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.AwardService;
 import org.springframework.http.ResponseEntity;
@@ -35,26 +37,15 @@ public class AwardController {
     ResponseEntity<ResponseObject> awardPrize(@RequestHeader("Authorization") String token,
                                               @RequestBody AwardRequestDTO awardRequestDTO) {
 
-        List<String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
-        if (roles != null) {
-            if (!roles.isEmpty()) {
-                for (String role : roles) {
-                    if (!role.toUpperCase().equals("USER")) {
-                        return awardService.awardPrize(awardRequestDTO);
-                    }
-                    return ResponseEntity.status(HttpStatus.OK)
-                            .body(new ResponseObject("ok", "Role is not sp!!", ""));
-                }
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "Role is empty!!", ""));
-            }
+        try {
+            if (TokenChecker.checkToken(token))
+                return awardService.awardPrize(awardRequestDTO);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "Role is null!!", ""));
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseObject("failed", "token is wrong or role is not sp!!", ""));
-
     }
-
 
 }

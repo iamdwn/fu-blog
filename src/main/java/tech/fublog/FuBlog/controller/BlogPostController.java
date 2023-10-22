@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.controller;
 
+import tech.fublog.FuBlog.Utility.TokenChecker;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.request.BlogPostRequestDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
@@ -44,39 +45,53 @@ public class BlogPostController {
 
 
     @DeleteMapping("/deleteBlogById/{postId}")
-    public ResponseEntity<ResponseObject> deleteBlog(@PathVariable Long postId) {
+    public ResponseEntity<ResponseObject> deleteBlog(@RequestHeader("Authorization") String token,
+                                                     @PathVariable Long postId) {
         try {
-            blogPostService.deleteBlogPost(postId);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "deleted successful", ""));
-        } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            if (TokenChecker.checkToken(token)) {
+                blogPostService.deleteBlogPost(postId);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "deleted successful", ""));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
 
     @PostMapping("/insert")
-    ResponseEntity<ResponseObject> insertBlogPost(@RequestBody BlogPostRequestDTO blogPostDTO) {
+    ResponseEntity<ResponseObject> insertBlogPost(@RequestHeader("Authorization") String token,
+                                                  @RequestBody BlogPostRequestDTO blogPostDTO) {
         try {
-            BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(blogPostDTO);
-            approvalRequestService.insertApprovalRequest(blogPostEntity);
-            postTagService.insertPostTag(blogPostDTO.getTagList(), blogPostEntity);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "post is waiting approve", ""));
-        } catch (BlogPostException ex) {
-            System.out.println(ex.getMessage());
+            if (TokenChecker.checkToken(token)) {
+                BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(blogPostDTO);
+                approvalRequestService.insertApprovalRequest(blogPostEntity);
+                postTagService.insertPostTag(blogPostDTO.getTagList(), blogPostEntity);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "post is waiting approve", ""));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<ResponseObject> updateBlog(@RequestBody BlogPostRequestDTO blogPostRequestDTO) {
+    public ResponseEntity<ResponseObject> updateBlog(@RequestHeader("Authorization") String token,
+                                                     @RequestBody BlogPostRequestDTO blogPostRequestDTO) {
         try {
-            BlogPostEntity blogPostEntity = blogPostService.updateBlogPost(blogPostRequestDTO);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "updated successful", blogPostEntity));
-        } catch (BlogPostException ex) {
+            if (TokenChecker.checkToken(token)) {
+                BlogPostEntity blogPostEntity = blogPostService.updateBlogPost(blogPostRequestDTO);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "updated successful", blogPostEntity));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
@@ -84,53 +99,31 @@ public class BlogPostController {
 
     @GetMapping("/getPinnedBlog")
     public ResponseEntity<ResponseObject> getPinnedBlog(@RequestHeader("Authorization") String token) {
-
-        List<String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
-        if (roles != null) {
-            if (!roles.isEmpty()) {
-                for (String role : roles) {
-                    if (!role.toUpperCase().equals("USER")
-                            && !role.toUpperCase().equals("LECTURE")) {
-                        return blogPostService.getPinnedBlog();
-                    }
-                    return ResponseEntity.status(HttpStatus.OK)
-                            .body(new ResponseObject("ok", "Role is not sp!!", ""));
-                }
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "Role is empty!!", ""));
+        try {
+            if (TokenChecker.checkRole(token, false)) {
+                return blogPostService.getPinnedBlog();
             }
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "Role is null!!", ""));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseObject("failed", "token is wrong or role is not sp!!", ""));
-
     }
 
     @PostMapping("/pinBlogAction/{postId}")
     public ResponseEntity<ResponseObject> pinBlog(@RequestHeader("Authorization") String token,
                                                   @PathVariable Long postId) {
-
-        List<String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
-        if (roles != null) {
-            if (!roles.isEmpty()) {
-                for (String role : roles) {
-                    if (!role.toUpperCase().equals("USER")
-                            && !role.toUpperCase().equals("LECTURE")) {
-                        return blogPostService.pinBlogAction(postId);
-                    }
-                    return ResponseEntity.status(HttpStatus.OK)
-                            .body(new ResponseObject("ok", "Role is not sp!!", ""));
-                }
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "Role is empty!!", ""));
+        try {
+            if (TokenChecker.checkRole(token, false)) {
+                return blogPostService.pinBlogAction(postId);
             }
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "Role is null!!", ""));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseObject("failed", "token is wrong or role is not sp!!", ""));
-
     }
 
 
@@ -141,7 +134,7 @@ public class BlogPostController {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", dto));
         } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
@@ -154,7 +147,7 @@ public class BlogPostController {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", dtoList));
         } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
@@ -178,7 +171,7 @@ public class BlogPostController {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", blogPostEntity));
         } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
@@ -190,7 +183,7 @@ public class BlogPostController {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", blogPostEntity));
         } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
@@ -202,7 +195,7 @@ public class BlogPostController {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", blogPostEntity));
         } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
@@ -215,7 +208,7 @@ public class BlogPostController {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", blogPosts));
         } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
@@ -227,7 +220,7 @@ public class BlogPostController {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", blogPosts));
         } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
@@ -240,23 +233,21 @@ public class BlogPostController {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", blogPosts));
         } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
 
     @GetMapping("/sorted/{page}/{size}")
-//    public ResponseEntity<Page<BlogPostEntity>> getSortedBlogPosts(
     public ResponseEntity<ResponseObject> getSortedBlogPosts(
             @RequestParam(name = "sortBy", defaultValue = "newest") String sortBy,
             @PathVariable int page, @PathVariable int size) {
-//        Page<BlogPostEntity> blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
         try {
             PaginationResponseDTO blogPosts = blogPostService.getSortedBlogPosts(sortBy, page, size);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", blogPosts));
         } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
@@ -269,10 +260,35 @@ public class BlogPostController {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", blogPosts));
         } catch (BlogPostException ex) {
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
 
+    @GetMapping("/getBlogByTrending/{page}/{size}")
+    public ResponseEntity<ResponseObject> getBlogByTrending(@PathVariable int page,
+                                                            @PathVariable int size) {
+        try {
+            PaginationResponseDTO blogPosts = blogPostService.getBlogByTrending(page, size);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPosts));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/getBlogByVote/{page}/{size}")
+    public ResponseEntity<ResponseObject> getBlogByVote(@PathVariable int page,
+                                                        @PathVariable int size) {
+        try {
+            PaginationResponseDTO blogPosts = blogPostService.getBlogByVote(page, size);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPosts));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
 }
 

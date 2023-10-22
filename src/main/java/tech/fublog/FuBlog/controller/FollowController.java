@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.controller;
 
+import tech.fublog.FuBlog.Utility.TokenChecker;
 import tech.fublog.FuBlog.dto.request.FollowRequestDTO;
 import tech.fublog.FuBlog.dto.response.FollowResponseDTO;
 import tech.fublog.FuBlog.exception.FollowException;
@@ -22,58 +23,74 @@ public class FollowController {
     private final JwtService jwtService;
 
     @Autowired
-    public FollowController(FollowService followService, JwtService jwtService) {
+    public FollowController(FollowService followService, JwtService jwtService, TokenChecker tokenChecker) {
         this.followService = followService;
         this.jwtService = jwtService;
     }
 
     @GetMapping("/follower/view/{userId}")
-    public ResponseEntity<ResponseObject> viewFollower(@PathVariable Long userId) {
+    public ResponseEntity<ResponseObject> viewFollower(@RequestHeader("Authorization") String token,
+                                                       @PathVariable Long userId) {
         try {
-            List<FollowResponseDTO> dtoList = followService.viewFollower(userId);
+            if (TokenChecker.checkToken(token)) {
+                List<FollowResponseDTO> dtoList = followService.viewFollower(userId);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", dtoList));
+            }
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "found", dtoList));
-        } catch (FollowException ex) {
-            System.out.println(ex.getMessage());
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
 
     @GetMapping("/following/view/{userId}")
-    public ResponseEntity<ResponseObject> viewFollowing(@PathVariable Long userId) {
+    public ResponseEntity<ResponseObject> viewFollowing(@RequestHeader("Authorization") String token,
+                                                        @PathVariable Long userId) {
         try {
-            List<FollowResponseDTO> dtoList = followService.viewFollowing(userId);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "found", dtoList));
-        } catch (FollowException ex) {
-            System.out.println(ex.getMessage());
+            if (TokenChecker.checkToken(token)) {
+                List<FollowResponseDTO> dtoList = followService.viewFollowing(userId);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", dtoList));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
 
     @GetMapping("/follower/count/{userId}")
-    public ResponseEntity<ResponseObject> countFollower(@PathVariable Long userId) {
+    public ResponseEntity<ResponseObject> countFollower(@RequestHeader("Authorization") String token,
+                                                        @PathVariable Long userId) {
         try {
-            Long count = followService.countFollower(userId);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "found", count));
-        } catch (FollowException ex) {
-            System.out.println(ex.getMessage());
+            if (TokenChecker.checkToken(token)) {
+                Long count = followService.countFollower(userId);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", count));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
 
     @GetMapping("/following/count/{userId}")
-    public ResponseEntity<ResponseObject> countFollowing(@PathVariable Long userId) {
+    public ResponseEntity<ResponseObject> countFollowing(@RequestHeader("Authorization") String token,
+                                                         @PathVariable Long userId) {
         try {
-            Long count = followService.countFollowing(userId);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "found", count));
-        } catch (FollowException ex) {
-            System.out.println(ex.getMessage());
+            if (TokenChecker.checkToken(token)) {
+                Long count = followService.countFollowing(userId);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", count));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
@@ -83,16 +100,17 @@ public class FollowController {
     public ResponseEntity<ResponseObject> insertFollow(@RequestHeader("Authorization") String token,
                                                        @PathVariable String action, @RequestBody FollowRequestDTO followRequestDTO) {
         try {
-            if (!jwtService.extractTokenToGetUser(token.substring(7)).isEmpty()) {
+            if (TokenChecker.checkToken(token)) {
                 if (action.equals("follow"))
                     followService.insertFollow(followRequestDTO);
                 else if (action.equals("unfollow"))
                     followService.unFollow(followRequestDTO);
-            } else throw new FollowException("");
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "successfully", ""));
+            }
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "successfully", ""));
-        } catch (FollowException ex) {
-            System.out.println(ex.getMessage());
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
@@ -100,17 +118,21 @@ public class FollowController {
 
 
     @PutMapping("/checkFollowAction")
-    public ResponseEntity<ResponseObject> checkFollow(@RequestBody FollowRequestDTO followRequestDTO) {
+    public ResponseEntity<ResponseObject> checkFollow(@RequestHeader("Authorization") String token,
+                                                      @RequestBody FollowRequestDTO followRequestDTO) {
         try {
-            boolean result = followService.checkFollow(followRequestDTO);
-            if (result)
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "You already follow this user", true));
-            else
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "You hasn't follow this user", false));
-        } catch (FollowException ex) {
-            System.out.println(ex.getMessage());
+            if (TokenChecker.checkToken(token)) {
+                boolean result = followService.checkFollow(followRequestDTO);
+                if (result)
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "You already follow this user", true));
+                else
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "You hasn't follow this user", false));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }

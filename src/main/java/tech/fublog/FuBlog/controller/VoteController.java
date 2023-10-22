@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.controller;
 
+import tech.fublog.FuBlog.Utility.TokenChecker;
 import tech.fublog.FuBlog.dto.VoteDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.NotificationEntity;
@@ -22,7 +23,7 @@ import java.util.Optional;
 @RequestMapping("/api/v1/auth/blogPosts/vote")
 @CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
 
-public class VoteController{
+public class VoteController {
     private final VoteService voteService;
 
     private final NotificationStorageService notificationStorageService;
@@ -66,10 +67,12 @@ public class VoteController{
     }
 
     @PostMapping("/insert")
-    public ResponseEntity<ResponseObject> insertVote(@RequestBody VoteDTO voteDTO) {
+    public ResponseEntity<ResponseObject> insertVote(@RequestHeader("Authorization") String token,
+                                                     @RequestBody VoteDTO voteDTO) {
         try {
-            VoteDTO dto = voteService.insertVote(voteDTO);
-            if (dto != null) {
+            if (TokenChecker.checkToken(token)) {
+                VoteDTO dto = voteService.insertVote(voteDTO);
+                if (dto != null) {
 //                Optional<UserEntity> userEntity = userRepository.findById(voteDTO.getUserId());
 //                Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(voteDTO.getPostId());
 //                NotificationEntity notificationEntity = new NotificationEntity();
@@ -77,13 +80,15 @@ public class VoteController{
 //                notificationEntity.setContent(userEntity.get().getFullName() + "was voted your post");
 //                notificationEntity.setUserNotiId(blogPostEntity.get().getAuthors());
 //                notificationStorageService.createNotificationStorage(notificationEntity);
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "Vote have been inserted", dto));
-            }else
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "Vote have been deleted", ""));
-        } catch (VoteException ex) {
-            System.out.println(ex.getMessage());
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "Vote have been inserted", dto));
+                } else
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "Vote have been deleted", ""));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
