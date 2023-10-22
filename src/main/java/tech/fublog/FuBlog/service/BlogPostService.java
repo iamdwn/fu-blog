@@ -459,4 +459,51 @@ public class BlogPostService {
         return new PaginationResponseDTO(blogPostDTOList, blogPostCount, pageCount);
     }
 
+    public PaginationResponseDTO getBlogByTrending(int page, int size) {
+        List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<BlogPostEntity> pageResult = blogPostRepository.findAllByTrending(pageable);
+        if (pageResult != null) {
+//            List<BlogPostEntity> sortedList = pageResult
+//                    .stream()
+//                    .sorted(Comparator.comparing(BlogPostEntity::getView)
+//                            .thenComparing(BlogPostEntity::getCreatedDate).reversed())
+//                    .collect(Collectors.toList());
+            for (BlogPostEntity blogPost : pageResult.getContent()) {
+                blogPostDTOList.add(DTOConverter.convertPostToDTO(blogPost.getId()));
+            }
+        }
+
+        Long blogPostCount = pageResult.getTotalElements();
+        Long pageCount = (long) pageResult.getTotalPages();
+
+        return new PaginationResponseDTO(blogPostDTOList, blogPostCount, pageCount);
+    }
+
+    public PaginationResponseDTO getBlogByVote(int page, int size) {
+        List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<BlogPostEntity> pageResult = blogPostRepository.findAllByVote(pageable);
+        if (pageResult != null) {
+//            List<BlogPostEntity> sortedList = pageResult
+//                    .stream()
+//                    .sorted((post1, post2) -> {
+//                        int voteCount1 = post1.getVotes().size();
+//                        int voteCount2 = post2.getVotes().size();
+//                        if (voteCount1 == voteCount2)
+//                            return post2.getCreatedDate().compareTo(post1.getCreatedDate());
+//                        return voteCount2 - voteCount1;
+//                    })
+//                    .collect(Collectors.toList());
+            for (BlogPostEntity blogPost : pageResult.getContent()) {
+                blogPostDTOList.add(DTOConverter.convertPostToDTO(blogPost.getId()));
+            }
+        }
+
+        Long blogPostCount = pageResult.getTotalElements();
+        Long pageCount = (long) pageResult.getTotalPages();
+
+        return new PaginationResponseDTO(blogPostDTOList, blogPostCount, pageCount);
+    }
+
 }

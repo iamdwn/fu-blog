@@ -246,11 +246,9 @@ public class BlogPostController {
     }
 
     @GetMapping("/sorted/{page}/{size}")
-//    public ResponseEntity<Page<BlogPostEntity>> getSortedBlogPosts(
     public ResponseEntity<ResponseObject> getSortedBlogPosts(
             @RequestParam(name = "sortBy", defaultValue = "newest") String sortBy,
             @PathVariable int page, @PathVariable int size) {
-//        Page<BlogPostEntity> blogPostEntities = blogPostService.getSortedBlogPosts(sortBy, page, size);
         try {
             PaginationResponseDTO blogPosts = blogPostService.getSortedBlogPosts(sortBy, page, size);
             return ResponseEntity.status(HttpStatus.OK)
@@ -274,5 +272,29 @@ public class BlogPostController {
         }
     }
 
+    @GetMapping("/getBlogByTrending/{page}/{size}")
+    public ResponseEntity<ResponseObject> getBlogByTrending(@PathVariable int page,
+                                                            @PathVariable int size) {
+        try {
+            PaginationResponseDTO blogPosts = blogPostService.getBlogByTrending(page, size);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPosts));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+    @GetMapping("/getBlogByVote/{page}/{size}")
+    public ResponseEntity<ResponseObject> getBlogByVote(@PathVariable int page,
+                                                            @PathVariable int size) {
+        try {
+            PaginationResponseDTO blogPosts = blogPostService.getBlogByVote(page, size);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPosts));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
 }
 
