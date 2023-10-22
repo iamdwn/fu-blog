@@ -82,20 +82,27 @@ public class FollowController {
     @PostMapping("/followAction/{action}")
     public ResponseEntity<ResponseObject> insertFollow(@RequestHeader("Authorization") String token,
                                                        @PathVariable String action, @RequestBody FollowRequestDTO followRequestDTO) {
-        try {
-            if (!jwtService.extractTokenToGetUser(token.substring(7)).isEmpty()) {
-                if (action.equals("follow"))
-                    followService.insertFollow(followRequestDTO);
-                else if (action.equals("unfollow"))
-                    followService.unFollow(followRequestDTO);
-            } else throw new FollowException("");
+        List<String> roles = jwtService.extractTokenToGetRoles(token.substring(7));
+        if (roles != null) {
+            if (!roles.isEmpty()) {
+                try {
+                    if (action.equals("follow"))
+                        followService.insertFollow(followRequestDTO);
+                    else if (action.equals("unfollow"))
+                        followService.unFollow(followRequestDTO);
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "successfully", ""));
+                } catch (FollowException ex) {
+                    System.out.println(ex.getMessage());
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new ResponseObject("failed", ex.getMessage(), ""));
+                }
+            }
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "Role is empty!!", ""));
+            }
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "successfully", ""));
-        } catch (FollowException ex) {
-            System.out.println(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseObject("failed", ex.getMessage(), ""));
-        }
+                    .body(new ResponseObject("ok", "Role is null!!", ""));
     }
 
 
