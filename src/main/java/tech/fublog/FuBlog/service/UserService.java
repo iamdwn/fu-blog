@@ -145,12 +145,12 @@ public class UserService {
             rankPointEnd = Long.MAX_VALUE;
         }
         else if (award == "gold"){
-            rankPointStart = 1000L;
+            rankPointStart = 5000L;
             rankPointEnd = 10000L;
         }
         else if (award == "silver"){
-            rankPointStart = 0L;
-            rankPointEnd = 1000L;
+            rankPointStart = 1000L;
+            rankPointEnd = 5000L;
         }
 
         Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueAndRankPointOrderByPointDesc(rankPointStart, rankPointEnd, pageable);
