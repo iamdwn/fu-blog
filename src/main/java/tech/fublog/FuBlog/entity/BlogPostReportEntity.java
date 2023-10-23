@@ -1,6 +1,7 @@
 package tech.fublog.FuBlog.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -31,12 +32,18 @@ public class BlogPostReportEntity {
     private Date createdDate = new Date();
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "reporter_blog_id")
     private UserEntity user;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "reported_blog_id")
     private BlogPostEntity blog;
 
-
+    public BlogPostReportEntity(String reason, UserEntity user, BlogPostEntity blog) {
+        this.reason = reason;
+        this.user = user;
+        this.blog = blog;
+    }
 }

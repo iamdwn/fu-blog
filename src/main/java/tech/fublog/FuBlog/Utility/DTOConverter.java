@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.CategoryDTO;
 import tech.fublog.FuBlog.dto.TagDTO;
+import tech.fublog.FuBlog.dto.request.BlogPostReportDTO;
+import tech.fublog.FuBlog.dto.request.UserReportDTO;
 import tech.fublog.FuBlog.dto.response.CategoryResponseDTO;
 import tech.fublog.FuBlog.dto.response.CommentResponseDTO;
 import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
@@ -25,13 +27,16 @@ public class DTOConverter {
     private static UserRepository userRepository = null;
     private static BlogPostRepository blogPostRepository = null;
 
+    private final UserReportRepository userReportRepository;
+
     @Autowired
-    public DTOConverter(CategoryRepository categoryRepository, CommentRepository commentRepository, VoteRepository voteRepository, UserRepository userRepository, BlogPostRepository blogPostRepository) {
+    public DTOConverter(CategoryRepository categoryRepository, CommentRepository commentRepository, VoteRepository voteRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, UserReportRepository userReportRepository) {
         this.categoryRepository = categoryRepository;
         this.commentRepository = commentRepository;
         this.voteRepository = voteRepository;
         this.userRepository = userRepository;
         this.blogPostRepository = blogPostRepository;
+        this.userReportRepository = userReportRepository;
     }
 
     public static CategoryResponseDTO convertResponseCategoryToDTO(CategoryEntity categoryEntity) {
@@ -144,5 +149,13 @@ public class DTOConverter {
             commentResponseDTO.setSubComment(dtoList);
             return commentResponseDTO;
         } else return null;
+    }
+
+    public static UserReportDTO convertUserReportDTO(UserReportEntity userReportEntity) {
+        return new UserReportDTO(userReportEntity.getReason(), userReportEntity.getReporterId().getId(), userReportEntity.getReportedUserId().getId(), userReportEntity.getCreatedDate());
+    }
+
+    public static BlogPostReportDTO convertBlogReportDTO(BlogPostReportEntity blogPostReportEntity) {
+        return new BlogPostReportDTO(blogPostReportEntity.getReason(), blogPostReportEntity.getUser().getId(), blogPostReportEntity.getBlog().getId(), blogPostReportEntity.getCreatedDate());
     }
 }
