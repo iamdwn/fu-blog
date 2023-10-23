@@ -137,8 +137,23 @@ public class UserService {
 
     public PaginationResponseDTO getAllUserByAward(String award, int page, int size) {
         List<UserRankDTO> userDTOs = new ArrayList<>();
+        Long rankPointStart = 0L;
+        Long rankPointEnd = 0L;
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueAndUserAwardsOrderByPointDesc(award, pageable);
+        if (award == "diamond"){
+            rankPointStart = 10000L;
+            rankPointEnd = Long.MAX_VALUE;
+        }
+        else if (award == "gold"){
+            rankPointStart = 1000L;
+            rankPointEnd = 10000L;
+        }
+        else if (award == "silver"){
+            rankPointStart = 0L;
+            rankPointEnd = 1000L;
+        }
+
+        Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueAndRankPointOrderByPointDesc(rankPointStart, rankPointEnd, pageable);
         for (UserEntity dto : pageResult.getContent()) {
             userDTOs.add(DTOConverter.convertUserRankDTO(dto));
         }
