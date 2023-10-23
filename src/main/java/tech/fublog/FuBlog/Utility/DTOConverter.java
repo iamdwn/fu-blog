@@ -2,6 +2,7 @@ package tech.fublog.FuBlog.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.CategoryDTO;
 import tech.fublog.FuBlog.dto.TagDTO;
@@ -10,9 +11,11 @@ import tech.fublog.FuBlog.dto.request.UserReportDTO;
 import tech.fublog.FuBlog.dto.response.CategoryResponseDTO;
 import tech.fublog.FuBlog.dto.response.CommentResponseDTO;
 import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
+import tech.fublog.FuBlog.dto.response.UserRankDTO;
 import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.repository.*;
+import tech.fublog.FuBlog.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,22 +24,25 @@ import java.util.stream.Collectors;
 
 @Component
 public class DTOConverter {
+    private static UserService userService;
     private static CategoryRepository categoryRepository;
     private static CommentRepository commentRepository = null;
     private static VoteRepository voteRepository = null;
     private static UserRepository userRepository = null;
+
     private static BlogPostRepository blogPostRepository = null;
 
     private final UserReportRepository userReportRepository;
 
     @Autowired
-    public DTOConverter(CategoryRepository categoryRepository, CommentRepository commentRepository, VoteRepository voteRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, UserReportRepository userReportRepository) {
+    public DTOConverter(CategoryRepository categoryRepository, CommentRepository commentRepository, VoteRepository voteRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, UserReportRepository userReportRepository, UserService userService) {
         this.categoryRepository = categoryRepository;
         this.commentRepository = commentRepository;
         this.voteRepository = voteRepository;
         this.userRepository = userRepository;
         this.blogPostRepository = blogPostRepository;
         this.userReportRepository = userReportRepository;
+        this.userService = userService;
     }
 
     public static CategoryResponseDTO convertResponseCategoryToDTO(CategoryEntity categoryEntity) {
@@ -122,6 +128,31 @@ public class DTOConverter {
                     roleNames.get(roleNames.size() - 1),
                     roleNames,
                     userEntity.getPoint()
+            );
+            return userDTO;
+        } else
+            throw new BlogPostException("not found user with " + userEntity.getId());
+
+    }
+
+    public static UserRankDTO convertUserRankDTO(UserEntity userEntity) {
+        if (userEntity != null) {
+
+            Set<RoleEntity> roleEntities = userEntity.getRoles();
+            List<String> roleNames = roleEntities.stream()
+                    .map(RoleEntity::getName)
+                    .collect(Collectors.toList());
+
+            UserRankDTO userDTO = new UserRankDTO(
+                    userEntity.getId(),
+                    userEntity.getFullName(),
+                    userEntity.getPicture(),
+                    userEntity.getEmail(),
+                    roleNames.get(roleNames.size() - 1),
+                    roleNames,
+                    userEntity.getPoint(),
+                    userService.countViewOfBlog(userEntity.getId()),
+                    userService.countVoteOfBlog(userEntity.getId())
             );
             return userDTO;
         } else
