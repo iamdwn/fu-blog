@@ -285,7 +285,7 @@ public class UserController {
     @GetMapping("/getAllUserByDiamond/{page}/{size}")
     public ResponseEntity<ResponseObject> getAllUserByDiamond(@PathVariable int page,
                                                               @PathVariable int size) {
-        PaginationResponseDTO userList = userService.getAllUserByAward("coc vang", page, size);
+        PaginationResponseDTO userList = userService.getAllUserByAward("diamond", page, size);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseObject("ok", "found", userList));
     }
