@@ -51,8 +51,8 @@ public class UserReportController {
     }
 
     @PutMapping("/checkReportUser")
-    public ResponseEntity<ResponseObject> checkFollow(@RequestHeader("Authorization") String token,
-                                                      @RequestBody UserReportDTO userReportDTO) {
+    public ResponseEntity<ResponseObject> checkReportUser(@RequestHeader("Authorization") String token,
+                                                          @RequestBody UserReportDTO userReportDTO) {
         try {
             if (TokenChecker.checkRole(token, true)) {
                 boolean result = userReportService.checkReport(userReportDTO.getReporterId(), userReportDTO.getReportedUserId());

@@ -51,8 +51,8 @@ public class BlogPostReportController {
     }
 
     @PutMapping("/checkReportBlog")
-    public ResponseEntity<ResponseObject> checkFollow(@RequestHeader("Authorization") String token,
-                                                      @RequestBody BlogPostReportDTO blogPostReportDTO) {
+    public ResponseEntity<ResponseObject> checkReportBlog(@RequestHeader("Authorization") String token,
+                                                          @RequestBody BlogPostReportDTO blogPostReportDTO) {
         try {
             if (TokenChecker.checkRole(token, true)) {
                 boolean result = blogPostReportService.checkReport(blogPostReportDTO.getUserId(), blogPostReportDTO.getBlogId());
