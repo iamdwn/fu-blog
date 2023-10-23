@@ -232,6 +232,22 @@ public class UserController {
         try {
             if (TokenChecker.checkToken(token))
                 return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "post found", userService.countViewOfBlog(userId)));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/countVoteOfBlog/{userId}")
+    public ResponseEntity<ResponseObject> countVoteOfBlog(@RequestHeader("Authorization") String token,
+                                                          @PathVariable Long userId) {
+        try {
+            if (TokenChecker.checkToken(token))
+                return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "post found", blogPostService.countPostMarkByUser(userId)));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));

@@ -417,6 +417,7 @@ public class BlogPostService {
         return 0L;
     }
 
+
     public List<CategoryEntity> findCategoryToSearch(CategoryEntity categoryEntity, List<CategoryEntity> categoryEntityList) {
         List<CategoryEntity> subEntityList = categoryRepository.findByParentCategory(categoryEntity);
         if (subEntityList.isEmpty()) {

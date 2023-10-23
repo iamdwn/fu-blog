@@ -13,6 +13,7 @@ import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
+import tech.fublog.FuBlog.dto.response.UserRankDTO;
 import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.exception.UserException;
@@ -122,11 +123,11 @@ public class UserService {
     }
 
     public PaginationResponseDTO getAllUserByPoint(int page, int size) {
-        List<UserInfoResponseDTO> userDTOs = new ArrayList<>();
+        List<UserRankDTO> userDTOs = new ArrayList<>();
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueOrderByPointDesc(pageable);
         for (UserEntity dto : pageResult.getContent()) {
-            userDTOs.add(DTOConverter.convertUserDTO(dto));
+            userDTOs.add(DTOConverter.convertUserRankDTO(dto));
         }
 
         Long userCount = pageResult.getTotalElements();
@@ -135,11 +136,11 @@ public class UserService {
     }
 
     public PaginationResponseDTO getAllUserByAward(String award, int page, int size) {
-        List<UserInfoResponseDTO> userDTOs = new ArrayList<>();
+        List<UserRankDTO> userDTOs = new ArrayList<>();
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueAndUserAwardsOrderByPointDesc(award, pageable);
         for (UserEntity dto : pageResult.getContent()) {
-            userDTOs.add(DTOConverter.convertUserDTO(dto));
+            userDTOs.add(DTOConverter.convertUserRankDTO(dto));
         }
 
         Long userCount = pageResult.getTotalElements();
@@ -280,6 +281,20 @@ public class UserService {
             if (!entitySet.isEmpty()) {
                 for (BlogPostEntity entity : entitySet) {
                     count += entity.getView();
+                }
+                return count;
+            } else throw new UserException("This user not wrote any post");
+        } else throw new UserException("User doesn't exists");
+    }
+
+    public Long countVoteOfBlog(Long userId) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        Long count = 0L;
+        if (userEntity.isPresent()) {
+            Set<BlogPostEntity> entitySet = userEntity.get().getBlogAuthors();
+            if (!entitySet.isEmpty()) {
+                for (BlogPostEntity entity : entitySet) {
+                    count += entity.getVotes().size();
                 }
                 return count;
             } else throw new UserException("This user not wrote any post");
