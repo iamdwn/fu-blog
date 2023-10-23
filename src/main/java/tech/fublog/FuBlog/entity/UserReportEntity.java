@@ -40,5 +40,9 @@ public class UserReportEntity {
     @JoinColumn(name = "reported_user_id")
     private UserEntity reportedUserId;
 
-
+    public UserReportEntity(String reason, UserEntity reporterId, UserEntity reportedUserId) {
+        this.reason = reason;
+        this.reporterId = reporterId;
+        this.reportedUserId = reportedUserId;
+    }
 }
