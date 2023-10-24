@@ -29,18 +29,20 @@ public class BlogPostController {
     private final CommentService commentService;
     private final JwtService jwtService;
     private final PostTagService postTagService;
+    private final AwardService awardService;
 
     @Autowired
     public BlogPostController(BlogPostService blogPostService, ApprovalRequestService approvalRequestService,
                               VoteService voteService, CommentService commentService,
-                              JwtService jwtService, PostTagService postTagService
-    ) {
+                              JwtService jwtService, PostTagService postTagService,
+                              AwardService awardService) {
         this.blogPostService = blogPostService;
         this.approvalRequestService = approvalRequestService;
         this.voteService = voteService;
         this.commentService = commentService;
         this.jwtService = jwtService;
         this.postTagService = postTagService;
+        this.awardService = awardService;
     }
 
 
@@ -69,6 +71,7 @@ public class BlogPostController {
                 BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(blogPostDTO);
                 approvalRequestService.insertApprovalRequest(blogPostEntity);
                 postTagService.insertPostTag(blogPostDTO.getTagList(), blogPostEntity);
+                awardService.checkAward(blogPostDTO.getUserId());
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "post is waiting approve", ""));
             }
