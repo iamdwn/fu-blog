@@ -66,14 +66,14 @@ public class AwardService {
     public void checkAward(Long userId) {
         UserEntity entity = userRepository.findByIdAndStatusIsTrue(userId);
         if (entity != null) {
-            if ((entity.getPoint() > 1000)
-                    && (entity.getPoint() <= 5000)) {
+            if ((entity.getPoint() >= 1000)
+                    && (entity.getPoint() < 5000)) {
                 awardPrize(new AwardRequestDTO("silver", entity.getId()));
-            } else if ((entity.getPoint() > 5000)
-                    && (entity.getPoint() <= 10000)) {
+            } else if ((entity.getPoint() >= 5000)
+                    && (entity.getPoint() < 10000)) {
                 awardPrize(new AwardRequestDTO("gold", entity.getId()));
             }
-            if (entity.getPoint() > 10000) {
+            if (entity.getPoint() >= 10000) {
                 awardPrize(new AwardRequestDTO("diamond", entity.getId()));
             }
 
