@@ -140,22 +140,20 @@ public class UserService {
         Long rankPointStart = 0L;
         Long rankPointEnd = 0L;
         Pageable pageable = PageRequest.of(page - 1, size);
-        if (award == "diamond"){
+        if (award == "diamond") {
             rankPointStart = 10000L;
             rankPointEnd = Long.MAX_VALUE;
-        }
-        else if (award == "gold"){
+        } else if (award == "gold") {
             rankPointStart = 5000L;
             rankPointEnd = 10000L;
-        }
-        else if (award == "silver"){
+        } else if (award == "silver") {
             rankPointStart = 1000L;
             rankPointEnd = 5000L;
         }
 
         Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueAndRankPointOrderByPointDesc(rankPointStart, rankPointEnd, pageable);
         for (UserEntity dto : pageResult.getContent()) {
-            userDTOs.add(DTOConverter.convertUserRankDTO(dto));
+                userDTOs.add(DTOConverter.convertUserRankDTO(dto));
         }
 
         Long userCount = pageResult.getTotalElements();
@@ -288,7 +286,7 @@ public class UserService {
         } else throw new UserException("User doesn't exists");
     }
 
-    public Long countViewOfBlog(Long userId) {
+    public Long countViewOfBlog(Long userId, Boolean isCheckAward) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         Long count = 0L;
         if (userEntity.isPresent()) {
@@ -298,11 +296,12 @@ public class UserService {
                     count += entity.getView();
                 }
                 return count;
-            } else throw new UserException("This user not wrote any post");
-        } else throw new UserException("User doesn't exists");
+            } else if(!isCheckAward) throw new UserException("This user not wrote any post");
+        } else if(!isCheckAward) throw new UserException("User doesn't exists");
+        return count;
     }
 
-    public Long countVoteOfBlog(Long userId) {
+    public Long countVoteOfBlog(Long userId, Boolean isCheckAward) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         Long count = 0L;
         if (userEntity.isPresent()) {
@@ -312,8 +311,9 @@ public class UserService {
                     count += entity.getVotes().size();
                 }
                 return count;
-            } else throw new UserException("This user not wrote any post");
-        } else throw new UserException("User doesn't exists");
+            } else if(!isCheckAward) throw new UserException("This user not wrote any post");
+        } else if(!isCheckAward) throw new UserException("User doesn't exists");
+        return count;
     }
 
     public boolean checkMarkPost(Long userId, Long postId) {
