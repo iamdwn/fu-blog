@@ -151,8 +151,8 @@ public class DTOConverter {
                     roleNames.get(roleNames.size() - 1),
                     roleNames,
                     userEntity.getPoint(),
-                    userService.countViewOfBlog(userEntity.getId()),
-                    userService.countVoteOfBlog(userEntity.getId())
+                    userService.countViewOfBlog(userEntity.getId(), true),
+                    userService.countVoteOfBlog(userEntity.getId(), true)
             );
             return userDTO;
         } else

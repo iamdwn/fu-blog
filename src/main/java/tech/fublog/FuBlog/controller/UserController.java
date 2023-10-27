@@ -232,7 +232,7 @@ public class UserController {
         try {
             if (TokenChecker.checkToken(token))
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "post found", userService.countViewOfBlog(userId)));
+                        .body(new ResponseObject("ok", "post found", userService.countViewOfBlog(userId, false)));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));
         } catch (RuntimeException ex) {
@@ -248,7 +248,7 @@ public class UserController {
         try {
             if (TokenChecker.checkToken(token))
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "post found", blogPostService.countPostMarkByUser(userId)));
+                        .body(new ResponseObject("ok", "post found", userService.countVoteOfBlog(userId, false)));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));
         } catch (RuntimeException ex) {
