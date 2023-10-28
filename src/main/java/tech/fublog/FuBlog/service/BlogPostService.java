@@ -131,16 +131,28 @@ public class BlogPostService {
 
         if (blogPostEntity.isPresent()
                 && blogPostEntity.get().getStatus()) {
-            BlogPostEntity blogPost = this.getBlogById(postId);
 
-            blogPost.setStatus(false);
+            blogPostEntity.get().setStatus(false);
 
-            blogPostRepository.save(blogPost);
+            blogPostRepository.save(blogPostEntity.get());
 
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "deleted successful", ""));
         }
         throw new BlogPostException("this blog was deleted or the blog not exist");
+    }
+
+
+    public void deleteBlogPostByUser(UserEntity user) {
+        List<BlogPostEntity> blogPostEntity = blogPostRepository.findByAuthorsAndStatusIsTrue(user);
+
+        if (!blogPostEntity.isEmpty()) {
+            for (BlogPostEntity entity : blogPostEntity) {
+                entity.setStatus(false);
+                blogPostRepository.save(entity);
+            }
+        }
+
     }
 
 

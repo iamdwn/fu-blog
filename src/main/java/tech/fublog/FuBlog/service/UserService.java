@@ -140,13 +140,13 @@ public class UserService {
         Long rankPointStart = 0L;
         Long rankPointEnd = 0L;
         Pageable pageable = PageRequest.of(page - 1, size);
-        if (award == "diamond") {
+        if (award.equalsIgnoreCase("diamond")) {
             rankPointStart = 10000L;
             rankPointEnd = Long.MAX_VALUE;
-        } else if (award == "gold") {
+        } else if (award.equalsIgnoreCase("gold")) {
             rankPointStart = 5000L;
             rankPointEnd = 10000L;
-        } else if (award == "silver") {
+        } else if (award.equalsIgnoreCase("silver")) {
             rankPointStart = 1000L;
             rankPointEnd = 5000L;
         }
@@ -204,7 +204,7 @@ public class UserService {
         return userRepository.findById(userId).orElse(null);
     }
 
-    public ResponseEntity<ResponseObject> deleteBlogPost(Long userId) {
+    public ResponseEntity<ResponseObject> deleteUser(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
 
         if (userEntity.isPresent()
@@ -214,10 +214,10 @@ public class UserService {
             userRepository.save(user);
 
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("OK", "Deleted successful", user));
+                    .body(new ResponseObject("OK", "deleted successful", user));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ResponseObject("Not found", "Post not found", ""));
+                .body(new ResponseObject("Not found", "user not found", ""));
     }
 
     public ResponseEntity<ResponseObject> updateUser(Long userId, UserDTO userDTO) {
@@ -316,6 +316,17 @@ public class UserService {
         return count;
     }
 
+    public void setRole(UserEntity user, String role) {
+        RoleEntity roleEntity = roleRepository.findByName(role);
+        if (roleEntity != null) {
+            Set<RoleEntity> roleEntities = new HashSet<>();
+            RoleEntity userRole = roleRepository.findByName(role);
+            roleEntities.add(userRole);
+            user.setRoles(roleEntities);
+
+        } else throw new UserException("Role doesn't exists!");
+    }
+
     public boolean checkMarkPost(Long userId, Long postId) {
         boolean result = false;
         Optional<UserEntity> userEntity = userRepository.findById(userId);
@@ -332,5 +343,7 @@ public class UserService {
             } else throw new UserException("Blog doesn't exists!");
         } else throw new UserException("User doesn't exists!");
     }
+
+
 
 }

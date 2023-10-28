@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 @Repository
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
     List<BlogPostEntity> findByIsApproved(Boolean isApproved);
+    List<BlogPostEntity> findByAuthorsAndStatusIsTrue(UserEntity userEntity);
 
     List<BlogPostEntity> findByTitleLike(String title);
 

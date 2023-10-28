@@ -5,11 +5,10 @@ import tech.fublog.FuBlog.Utility.TokenChecker;
 import tech.fublog.FuBlog.dto.PostMarkDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
+import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
-import tech.fublog.FuBlog.exception.BlogPostException;
-import tech.fublog.FuBlog.exception.FollowException;
-import tech.fublog.FuBlog.exception.UserException;
 import tech.fublog.FuBlog.model.ResponseObject;
+import tech.fublog.FuBlog.repository.RoleRepository;
 import tech.fublog.FuBlog.repository.UserRepository;
 import tech.fublog.FuBlog.service.BlogPostService;
 import tech.fublog.FuBlog.service.JwtService;
@@ -19,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/auth/user")
@@ -176,8 +176,12 @@ public class UserController {
                                                      @PathVariable Long userId) {
 
         try {
-            if (TokenChecker.checkToken(token)) {
-                userService.deleteBlogPost(userId);
+            if (TokenChecker.checkRole(token, true)) {
+                Optional<UserEntity> userEntity = userRepository.findById(userId);
+                if (userEntity.isPresent()
+                        && userEntity.get().getStatus())
+                    userService.deleteUser(userId);
+                blogPostService.deleteBlogPostByUser(userEntity.get());
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "found", ""));
             }
@@ -304,6 +308,27 @@ public class UserController {
         PaginationResponseDTO userList = userService.getAllUserByAward("silver", page, size);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseObject("ok", "found", userList));
+    }
+
+    @PostMapping("/setRole/{userId}/{role}")
+    public ResponseEntity<ResponseObject> setRole(@RequestHeader("Authorization") String token,
+                                                  @PathVariable Long userId,
+                                                  @PathVariable String role) {
+        try {
+            if (TokenChecker.checkRole(token, false)) {
+                Optional<UserEntity> userEntity = userRepository.findById(userId);
+                if (userEntity.isPresent()
+                        && userEntity.get().getStatus())
+                    userService.setRole(userEntity.get(), role);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", ""));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
     }
 
 }
