@@ -12,7 +12,7 @@ import java.util.List;
 public class UserInfoResponseDTO {
     private Long id;
     private String fullName;
-    private String image;
+    private String picture;
     private String email;
     private String role;
     private List<String> roles;
