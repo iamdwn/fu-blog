@@ -386,6 +386,11 @@ public class BlogPostService {
         return filterBlogPost("", page, size);
     }
 
+    public PaginationResponseDTO getAllBlogPosts() {
+        List<BlogPostEntity> blogPostDTOList = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc();
+        return new PaginationResponseDTO(blogPostDTOList, (long) blogPostDTOList.size(), 1L);
+    }
+
 
     public PaginationResponseDTO getAllBlogPostByTitle(String title, int page, int size) {
         return filterBlogPost(title, page, size);

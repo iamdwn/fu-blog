@@ -216,6 +216,20 @@ public class BlogPostController {
         }
     }
 
+
+    @GetMapping("/getAllBlog")
+    public ResponseEntity<ResponseObject> getAllBlogs() {
+
+        try {
+            PaginationResponseDTO blogPosts = blogPostService.getAllBlogPosts();
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPosts));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
     @GetMapping("/getByTitle/{title}/{page}/{size}")
     public ResponseEntity<ResponseObject> getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
         try {
