@@ -30,7 +30,7 @@ pipeline {
                 sh 'docker image pull chalsfptu/fublogapi:latest'
                 sh 'docker container stop fubloglogin || echo "this container does not exist" '
                 sh 'echo y | docker system prune '
-                sh 'docker  run -d --rm --name fubloglogin -p 8084:8080 --restart unless-stopped  chalsfptu/fublogapi  '
+                sh 'docker  run -d  --name fubloglogin -p 8084:8080 --restart unless-stopped  chalsfptu/fublogapi  '
             }
         }
         
