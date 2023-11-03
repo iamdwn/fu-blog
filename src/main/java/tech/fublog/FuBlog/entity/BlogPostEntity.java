@@ -50,7 +50,7 @@ public class BlogPostEntity {
     private Boolean isApproved  = false;
 
     @Column
-    private String image;
+    private String picture;
 
     @Column
     private Long view;
@@ -92,11 +92,11 @@ public class BlogPostEntity {
     @JsonIgnore
     private Set<UserEntity> userMarks = new HashSet<>();
 
-    public BlogPostEntity(String typePost, String title, String content, String image, CategoryEntity category, UserEntity authors, Long view, Boolean pinned) {
+    public BlogPostEntity(String typePost, String title, String content, String picture, CategoryEntity category, UserEntity authors, Long view, Boolean pinned) {
         this.typePost = typePost;
         this.title = title;
         this.content = content;
-        this.image = image;
+        this.picture = picture;
         this.category = category;
         this.authors = authors;
         this.view = view;
