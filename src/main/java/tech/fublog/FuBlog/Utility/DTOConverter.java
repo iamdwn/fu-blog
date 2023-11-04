@@ -96,7 +96,7 @@ public class DTOConverter {
                     blogPostEntity.getTypePost(),
                     blogPostEntity.getTitle(),
                     blogPostEntity.getContent(),
-                    blogPostEntity.getImage(),
+                    blogPostEntity.getPicture(),
                     blogPostEntity.getCategory().getName(),
                     blogPostEntity.getCategory().getParentCategory(),
                     tagDTOs,
