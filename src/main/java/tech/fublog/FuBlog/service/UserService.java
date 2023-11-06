@@ -174,7 +174,7 @@ public class UserService {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()
                 && userEntity.get().getStatus()) {
-            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findByIdAndStatusIsTrueAndIsApprovedIsTrue(postId);
             if (blogPostEntity.isPresent()) {
                 Set<BlogPostEntity> entitySet;
                 if (userEntity.get().getMarkPosts().isEmpty()) {
@@ -197,7 +197,7 @@ public class UserService {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()
                 && userEntity.get().getStatus()) {
-            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findByIdAndStatusIsTrueAndIsApprovedIsTrue(postId);
             if (blogPostEntity.isPresent()) {
                 if (!userEntity.get().getMarkPosts().isEmpty()) {
                     userEntity.get().getMarkPosts().removeIf(entity -> entity.getId().equals(postId));

@@ -63,9 +63,9 @@ public class UserController {
 
         try {
             if (TokenChecker.checkToken(token)) {
-                if (action.equals("mark")) {
+                if (action.equalsIgnoreCase("mark")) {
                     userService.markPost(postMarkDTO.getUserId(), postMarkDTO.getPostId());
-                } else if (action.equals("unMark")) {
+                } else if (action.equalsIgnoreCase("unMark")) {
                     userService.unMarkPost(postMarkDTO.getUserId(), postMarkDTO.getPostId());
                 }
                 return ResponseEntity.status(HttpStatus.OK)

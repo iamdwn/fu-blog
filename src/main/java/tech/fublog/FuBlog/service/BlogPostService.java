@@ -305,8 +305,8 @@ public class BlogPostService {
             filter = "%" + filter + "%";
             pageResult = blogPostRepository.getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(filter, pageable);
         } else {
-            Long cateroryId = Long.parseLong(filter);
-            Optional<CategoryEntity> categoryOptional = categoryRepository.findById(cateroryId);
+            Long categoryId = Long.parseLong(filter);
+            Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
 //            pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
 
             pageResult = findBlogByCategory(categoryOptional.get().getName(),
@@ -345,6 +345,25 @@ public class BlogPostService {
                 }
                 return blogPostEntityPage;
             } else return new PageImpl<>(Collections.emptyList());
+        } else throw new BlogPostException("Category doesn't exists");
+    }
+
+    public List<BlogPostEntity> findBlogByCategory(String name, Long parentCategoryId) {
+        Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(name, parentCategoryId);
+        if (categoryEntity.isPresent()) {
+            List<CategoryEntity> categoryEntityList = findCategoryToSearch(categoryEntity.get(), new ArrayList<>());
+            if (!categoryEntityList.isEmpty()) {
+                List<BlogPostEntity> blogPostEntitySet = new ArrayList<>();
+                Set<BlogPostEntity> blogPostSet = new HashSet<>();
+                List<BlogPostEntity> blogPostEntityPage = blogPostRepository.findByCategoryInAndIsApprovedTrueAndStatusTrue(categoryEntityList);
+                if (blogPostEntityPage != null) {
+                    blogPostEntitySet.addAll(blogPostEntityPage);
+                }
+                for (BlogPostEntity entity : blogPostEntitySet) {
+                    blogPostSet.add(entity);
+                }
+                return blogPostEntityPage;
+            } else return new ArrayList<>();
         } else throw new BlogPostException("Category doesn't exists");
     }
 
@@ -398,6 +417,16 @@ public class BlogPostService {
 
     public PaginationResponseDTO getBlogPostsByCategoryId(Long categoryId, int page, int size) {
         return filterBlogPost(String.valueOf(categoryId), page, size);
+    }
+
+    public PaginationResponseDTO getBlogPostsByCategoryId(Long categoryId) {
+        Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
+//            pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
+
+        List<BlogPostEntity> list = findBlogByCategory(categoryOptional.get().getName(),
+                categoryOptional.get().getParentCategory() == null ? null
+                        : categoryOptional.get().getParentCategory().getId());
+        return new PaginationResponseDTO(list, (long) list.size(), 1L);
     }
 
     public PaginationResponseDTO getSortedBlogPosts(String sortBy, int page, int size) {
