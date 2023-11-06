@@ -134,6 +134,15 @@ public class UserService {
         Long pageCount = (long) pageResult.getTotalPages();
         return new PaginationResponseDTO(userDTOs, userCount, pageCount);
     }
+    public PaginationResponseDTO getAllUserByPoints() {
+        List<UserRankDTO> userDTOs = new ArrayList<>();
+        List<UserEntity> pageResult = userRepository.findAllByStatusIsTrueOrderByPointDesc();
+        for (UserEntity dto : pageResult) {
+            userDTOs.add(DTOConverter.convertUserRankDTO(dto));
+        }
+
+        return new PaginationResponseDTO(userDTOs, (long) pageResult.size(), 1L);
+    }
 
     public PaginationResponseDTO getAllUserByAward(String award, int page, int size) {
         List<UserRankDTO> userDTOs = new ArrayList<>();
