@@ -333,14 +333,14 @@ public class BlogPostService {
         if (categoryEntity.isPresent()) {
             List<CategoryEntity> categoryEntityList = findCategoryToSearch(categoryEntity.get(), new ArrayList<>());
             if (!categoryEntityList.isEmpty()) {
-                List<BlogPostEntity> blogPostEntitySet = new ArrayList<>();
+                List<BlogPostEntity> blogPostEntity = new ArrayList<>();
                 Set<BlogPostEntity> blogPostSet = new HashSet<>();
                 Pageable pageable = PageRequest.of(page - 1, size);
                 Page<BlogPostEntity> blogPostEntityPage = blogPostRepository.findByCategoryInAndIsApprovedTrueAndStatusTrue(categoryEntityList, pageable);
                 if (blogPostEntityPage != null) {
-                    blogPostEntitySet.addAll(blogPostEntityPage.getContent());
+                    blogPostEntity.addAll(blogPostEntityPage.getContent());
                 }
-                for (BlogPostEntity entity : blogPostEntitySet) {
+                for (BlogPostEntity entity : blogPostEntity) {
                     blogPostSet.add(entity);
                 }
                 return blogPostEntityPage;
@@ -353,16 +353,16 @@ public class BlogPostService {
         if (categoryEntity.isPresent()) {
             List<CategoryEntity> categoryEntityList = findCategoryToSearch(categoryEntity.get(), new ArrayList<>());
             if (!categoryEntityList.isEmpty()) {
-                List<BlogPostEntity> blogPostEntitySet = new ArrayList<>();
+                List<BlogPostEntity> blogPostEntity = new ArrayList<>();
                 Set<BlogPostEntity> blogPostSet = new HashSet<>();
-                List<BlogPostEntity> blogPostEntityPage = blogPostRepository.findByCategoryInAndIsApprovedTrueAndStatusTrue(categoryEntityList);
-                if (blogPostEntityPage != null) {
-                    blogPostEntitySet.addAll(blogPostEntityPage);
+                List<BlogPostEntity> blogPostEntityList = blogPostRepository.findByCategoryInAndIsApprovedTrueAndStatusTrue(categoryEntityList);
+                if (blogPostEntityList != null) {
+                    blogPostEntity.addAll(blogPostEntityList);
                 }
-                for (BlogPostEntity entity : blogPostEntitySet) {
+                for (BlogPostEntity entity : blogPostEntity) {
                     blogPostSet.add(entity);
                 }
-                return blogPostEntityPage;
+                return blogPostEntityList;
             } else return new ArrayList<>();
         } else throw new BlogPostException("Category doesn't exists");
     }
