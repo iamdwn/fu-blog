@@ -255,6 +255,19 @@ public class BlogPostController {
         }
     }
 
+    @GetMapping("/getByCategory/{categoryId}")
+    public ResponseEntity<ResponseObject> getBlogPostsByCategoryId(@PathVariable Long categoryId) {
+//        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+        try {
+            PaginationResponseDTO blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPosts));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
     @GetMapping("/sorted/{page}/{size}")
     public ResponseEntity<ResponseObject> getSortedBlogPosts(
             @RequestParam(name = "sortBy", defaultValue = "newest") String sortBy,
