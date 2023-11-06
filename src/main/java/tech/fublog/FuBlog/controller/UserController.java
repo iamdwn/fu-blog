@@ -286,6 +286,13 @@ public class UserController {
                 .body(new ResponseObject("ok", "found", userList));
     }
 
+    @GetMapping("/getAllUserByPoint")
+    public ResponseEntity<ResponseObject> getAllUserByPoint() {
+        PaginationResponseDTO userList = userService.getAllUserByPoints();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", userList));
+    }
+
     @GetMapping("/getAllUserByDiamond/{page}/{size}")
     public ResponseEntity<ResponseObject> getAllUserByDiamond(@PathVariable int page,
                                                               @PathVariable int size) {

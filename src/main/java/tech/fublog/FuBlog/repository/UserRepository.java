@@ -27,6 +27,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Page<UserEntity> findAllByStatusIsTrue(Pageable pageable);
     Page<UserEntity> findAllByStatusIsTrueOrderByPointDesc(Pageable pageable);
+    List<UserEntity> findAllByStatusIsTrueOrderByPointDesc();
 
     @Query("SELECT user FROM UserEntity user JOIN UserAwardEntity userAward WHERE user.status = true AND user.id = userAward.user.id AND userAward.award.name = :award ORDER BY user.point DESC")
     Page<UserEntity> findAllByStatusIsTrueAndUserAwardsOrderByPointDesc(String award, Pageable pageable);
