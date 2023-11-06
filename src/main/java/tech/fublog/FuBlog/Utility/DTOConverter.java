@@ -19,6 +19,7 @@ import tech.fublog.FuBlog.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,18 +30,19 @@ public class DTOConverter {
     private static CommentRepository commentRepository = null;
     private static VoteRepository voteRepository = null;
     private static UserRepository userRepository = null;
-
+    private static AwardRepository awardRepository = null;
     private static BlogPostRepository blogPostRepository = null;
 
     private final UserReportRepository userReportRepository;
 
     @Autowired
-    public DTOConverter(CategoryRepository categoryRepository, CommentRepository commentRepository, VoteRepository voteRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, UserReportRepository userReportRepository, UserService userService) {
+    public DTOConverter(CategoryRepository categoryRepository, CommentRepository commentRepository, VoteRepository voteRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, AwardRepository awardRepository, UserReportRepository userReportRepository, UserService userService) {
         this.categoryRepository = categoryRepository;
         this.commentRepository = commentRepository;
         this.voteRepository = voteRepository;
         this.userRepository = userRepository;
         this.blogPostRepository = blogPostRepository;
+        this.awardRepository = awardRepository;
         this.userReportRepository = userReportRepository;
         this.userService = userService;
     }
@@ -142,6 +144,8 @@ public class DTOConverter {
             List<String> roleNames = roleEntities.stream()
                     .map(RoleEntity::getName)
                     .collect(Collectors.toList());
+            Optional<AwardEntity> award = awardRepository.findById(userEntity.getId());
+            String awardName = award.isPresent() ? award.get().getName() : null;
 
             UserRankDTO userDTO = new UserRankDTO(
                     userEntity.getId(),
@@ -151,6 +155,7 @@ public class DTOConverter {
                     roleNames.get(roleNames.size() - 1),
                     roleNames,
                     userEntity.getPoint(),
+                    awardName,
                     userService.countViewOfBlog(userEntity.getId(), true),
                     userService.countVoteOfBlog(userEntity.getId(), true)
             );

@@ -17,6 +17,7 @@ public class UserRankDTO {
     private String role;
     private List<String> roles;
     private Double point;
+    private String ranking;
     private Long countViewOfBlog;
     private Long countVoteOfBlog;
 }
