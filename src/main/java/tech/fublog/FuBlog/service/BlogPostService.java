@@ -429,6 +429,20 @@ public class BlogPostService {
         return new PaginationResponseDTO(list, (long) list.size(), 1L);
     }
 
+    public PaginationResponseDTO getBlogByFollow(Long userId) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
+        if (userEntity.isPresent()) {
+            List<BlogPostEntity> blogPostList = blogPostRepository.findByFollowAndIsApprovedTrueAndStatusTrue(userId);
+            if (blogPostList != null) {
+                for (BlogPostEntity entity : blogPostList) {
+                    blogPostDTOList.add(DTOConverter.convertPostToDTO(entity.getId()));
+                }
+                return new PaginationResponseDTO(blogPostDTOList, (long) blogPostDTOList.size(), 1L);
+            } throw new BlogPostException("User who you followed doesn't write any posts");
+        } throw new BlogPostException("User doesn't exist");
+    }
+
     public PaginationResponseDTO getSortedBlogPosts(String sortBy, int page, int size) {
         return filterBlogPost(sortBy, page, size);
     }

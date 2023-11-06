@@ -268,6 +268,17 @@ public class BlogPostController {
         }
     }
 
+    @GetMapping("/getBlogByFollow/{userId}")
+    public ResponseEntity<ResponseObject> getBlogByFollow(@PathVariable Long userId) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found",  blogPostService.getBlogByFollow(userId)));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
     @GetMapping("/sorted/{page}/{size}")
     public ResponseEntity<ResponseObject> getSortedBlogPosts(
             @RequestParam(name = "sortBy", defaultValue = "newest") String sortBy,

@@ -4,6 +4,8 @@ import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.Utility.TokenChecker;
 import tech.fublog.FuBlog.dto.PostMarkDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
+import tech.fublog.FuBlog.dto.request.UserPasswordUpdateDTO;
+import tech.fublog.FuBlog.dto.request.UserUpdateDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
@@ -194,17 +196,18 @@ public class UserController {
         }
     }
 
-    @PutMapping("/updateUser/{userId}")
-    public ResponseEntity<?> updateUser(@RequestHeader("Authorization") String token,
-                                        @PathVariable Long userId,
-                                        @RequestBody UserDTO userDTO) {
+    @PutMapping("/updateUserProfile/{userId}")
+    public ResponseEntity<ResponseObject> updateUser(@RequestHeader("Authorization") String token,
+                                                     @PathVariable Long userId,
+                                                     @RequestBody UserUpdateDTO userUpdateDTO) {
         if (userId == null) {
-            return ResponseEntity.badRequest().body("User ID cannot be null");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "User ID cannot be null", ""));
         }
         try {
             if (TokenChecker.checkToken(token))
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "found", userService.updateUser(userId, userDTO)));
+                        .body(new ResponseObject("ok", "updated successfully", userService.updateUserProfile(userId, userUpdateDTO)));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));
         } catch (RuntimeException ex) {
@@ -213,6 +216,30 @@ public class UserController {
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
+
+    @PutMapping("/updateUserPassword/{userId}")
+    public ResponseEntity<ResponseObject> updateUserPassword(@RequestHeader("Authorization") String token,
+                                                             @PathVariable Long userId,
+                                                             @RequestBody UserPasswordUpdateDTO userPasswordUpdateDTO) {
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "User ID cannot be null", ""));
+        }
+        try {
+            if (TokenChecker.checkToken(token)) {
+                userService.updateUserPassword(userId, userPasswordUpdateDTO);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", ""));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
 
     @GetMapping("/countPostMarkByUser/{userId}")
     ResponseEntity<ResponseObject> countPostMarkByUser(@RequestHeader("Authorization") String token,

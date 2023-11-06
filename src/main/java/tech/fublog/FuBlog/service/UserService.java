@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
+import tech.fublog.FuBlog.dto.request.UserPasswordUpdateDTO;
+import tech.fublog.FuBlog.dto.request.UserUpdateDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
 import tech.fublog.FuBlog.dto.response.UserRankDTO;
@@ -54,7 +56,11 @@ public class UserService {
     @Autowired
     private Hashing hashing;
 
+    @Autowired
+    PasswordEncoder encoder;
+
     private PasswordEncoder passwordEncoder;
+
 
 
     public UserEntity saveUser(UserEntity user) {
@@ -77,7 +83,7 @@ public class UserService {
     }
 
 
-    public ResponseEntity<ResponseObject> getActiveUser() {
+    public List<UserInfoResponseDTO> getActiveUser() {
         List<UserEntity> userEntities = userRepository.findAllByOrderByPointDesc();
         List<UserInfoResponseDTO> highestPointUser = new ArrayList<>();
 
@@ -90,9 +96,7 @@ public class UserService {
             }
         }
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new tech.fublog.FuBlog.model.ResponseObject("found", "list found",
-                        highestPointUser));
+        return highestPointUser;
     }
 
 
@@ -134,6 +138,7 @@ public class UserService {
         Long pageCount = (long) pageResult.getTotalPages();
         return new PaginationResponseDTO(userDTOs, userCount, pageCount);
     }
+
     public PaginationResponseDTO getAllUserByPoints() {
         List<UserRankDTO> userDTOs = new ArrayList<>();
         List<UserEntity> pageResult = userRepository.findAllByStatusIsTrueOrderByPointDesc();
@@ -162,7 +167,7 @@ public class UserService {
 
         Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueAndRankPointOrderByPointDesc(rankPointStart, rankPointEnd, pageable);
         for (UserEntity dto : pageResult.getContent()) {
-                userDTOs.add(DTOConverter.convertUserRankDTO(dto));
+            userDTOs.add(DTOConverter.convertUserRankDTO(dto));
         }
 
         Long userCount = pageResult.getTotalElements();
@@ -263,6 +268,32 @@ public class UserService {
                 .body(new ResponseObject("failed", "updated failed", ""));
     }
 
+
+    public UserUpdateDTO updateUserProfile(Long userId, UserUpdateDTO userUpdateDTO) {
+
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            UserEntity user = this.getUserById(userId);
+            user.setFullName(userUpdateDTO.getFullName());
+            user.setEmail(userUpdateDTO.getEmail());
+            user.setPicture(userUpdateDTO.getPicture());
+            userRepository.save(user);
+            return userUpdateDTO;
+        } throw new UserException("updated failed");
+    }
+
+    public void updateUserPassword(Long userId, UserPasswordUpdateDTO userPasswordUpdateDTO) {
+
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            if (encoder.encode(userPasswordUpdateDTO.getConfirmPassword()).equals(userEntity.get().getPassword())) {
+                UserEntity user = this.getUserById(userId);
+                user.setFullName(encoder.encode(userPasswordUpdateDTO.getNewPassword()));
+                userRepository.save(user);
+            } throw new UserException("confirm password is not correct ");
+        } throw new UserException("updated failed");
+    }
+
     public List<BlogPostDTO> getMarkPostByUser(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
@@ -305,8 +336,8 @@ public class UserService {
                     count += entity.getView();
                 }
                 return count;
-            } else if(!isCheckAward) throw new UserException("This user not wrote any post");
-        } else if(!isCheckAward) throw new UserException("User doesn't exists");
+            } else if (!isCheckAward) throw new UserException("This user not wrote any post");
+        } else if (!isCheckAward) throw new UserException("User doesn't exists");
         return count;
     }
 
@@ -320,8 +351,8 @@ public class UserService {
                     count += entity.getVotes().size();
                 }
                 return count;
-            } else if(!isCheckAward) throw new UserException("This user not wrote any post");
-        } else if(!isCheckAward) throw new UserException("User doesn't exists");
+            } else if (!isCheckAward) throw new UserException("This user not wrote any post");
+        } else if (!isCheckAward) throw new UserException("User doesn't exists");
         return count;
     }
 
@@ -352,7 +383,6 @@ public class UserService {
             } else throw new UserException("Blog doesn't exists!");
         } else throw new UserException("User doesn't exists!");
     }
-
 
 
 }

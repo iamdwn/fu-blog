@@ -42,6 +42,10 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
             "bp.isApproved = true AND bp.status = true ORDER BY bp.category.name asc ")
     List<BlogPostEntity> findByCategoryInAndIsApprovedTrueAndStatusTrue(@Param("categoryEntityList") List<CategoryEntity> categoryEntityList);
 
+    @Query("SELECT bp FROM BlogPostEntity bp JOIN FollowEntity f WHERE bp.authors.id = f.following.id AND f.follower.id = :userId AND " +
+            "bp.isApproved = true AND bp.status = true")
+    List<BlogPostEntity> findByFollowAndIsApprovedTrueAndStatusTrue(@Param("userId") Long userId);
+
     //    @Query("SELECT bp FROM BlogPostEntity bp WHERE (bp.category.id = :categoryId OR bp.category.parentCategory.id = :categoryId) " +
 //            "AND (bp.isApproved = true AND bp.status = true) ORDER BY bp.category.categoryName asc ")
 //    Page<BlogPostEntity> findBlogPostsByCategoryIdOrParentId(
