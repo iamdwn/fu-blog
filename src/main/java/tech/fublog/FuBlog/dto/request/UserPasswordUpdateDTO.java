@@ -8,7 +8,8 @@ import lombok.*;
 @Getter
 @Setter
 public class UserPasswordUpdateDTO {
-    private String confirmPassword;
+    private String oldPassword;
     private String newPassword;
+    private String confirmPassword;
 }
 

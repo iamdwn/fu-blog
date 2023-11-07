@@ -287,10 +287,12 @@ public class UserService {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
             if (encoder.encode(userPasswordUpdateDTO.getConfirmPassword()).equals(userEntity.get().getPassword())) {
-                UserEntity user = this.getUserById(userId);
-                user.setFullName(encoder.encode(userPasswordUpdateDTO.getNewPassword()));
-                userRepository.save(user);
-            } throw new UserException("confirm password is not correct ");
+                if (userPasswordUpdateDTO.getNewPassword().equals(userPasswordUpdateDTO.getConfirmPassword())) {
+                    UserEntity user = this.getUserById(userId);
+                    user.setHashedpassword(encoder.encode(userPasswordUpdateDTO.getNewPassword()));
+                    userRepository.save(user);
+                } throw new UserException("confirm password is not correct");
+            } throw new UserException("old password is not correct ");
         } throw new UserException("updated failed");
     }
 
