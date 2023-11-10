@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import tech.fublog.FuBlog.Utility.TokenChecker;
 import tech.fublog.FuBlog.dto.request.ApprovalRequestRequestDTO;
 import tech.fublog.FuBlog.dto.response.ApprovalRequestResponseDTO;
+import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.repository.UserRepository;
@@ -43,6 +44,25 @@ public class ApprovalRequestController {
         try {
             if (TokenChecker.checkRole(token, true)) {
                 List<ApprovalRequestResponseDTO> dtoList = approvalRequestService.getAllApprovalRequest();
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", dtoList));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+
+    }
+
+    @GetMapping("/viewByCategory/{categoryId}")
+    public ResponseEntity<ResponseObject> getAllRequestByCategory(@RequestHeader("Authorization") String token,
+                                                                  @PathVariable Long categoryId) {
+
+        try {
+            if (TokenChecker.checkRole(token, true)) {
+                PaginationResponseDTO dtoList = approvalRequestService.getAllApprovalRequestByCategory(categoryId);
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "found", dtoList));
             }

@@ -21,7 +21,7 @@ public class BlogPostDTO {
     private String typePost;
     private String title;
     private String content;
-    private String image;
+    private String picture;
     private String categoryName;
     private CategoryEntity parentCategoryId;
     private Set<TagDTO> tagList;

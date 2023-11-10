@@ -92,7 +92,7 @@ public class BlogPostService {
                     blogPostEntity.getTypePost(),
                     blogPostEntity.getTitle(),
                     blogPostEntity.getContent(),
-                    blogPostEntity.getImage(),
+                    blogPostEntity.getPicture(),
                     blogPostEntity.getCategory().getName(),
                     blogPostEntity.getCategory().getParentCategory(),
                     tagDTOs,
@@ -131,16 +131,28 @@ public class BlogPostService {
 
         if (blogPostEntity.isPresent()
                 && blogPostEntity.get().getStatus()) {
-            BlogPostEntity blogPost = this.getBlogById(postId);
 
-            blogPost.setStatus(false);
+            blogPostEntity.get().setStatus(false);
 
-            blogPostRepository.save(blogPost);
+            blogPostRepository.save(blogPostEntity.get());
 
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "deleted successful", ""));
         }
         throw new BlogPostException("this blog was deleted or the blog not exist");
+    }
+
+
+    public void deleteBlogPostByUser(UserEntity user) {
+        List<BlogPostEntity> blogPostEntity = blogPostRepository.findByAuthorsAndStatusIsTrue(user);
+
+        if (!blogPostEntity.isEmpty()) {
+            for (BlogPostEntity entity : blogPostEntity) {
+                entity.setStatus(false);
+                blogPostRepository.save(entity);
+            }
+        }
+
     }
 
 
@@ -293,8 +305,8 @@ public class BlogPostService {
             filter = "%" + filter + "%";
             pageResult = blogPostRepository.getBlogPostEntitiesByTitleLikeAndIsApprovedIsTrueAndStatusIsTrue(filter, pageable);
         } else {
-            Long cateroryId = Long.parseLong(filter);
-            Optional<CategoryEntity> categoryOptional = categoryRepository.findById(cateroryId);
+            Long categoryId = Long.parseLong(filter);
+            Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
 //            pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
 
             pageResult = findBlogByCategory(categoryOptional.get().getName(),
@@ -321,18 +333,37 @@ public class BlogPostService {
         if (categoryEntity.isPresent()) {
             List<CategoryEntity> categoryEntityList = findCategoryToSearch(categoryEntity.get(), new ArrayList<>());
             if (!categoryEntityList.isEmpty()) {
-                List<BlogPostEntity> blogPostEntitySet = new ArrayList<>();
+                List<BlogPostEntity> blogPostEntity = new ArrayList<>();
                 Set<BlogPostEntity> blogPostSet = new HashSet<>();
                 Pageable pageable = PageRequest.of(page - 1, size);
                 Page<BlogPostEntity> blogPostEntityPage = blogPostRepository.findByCategoryInAndIsApprovedTrueAndStatusTrue(categoryEntityList, pageable);
                 if (blogPostEntityPage != null) {
-                    blogPostEntitySet.addAll(blogPostEntityPage.getContent());
+                    blogPostEntity.addAll(blogPostEntityPage.getContent());
                 }
-                for (BlogPostEntity entity : blogPostEntitySet) {
+                for (BlogPostEntity entity : blogPostEntity) {
                     blogPostSet.add(entity);
                 }
                 return blogPostEntityPage;
             } else return new PageImpl<>(Collections.emptyList());
+        } else throw new BlogPostException("Category doesn't exists");
+    }
+
+    public List<BlogPostEntity> findBlogByCategory(String name, Long parentCategoryId) {
+        Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(name, parentCategoryId);
+        if (categoryEntity.isPresent()) {
+            List<CategoryEntity> categoryEntityList = findCategoryToSearch(categoryEntity.get(), new ArrayList<>());
+            if (!categoryEntityList.isEmpty()) {
+                List<BlogPostEntity> blogPostEntity = new ArrayList<>();
+                Set<BlogPostEntity> blogPostSet = new HashSet<>();
+                List<BlogPostEntity> blogPostEntityList = blogPostRepository.findByCategoryInAndIsApprovedTrueAndStatusTrue(categoryEntityList);
+                if (blogPostEntityList != null) {
+                    blogPostEntity.addAll(blogPostEntityList);
+                }
+                for (BlogPostEntity entity : blogPostEntity) {
+                    blogPostSet.add(entity);
+                }
+                return blogPostEntityList;
+            } else return new ArrayList<>();
         } else throw new BlogPostException("Category doesn't exists");
     }
 
@@ -374,6 +405,11 @@ public class BlogPostService {
         return filterBlogPost("", page, size);
     }
 
+    public PaginationResponseDTO getAllBlogPosts() {
+        List<BlogPostEntity> blogPostDTOList = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc();
+        return new PaginationResponseDTO(blogPostDTOList, (long) blogPostDTOList.size(), 1L);
+    }
+
 
     public PaginationResponseDTO getAllBlogPostByTitle(String title, int page, int size) {
         return filterBlogPost(title, page, size);
@@ -381,6 +417,30 @@ public class BlogPostService {
 
     public PaginationResponseDTO getBlogPostsByCategoryId(Long categoryId, int page, int size) {
         return filterBlogPost(String.valueOf(categoryId), page, size);
+    }
+
+    public PaginationResponseDTO getBlogPostsByCategoryId(Long categoryId) {
+        Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
+//            pageResult = blogPostRepository.findBlogPostsByCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
+
+        List<BlogPostEntity> list = findBlogByCategory(categoryOptional.get().getName(),
+                categoryOptional.get().getParentCategory() == null ? null
+                        : categoryOptional.get().getParentCategory().getId());
+        return new PaginationResponseDTO(list, (long) list.size(), 1L);
+    }
+
+    public PaginationResponseDTO getBlogByFollow(Long userId) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
+        if (userEntity.isPresent()) {
+            List<BlogPostEntity> blogPostList = blogPostRepository.findByFollowAndIsApprovedTrueAndStatusTrue(userId);
+            if (blogPostList != null) {
+                for (BlogPostEntity entity : blogPostList) {
+                    blogPostDTOList.add(DTOConverter.convertPostToDTO(entity.getId()));
+                }
+                return new PaginationResponseDTO(blogPostDTOList, (long) blogPostDTOList.size(), 1L);
+            } throw new BlogPostException("User who you followed doesn't write any posts");
+        } throw new BlogPostException("User doesn't exist");
     }
 
     public PaginationResponseDTO getSortedBlogPosts(String sortBy, int page, int size) {
@@ -416,6 +476,7 @@ public class BlogPostService {
         }
         return 0L;
     }
+
 
     public List<CategoryEntity> findCategoryToSearch(CategoryEntity categoryEntity, List<CategoryEntity> categoryEntityList) {
         List<CategoryEntity> subEntityList = categoryRepository.findByParentCategory(categoryEntity);

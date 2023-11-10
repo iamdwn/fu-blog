@@ -1,12 +1,13 @@
 package tech.fublog.FuBlog.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import tech.fublog.FuBlog.service.JwtService;
 
 import java.util.List;
 
-@Service
+@Component
 public class TokenChecker {
     private static JwtService jwtService = null;
 

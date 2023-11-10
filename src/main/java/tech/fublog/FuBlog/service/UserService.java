@@ -11,8 +11,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
+import tech.fublog.FuBlog.dto.request.UserPasswordUpdateDTO;
+import tech.fublog.FuBlog.dto.request.UserUpdateDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
+import tech.fublog.FuBlog.dto.response.UserRankDTO;
 import tech.fublog.FuBlog.entity.*;
 import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.exception.UserException;
@@ -53,7 +56,11 @@ public class UserService {
     @Autowired
     private Hashing hashing;
 
+    @Autowired
+    PasswordEncoder encoder;
+
     private PasswordEncoder passwordEncoder;
+
 
 
     public UserEntity saveUser(UserEntity user) {
@@ -76,7 +83,7 @@ public class UserService {
     }
 
 
-    public ResponseEntity<ResponseObject> getActiveUser() {
+    public List<UserInfoResponseDTO> getActiveUser() {
         List<UserEntity> userEntities = userRepository.findAllByOrderByPointDesc();
         List<UserInfoResponseDTO> highestPointUser = new ArrayList<>();
 
@@ -89,9 +96,7 @@ public class UserService {
             }
         }
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new tech.fublog.FuBlog.model.ResponseObject("found", "list found",
-                        highestPointUser));
+        return highestPointUser;
     }
 
 
@@ -122,11 +127,11 @@ public class UserService {
     }
 
     public PaginationResponseDTO getAllUserByPoint(int page, int size) {
-        List<UserInfoResponseDTO> userDTOs = new ArrayList<>();
+        List<UserRankDTO> userDTOs = new ArrayList<>();
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueOrderByPointDesc(pageable);
         for (UserEntity dto : pageResult.getContent()) {
-            userDTOs.add(DTOConverter.convertUserDTO(dto));
+            userDTOs.add(DTOConverter.convertUserRankDTO(dto));
         }
 
         Long userCount = pageResult.getTotalElements();
@@ -134,12 +139,35 @@ public class UserService {
         return new PaginationResponseDTO(userDTOs, userCount, pageCount);
     }
 
+    public PaginationResponseDTO getAllUserByPoints() {
+        List<UserRankDTO> userDTOs = new ArrayList<>();
+        List<UserEntity> pageResult = userRepository.findAllByStatusIsTrueOrderByPointDesc();
+        for (UserEntity dto : pageResult) {
+            userDTOs.add(DTOConverter.convertUserRankDTO(dto));
+        }
+
+        return new PaginationResponseDTO(userDTOs, (long) pageResult.size(), 1L);
+    }
+
     public PaginationResponseDTO getAllUserByAward(String award, int page, int size) {
-        List<UserInfoResponseDTO> userDTOs = new ArrayList<>();
+        List<UserRankDTO> userDTOs = new ArrayList<>();
+        Long rankPointStart = 0L;
+        Long rankPointEnd = 0L;
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueAndUserAwardsOrderByPointDesc(award, pageable);
+        if (award.equalsIgnoreCase("diamond")) {
+            rankPointStart = 10000L;
+            rankPointEnd = Long.MAX_VALUE;
+        } else if (award.equalsIgnoreCase("gold")) {
+            rankPointStart = 5000L;
+            rankPointEnd = 10000L;
+        } else if (award.equalsIgnoreCase("silver")) {
+            rankPointStart = 1000L;
+            rankPointEnd = 5000L;
+        }
+
+        Page<UserEntity> pageResult = userRepository.findAllByStatusIsTrueAndRankPointOrderByPointDesc(rankPointStart, rankPointEnd, pageable);
         for (UserEntity dto : pageResult.getContent()) {
-            userDTOs.add(DTOConverter.convertUserDTO(dto));
+            userDTOs.add(DTOConverter.convertUserRankDTO(dto));
         }
 
         Long userCount = pageResult.getTotalElements();
@@ -151,7 +179,7 @@ public class UserService {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()
                 && userEntity.get().getStatus()) {
-            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findByIdAndStatusIsTrueAndIsApprovedIsTrue(postId);
             if (blogPostEntity.isPresent()) {
                 Set<BlogPostEntity> entitySet;
                 if (userEntity.get().getMarkPosts().isEmpty()) {
@@ -174,7 +202,7 @@ public class UserService {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()
                 && userEntity.get().getStatus()) {
-            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+            Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findByIdAndStatusIsTrueAndIsApprovedIsTrue(postId);
             if (blogPostEntity.isPresent()) {
                 if (!userEntity.get().getMarkPosts().isEmpty()) {
                     userEntity.get().getMarkPosts().removeIf(entity -> entity.getId().equals(postId));
@@ -190,7 +218,7 @@ public class UserService {
         return userRepository.findById(userId).orElse(null);
     }
 
-    public ResponseEntity<ResponseObject> deleteBlogPost(Long userId) {
+    public ResponseEntity<ResponseObject> deleteUser(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
 
         if (userEntity.isPresent()
@@ -200,10 +228,10 @@ public class UserService {
             userRepository.save(user);
 
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("OK", "Deleted successful", user));
+                    .body(new ResponseObject("OK", "deleted successful", user));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ResponseObject("Not found", "Post not found", ""));
+                .body(new ResponseObject("Not found", "user not found", ""));
     }
 
     public ResponseEntity<ResponseObject> updateUser(Long userId, UserDTO userDTO) {
@@ -240,6 +268,34 @@ public class UserService {
                 .body(new ResponseObject("failed", "updated failed", ""));
     }
 
+
+    public UserUpdateDTO updateUserProfile(Long userId, UserUpdateDTO userUpdateDTO) {
+
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            UserEntity user = this.getUserById(userId);
+            user.setFullName(userUpdateDTO.getFullName());
+            user.setEmail(userUpdateDTO.getEmail());
+            user.setPicture(userUpdateDTO.getPicture());
+            userRepository.save(user);
+            return userUpdateDTO;
+        } throw new UserException("updated failed");
+    }
+
+    public void updateUserPassword(Long userId, UserPasswordUpdateDTO userPasswordUpdateDTO) {
+
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (userEntity.isPresent()) {
+            if (encoder.encode(userPasswordUpdateDTO.getConfirmPassword()).equals(userEntity.get().getPassword())) {
+                if (userPasswordUpdateDTO.getNewPassword().equals(userPasswordUpdateDTO.getConfirmPassword())) {
+                    UserEntity user = this.getUserById(userId);
+                    user.setHashedpassword(encoder.encode(userPasswordUpdateDTO.getNewPassword()));
+                    userRepository.save(user);
+                } throw new UserException("confirm password is not correct");
+            } throw new UserException("old password is not correct ");
+        } throw new UserException("updated failed");
+    }
+
     public List<BlogPostDTO> getMarkPostByUser(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
@@ -272,7 +328,7 @@ public class UserService {
         } else throw new UserException("User doesn't exists");
     }
 
-    public Long countViewOfBlog(Long userId) {
+    public Long countViewOfBlog(Long userId, Boolean isCheckAward) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         Long count = 0L;
         if (userEntity.isPresent()) {
@@ -282,8 +338,35 @@ public class UserService {
                     count += entity.getView();
                 }
                 return count;
-            } else throw new UserException("This user not wrote any post");
-        } else throw new UserException("User doesn't exists");
+            } else if (!isCheckAward) throw new UserException("This user not wrote any post");
+        } else if (!isCheckAward) throw new UserException("User doesn't exists");
+        return count;
+    }
+
+    public Long countVoteOfBlog(Long userId, Boolean isCheckAward) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        Long count = 0L;
+        if (userEntity.isPresent()) {
+            Set<BlogPostEntity> entitySet = userEntity.get().getBlogAuthors();
+            if (!entitySet.isEmpty()) {
+                for (BlogPostEntity entity : entitySet) {
+                    count += entity.getVotes().size();
+                }
+                return count;
+            } else if (!isCheckAward) throw new UserException("This user not wrote any post");
+        } else if (!isCheckAward) throw new UserException("User doesn't exists");
+        return count;
+    }
+
+    public void setRole(UserEntity user, String role) {
+        RoleEntity roleEntity = roleRepository.findByName(role);
+        if (roleEntity != null) {
+            Set<RoleEntity> roleEntities = new HashSet<>();
+            RoleEntity userRole = roleRepository.findByName(role);
+            roleEntities.add(userRole);
+            user.setRoles(roleEntities);
+
+        } else throw new UserException("Role doesn't exists!");
     }
 
     public boolean checkMarkPost(Long userId, Long postId) {
@@ -302,5 +385,6 @@ public class UserService {
             } else throw new UserException("Blog doesn't exists!");
         } else throw new UserException("User doesn't exists!");
     }
+
 
 }

@@ -29,18 +29,20 @@ public class BlogPostController {
     private final CommentService commentService;
     private final JwtService jwtService;
     private final PostTagService postTagService;
+    private final AwardService awardService;
 
     @Autowired
     public BlogPostController(BlogPostService blogPostService, ApprovalRequestService approvalRequestService,
                               VoteService voteService, CommentService commentService,
-                              JwtService jwtService, PostTagService postTagService
-    ) {
+                              JwtService jwtService, PostTagService postTagService,
+                              AwardService awardService) {
         this.blogPostService = blogPostService;
         this.approvalRequestService = approvalRequestService;
         this.voteService = voteService;
         this.commentService = commentService;
         this.jwtService = jwtService;
         this.postTagService = postTagService;
+        this.awardService = awardService;
     }
 
 
@@ -69,6 +71,7 @@ public class BlogPostController {
                 BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(blogPostDTO);
                 approvalRequestService.insertApprovalRequest(blogPostEntity);
                 postTagService.insertPostTag(blogPostDTO.getTagList(), blogPostEntity);
+                awardService.checkAward(blogPostDTO.getUserId());
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "post is waiting approve", ""));
             }
@@ -213,6 +216,20 @@ public class BlogPostController {
         }
     }
 
+
+    @GetMapping("/getAllBlog")
+    public ResponseEntity<ResponseObject> getAllBlogs() {
+
+        try {
+            PaginationResponseDTO blogPosts = blogPostService.getAllBlogPosts();
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPosts));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
     @GetMapping("/getByTitle/{title}/{page}/{size}")
     public ResponseEntity<ResponseObject> getBlogByTitle(@PathVariable String title, @PathVariable int page, @PathVariable int size) {
         try {
@@ -232,6 +249,30 @@ public class BlogPostController {
             PaginationResponseDTO blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", blogPosts));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/getByCategory/{categoryId}")
+    public ResponseEntity<ResponseObject> getBlogPostsByCategoryId(@PathVariable Long categoryId) {
+//        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+        try {
+            PaginationResponseDTO blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found", blogPosts));
+        } catch (BlogPostException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/getBlogByFollow/{userId}")
+    public ResponseEntity<ResponseObject> getBlogByFollow(@PathVariable Long userId) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject("ok", "post found",  blogPostService.getBlogByFollow(userId)));
         } catch (BlogPostException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));

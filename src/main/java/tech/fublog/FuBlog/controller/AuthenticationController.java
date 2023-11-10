@@ -2,15 +2,13 @@ package tech.fublog.FuBlog.controller;
 
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import tech.fublog.FuBlog.auth.AuthenticationReponse;
+import tech.fublog.FuBlog.auth.AuthenticationResponse;
 import tech.fublog.FuBlog.auth.AuthenticationRequest;
 import tech.fublog.FuBlog.auth.MessageResponse;
 import tech.fublog.FuBlog.auth.SignupRequest;
 import tech.fublog.FuBlog.dto.UserDTO;
-import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.repository.CategoryCustomRepo;
@@ -211,13 +209,13 @@ public class AuthenticationController {
             set.stream().forEach(i -> authorities.add(new SimpleGrantedAuthority(i.getName())));
             var jwtToken = jwtService.generateToken(user, authorities);
 //            var jwtRefreshToken = jwtService.generateRefreshToken(user, authorities);
-            AuthenticationReponse authenticationReponse = new AuthenticationReponse();
-            authenticationReponse.setToken(jwtToken);
-            authenticationReponse.setRefreshToken(refreshToken.substring(7));
+            AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+            authenticationResponse.setToken(jwtToken);
+            authenticationResponse.setRefreshToken(refreshToken.substring(7));
 //            System.out.println(authenticationReponse);
-            return ResponseEntity.ok(authenticationReponse);
+            return ResponseEntity.ok(authenticationResponse);
         }
-        return ResponseEntity.badRequest().body(new MessageResponse("Can not have new token!!1"));
+        return ResponseEntity.badRequest().body(new MessageResponse("Can not have new token!!!"));
 
     }
 //   @GetMapping("/logout")

@@ -46,7 +46,7 @@ public class AwardService {
         Optional<UserEntity> userEntity = userRepository.findById(awardRequestDTO.getUserId());
 
 
-        if (awardEntity.isPresent()){
+        if (awardEntity.isPresent()) {
             Date achievementDate = new Date();
             ZoneId zoneId = ZoneId.of("Asia/Ho_Chi_Minh");
             achievementDate.toInstant().atZone(zoneId).toLocalDateTime();
@@ -61,6 +61,23 @@ public class AwardService {
 
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
                 .body(new ResponseObject("failed", "awarded failed", ""));
+    }
+
+    public void checkAward(Long userId) {
+        UserEntity entity = userRepository.findByIdAndStatusIsTrue(userId);
+        if (entity != null) {
+            if ((entity.getPoint() >= 1000)
+                    && (entity.getPoint() < 5000)) {
+                awardPrize(new AwardRequestDTO("silver", entity.getId()));
+            } else if ((entity.getPoint() >= 5000)
+                    && (entity.getPoint() < 10000)) {
+                awardPrize(new AwardRequestDTO("gold", entity.getId()));
+            }
+            if (entity.getPoint() >= 10000) {
+                awardPrize(new AwardRequestDTO("diamond", entity.getId()));
+            }
+
+        }
     }
 
 }

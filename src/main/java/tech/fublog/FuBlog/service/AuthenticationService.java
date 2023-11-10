@@ -1,6 +1,6 @@
 package tech.fublog.FuBlog.service;
 
-import tech.fublog.FuBlog.auth.AuthenticationReponse;
+import tech.fublog.FuBlog.auth.AuthenticationResponse;
 import tech.fublog.FuBlog.auth.AuthenticationRequest;
 import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.entity.RoleEntity;
@@ -27,7 +27,7 @@ public class AuthenticationService {
     private final CategoryCustomRepo categoryCustomRepo;
     private final JwtService jwtService;
 
-    public AuthenticationReponse authenticate(AuthenticationRequest authenticationRequest){
+    public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest){
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
         UserEntity user = userRepository.findByUsernameAndStatusTrue(authenticationRequest.getUsername()).orElseThrow();
         String fullname = user.getFullName();
@@ -58,7 +58,7 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(user, authorities);
         var jwtRefreshToken = jwtService.generateRefreshToken(user, authorities);
 
-        return AuthenticationReponse.builder().token(jwtToken).refreshToken(jwtRefreshToken).build();
+        return AuthenticationResponse.builder().token(jwtToken).refreshToken(jwtRefreshToken).build();
 
     }
 //        AuthenticationReponse authenticationReponse = new AuthenticationReponse();

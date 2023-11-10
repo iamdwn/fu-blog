@@ -20,7 +20,9 @@ import java.util.stream.Stream;
 @Repository
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
     List<BlogPostEntity> findByIsApproved(Boolean isApproved);
+    List<BlogPostEntity> findByAuthorsAndStatusIsTrue(UserEntity userEntity);
 
+    Optional<BlogPostEntity> findByIdAndStatusIsTrueAndIsApprovedIsTrue(Long postId);
     List<BlogPostEntity> findByTitleLike(String title);
 
     //    public List<BlogPostEntity> getBlogPostEntitiesByTitle(String title, Pageable pageable);
@@ -36,6 +38,14 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
     Page<BlogPostEntity> findByCategoryInAndIsApprovedTrueAndStatusTrue(@Param("categoryEntityList") List<CategoryEntity> categoryEntityList,
                                                                         Pageable pageable);
 
+    @Query("SELECT bp FROM BlogPostEntity bp WHERE bp.category IN:categoryEntityList AND " +
+            "bp.isApproved = true AND bp.status = true ORDER BY bp.category.name asc ")
+    List<BlogPostEntity> findByCategoryInAndIsApprovedTrueAndStatusTrue(@Param("categoryEntityList") List<CategoryEntity> categoryEntityList);
+
+    @Query("SELECT bp FROM BlogPostEntity bp JOIN FollowEntity f WHERE bp.authors.id = f.following.id AND f.follower.id = :userId AND " +
+            "bp.isApproved = true AND bp.status = true")
+    List<BlogPostEntity> findByFollowAndIsApprovedTrueAndStatusTrue(@Param("userId") Long userId);
+
     //    @Query("SELECT bp FROM BlogPostEntity bp WHERE (bp.category.id = :categoryId OR bp.category.parentCategory.id = :categoryId) " +
 //            "AND (bp.isApproved = true AND bp.status = true) ORDER BY bp.category.categoryName asc ")
 //    Page<BlogPostEntity> findBlogPostsByCategoryIdOrParentId(
@@ -50,6 +60,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
     Page<BlogPostEntity> findAllByStatusIsTrueAndIsApprovedIsTrue(Pageable pageable);
 
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(Pageable pageable);
+    List<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc();
 
     Page<BlogPostEntity> findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateAsc(Pageable pageable);
 

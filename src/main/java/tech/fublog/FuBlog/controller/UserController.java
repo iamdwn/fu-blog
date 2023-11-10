@@ -4,12 +4,13 @@ import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.Utility.TokenChecker;
 import tech.fublog.FuBlog.dto.PostMarkDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
+import tech.fublog.FuBlog.dto.request.UserPasswordUpdateDTO;
+import tech.fublog.FuBlog.dto.request.UserUpdateDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
+import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
-import tech.fublog.FuBlog.exception.BlogPostException;
-import tech.fublog.FuBlog.exception.FollowException;
-import tech.fublog.FuBlog.exception.UserException;
 import tech.fublog.FuBlog.model.ResponseObject;
+import tech.fublog.FuBlog.repository.RoleRepository;
 import tech.fublog.FuBlog.repository.UserRepository;
 import tech.fublog.FuBlog.service.BlogPostService;
 import tech.fublog.FuBlog.service.JwtService;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/auth/user")
@@ -63,9 +65,9 @@ public class UserController {
 
         try {
             if (TokenChecker.checkToken(token)) {
-                if (action.equals("mark")) {
+                if (action.equalsIgnoreCase("mark")) {
                     userService.markPost(postMarkDTO.getUserId(), postMarkDTO.getPostId());
-                } else if (action.equals("unMark")) {
+                } else if (action.equalsIgnoreCase("unMark")) {
                     userService.unMarkPost(postMarkDTO.getUserId(), postMarkDTO.getPostId());
                 }
                 return ResponseEntity.status(HttpStatus.OK)
@@ -176,8 +178,12 @@ public class UserController {
                                                      @PathVariable Long userId) {
 
         try {
-            if (TokenChecker.checkToken(token)) {
-                userService.deleteBlogPost(userId);
+            if (TokenChecker.checkRole(token, true)) {
+                Optional<UserEntity> userEntity = userRepository.findById(userId);
+                if (userEntity.isPresent()
+                        && userEntity.get().getStatus())
+                    userService.deleteUser(userId);
+                blogPostService.deleteBlogPostByUser(userEntity.get());
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "found", ""));
             }
@@ -190,17 +196,18 @@ public class UserController {
         }
     }
 
-    @PutMapping("/updateUser/{userId}")
-    public ResponseEntity<?> updateUser(@RequestHeader("Authorization") String token,
-                                        @PathVariable Long userId,
-                                        @RequestBody UserDTO userDTO) {
+    @PutMapping("/updateUserProfile/{userId}")
+    public ResponseEntity<ResponseObject> updateUser(@RequestHeader("Authorization") String token,
+                                                     @PathVariable Long userId,
+                                                     @RequestBody UserUpdateDTO userUpdateDTO) {
         if (userId == null) {
-            return ResponseEntity.badRequest().body("User ID cannot be null");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "User ID cannot be null", ""));
         }
         try {
             if (TokenChecker.checkToken(token))
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "found", userService.updateUser(userId, userDTO)));
+                        .body(new ResponseObject("ok", "updated successfully", userService.updateUserProfile(userId, userUpdateDTO)));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));
         } catch (RuntimeException ex) {
@@ -209,6 +216,30 @@ public class UserController {
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
     }
+
+    @PutMapping("/updateUserPassword/{userId}")
+    public ResponseEntity<ResponseObject> updateUserPassword(@RequestHeader("Authorization") String token,
+                                                             @PathVariable Long userId,
+                                                             @RequestBody UserPasswordUpdateDTO userPasswordUpdateDTO) {
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "User ID cannot be null", ""));
+        }
+        try {
+            if (TokenChecker.checkToken(token)) {
+                userService.updateUserPassword(userId, userPasswordUpdateDTO);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", ""));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
 
     @GetMapping("/countPostMarkByUser/{userId}")
     ResponseEntity<ResponseObject> countPostMarkByUser(@RequestHeader("Authorization") String token,
@@ -232,7 +263,23 @@ public class UserController {
         try {
             if (TokenChecker.checkToken(token))
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "post found", blogPostService.countPostMarkByUser(userId)));
+                        .body(new ResponseObject("ok", "post found", userService.countViewOfBlog(userId, false)));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/countVoteOfBlog/{userId}")
+    public ResponseEntity<ResponseObject> countVoteOfBlog(@RequestHeader("Authorization") String token,
+                                                          @PathVariable Long userId) {
+        try {
+            if (TokenChecker.checkToken(token))
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "post found", userService.countVoteOfBlog(userId, false)));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));
         } catch (RuntimeException ex) {
@@ -266,6 +313,13 @@ public class UserController {
                 .body(new ResponseObject("ok", "found", userList));
     }
 
+    @GetMapping("/getAllUserByPoint")
+    public ResponseEntity<ResponseObject> getAllUserByPoint() {
+        PaginationResponseDTO userList = userService.getAllUserByPoints();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject("ok", "found", userList));
+    }
+
     @GetMapping("/getAllUserByDiamond/{page}/{size}")
     public ResponseEntity<ResponseObject> getAllUserByDiamond(@PathVariable int page,
                                                               @PathVariable int size) {
@@ -288,6 +342,27 @@ public class UserController {
         PaginationResponseDTO userList = userService.getAllUserByAward("silver", page, size);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseObject("ok", "found", userList));
+    }
+
+    @PostMapping("/setRole/{userId}/{role}")
+    public ResponseEntity<ResponseObject> setRole(@RequestHeader("Authorization") String token,
+                                                  @PathVariable Long userId,
+                                                  @PathVariable String role) {
+        try {
+            if (TokenChecker.checkRole(token, false)) {
+                Optional<UserEntity> userEntity = userRepository.findById(userId);
+                if (userEntity.isPresent()
+                        && userEntity.get().getStatus())
+                    userService.setRole(userEntity.get(), role);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", ""));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
     }
 
 }
