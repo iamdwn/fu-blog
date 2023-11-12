@@ -19,15 +19,23 @@ public class AdminService {
         this.blogPostRepository = blogPostRepository;
     }
 
+    public Long countBlogInMonth() {
+        Date currentDate = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        Long countBlog = blogPostRepository.countAllInCurrentMonth();
+        return countBlog;
+    }
+
     public Long countBlogByCategory(Long categoryId) {
         Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
-//            pageResult = blogPostRepository.findBlogPostsBƯyCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
-
         List<BlogPostEntity> list = findBlogByCategory(categoryOptional.get().getName(),
                 categoryOptional.get().getParentCategory() == null ? null
                         : categoryOptional.get().getParentCategory().getId());
         return list != null ? list.size() : 0L;
     }
+
     public List<BlogPostEntity> findBlogByCategory(String name, Long parentCategoryId) {
         Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(name, parentCategoryId);
         if (categoryEntity.isPresent()) {
