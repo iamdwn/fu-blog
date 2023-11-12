@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class  JwtService {
-
     private static final String Secret_key = "123";
 
     public String generateToken(UserEntity user, Collection<SimpleGrantedAuthority> authorities){

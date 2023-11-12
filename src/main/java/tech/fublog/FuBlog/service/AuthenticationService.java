@@ -19,10 +19,8 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
-
     private final RoleCustomRepo roleCustomRepo;
     private final CategoryCustomRepo categoryCustomRepo;
     private final JwtService jwtService;

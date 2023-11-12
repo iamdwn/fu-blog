@@ -17,11 +17,9 @@ import java.util.Optional;
 
 @Service
 public class VoteService {
-
     private final VoteRepository voteRepository;
     private final BlogPostRepository blogPostRepository;
     private final UserRepository userRepository;
-
     private final NotificationStorageService notificationStorageService;
 
     @Autowired

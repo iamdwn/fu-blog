@@ -23,11 +23,9 @@ import java.util.List;
 @CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
 //@CrossOrigin(origins = "*")
 public class ApprovalRequestController {
-
     private final BlogPostService blogPostService;
     private final UserRepository userRepository;
     private final JwtService jwtService;
-
     private final ApprovalRequestService approvalRequestService;
 
     @Autowired

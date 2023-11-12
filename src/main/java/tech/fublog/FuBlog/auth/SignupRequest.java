@@ -11,14 +11,9 @@ import java.util.Set;
 @NoArgsConstructor
 public class SignupRequest {
     private String fullName;
-
     private String username;
-
     private String email;
-
     private String password = "1";
-
     private String picture;
-
     private Set<String> role;
 }

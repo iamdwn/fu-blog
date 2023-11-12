@@ -17,7 +17,6 @@ import java.util.List;
 //@CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
 @CrossOrigin(origins = "*")
 public class PushNotificationController {
-
     private final PushNotificationService service;
 
     public PushNotificationController(PushNotificationService service) {

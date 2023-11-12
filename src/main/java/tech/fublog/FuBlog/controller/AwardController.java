@@ -18,7 +18,6 @@ import java.util.List;
 @CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
 //@CrossOrigin(origins = "*")
 public class AwardController {
-
     private final AwardService awardService;
     private final JwtService jwtService;
 

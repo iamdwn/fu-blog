@@ -16,7 +16,6 @@ import java.util.Set;
 @Service
 public class PostTagService {
     private final PostTagRepository postTagRepository;
-
     private final TagRepository tagRepository;
 
     @Autowired
