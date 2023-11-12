@@ -33,7 +33,7 @@ public class AdminService {
     }
 
     public Long countBlogInMonth() {
-        Long countBlog = blogPostRepository.countAllInCurrentMonth();
+        Long countBlog = Math.round(blogPostRepository.countAllInCurrentMonth());
         return countBlog;
     }
 
@@ -50,6 +50,14 @@ public class AdminService {
         Double countPrevious = getCurrentMonth() == 1
                 ? userReportRepository.countAllInPreviousMonthAndYear()
                 : userReportRepository.countAllInPreviousMonth();
+        return countPrevious != 0 ? (countCurrent / countPrevious) - 1 : 0;
+    }
+
+    public Double calculateBlogWeight() {
+        Double countCurrent = blogPostRepository.countAllInCurrentMonth();
+        Double countPrevious = getCurrentMonth() == 1
+                ? blogPostRepository.countAllInPreviousMonthAndYear()
+                : blogPostRepository.countAllInPreviousMonth();
         return countPrevious != 0 ? (countCurrent / countPrevious) - 1 : 0;
     }
 

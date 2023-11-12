@@ -79,5 +79,20 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/calculateBlogWeight")
+    public ResponseEntity<ResponseObject> calculateBlogWeight(@RequestHeader("Authorization") String token) {
+        try {
+            if (TokenChecker.checkRole(token, false)) {
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", adminService.calculateBlogWeight()));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
 
 }

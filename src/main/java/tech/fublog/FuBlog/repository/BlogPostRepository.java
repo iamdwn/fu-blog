@@ -54,7 +54,13 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 //    );
 
     @Query("SELECT count(b) FROM BlogPostEntity b WHERE year(b.createdDate) = year(current_date) AND month(b.createdDate) = month(current_date)")
-    Long countAllInCurrentMonth();
+    Double countAllInCurrentMonth();
+
+    @Query("SELECT count(b) FROM BlogPostReportEntity b WHERE year(b.createdDate) = year(current_date) AND month(b.createdDate) = month(current_date) - 1")
+    Double countAllInPreviousMonth();
+
+    @Query("SELECT count(b) FROM BlogPostReportEntity b WHERE year(b.createdDate)= year(current_date) - 1 AND month(b.createdDate)= month(current_date) + 11")
+    Double countAllInPreviousMonthAndYear();
 
     Set<BlogPostEntity> findAllByAuthors(UserEntity userEntity);
 
