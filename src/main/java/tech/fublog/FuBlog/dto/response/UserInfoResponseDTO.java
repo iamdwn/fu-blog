@@ -17,4 +17,15 @@ public class UserInfoResponseDTO {
     private String role;
     private List<String> roles;
     private Double point;
+    private String username;
+
+    public UserInfoResponseDTO(Long id, String fullName, String picture, String email, String role, List<String> roles, Double point) {
+        this.id = id;
+        this.fullName = fullName;
+        this.picture = picture;
+        this.email = email;
+        this.role = role;
+        this.roles = roles;
+        this.point = point;
+    }
 }
