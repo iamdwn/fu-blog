@@ -4,8 +4,7 @@ import org.springframework.stereotype.Service;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.exception.BlogPostException;
-import tech.fublog.FuBlog.repository.BlogPostRepository;
-import tech.fublog.FuBlog.repository.CategoryRepository;
+import tech.fublog.FuBlog.repository.*;
 
 import java.util.*;
 
@@ -13,21 +12,55 @@ import java.util.*;
 public class AdminService {
     private final CategoryRepository categoryRepository;
     private final BlogPostRepository blogPostRepository;
+    private final UserRepository userRepository;
+    private final BlogPostReportRepository blogPostReportRepository;
+    private final UserReportRepository userReportRepository;
 
-    public AdminService(CategoryRepository categoryRepository, BlogPostRepository blogPostRepository) {
+    public AdminService(CategoryRepository categoryRepository, BlogPostRepository blogPostRepository, UserRepository userRepository, BlogPostReportRepository blogPostReportRepository, UserReportRepository userReportRepository) {
         this.categoryRepository = categoryRepository;
         this.blogPostRepository = blogPostRepository;
+        this.userRepository = userRepository;
+        this.blogPostReportRepository = blogPostReportRepository;
+        this.userReportRepository = userReportRepository;
+    }
+
+    public int getCurrentMonth() {
+        Date currentDate = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        return month;
+    }
+
+    public Long countBlogInMonth() {
+        Long countBlog = blogPostRepository.countAllInCurrentMonth();
+        return countBlog;
+    }
+
+    public Double calculateBlogReportWeight() {
+        Double countCurrent = blogPostReportRepository.countAllInCurrentMonth();
+        Double countPrevious = getCurrentMonth() == 1
+            ? blogPostReportRepository.countAllInPreviousMonthAndYear()
+            : blogPostReportRepository.countAllInPreviousMonth();
+        return countPrevious != 0 ? (countCurrent / countPrevious) - 1 : 0;
+    }
+
+    public Double calculateUserReportWeight() {
+        Double countCurrent = userReportRepository.countAllInCurrentMonth();
+        Double countPrevious = getCurrentMonth() == 1
+                ? userReportRepository.countAllInPreviousMonthAndYear()
+                : userReportRepository.countAllInPreviousMonth();
+        return countPrevious != 0 ? (countCurrent / countPrevious) - 1 : 0;
     }
 
     public Long countBlogByCategory(Long categoryId) {
         Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
-//            pageResult = blogPostRepository.findBlogPostsBƯyCategoryIdOrParentId(categoryOptional.get().getId(), pageable);
-
         List<BlogPostEntity> list = findBlogByCategory(categoryOptional.get().getName(),
                 categoryOptional.get().getParentCategory() == null ? null
                         : categoryOptional.get().getParentCategory().getId());
         return list != null ? list.size() : 0L;
     }
+
     public List<BlogPostEntity> findBlogByCategory(String name, Long parentCategoryId) {
         Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(name, parentCategoryId);
         if (categoryEntity.isPresent()) {

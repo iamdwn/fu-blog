@@ -52,6 +52,10 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 //            @Param("categoryId") Long categoryId,
 //            Pageable pageable
 //    );
+
+    @Query("SELECT count(b) FROM BlogPostEntity b WHERE year(b.createdDate) = year(current_date) AND month(b.createdDate) = month(current_date)")
+    Long countAllInCurrentMonth();
+
     Set<BlogPostEntity> findAllByAuthors(UserEntity userEntity);
 
     BlogPostEntity findByPinnedIsTrue();
