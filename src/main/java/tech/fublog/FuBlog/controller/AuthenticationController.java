@@ -186,6 +186,8 @@ public class AuthenticationController {
         userDTO.setId(user.get().getId());
         userDTO.setPassword(user.get().getHashedpassword());
         userDTO.setRoles(roles);
+        userDTO.setUsername(user.get().getUsername());
+
 //        userDTO.setCategories();
         return userDTO;
 

@@ -128,7 +128,8 @@ public class DTOConverter {
                     userEntity.getEmail(),
                     roleNames.get(roleNames.size() - 1),
                     roleNames,
-                    userEntity.getPoint()
+                    userEntity.getPoint(),
+                    userEntity.getUsername()
             );
             return userDTO;
         } else

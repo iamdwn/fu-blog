@@ -22,6 +22,16 @@ public class UserDTO {
     private Boolean status;
     private String role;
     private List<String> roles;
+    private String username;
 
-
+    public UserDTO(String fullName, String password, String email, Long id, String picture, Boolean status, String role, List<String> roles) {
+        this.fullName = fullName;
+        this.password = password;
+        this.email = email;
+        this.id = id;
+        this.picture = picture;
+        this.status = status;
+        this.role = role;
+        this.roles = roles;
+    }
 }
