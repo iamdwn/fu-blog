@@ -28,9 +28,7 @@ import java.util.Optional;
 public class UserController {
     private final UserService userService;
     private final BlogPostService blogPostService;
-
     private final JwtService jwtService;
-
     private final UserRepository userRepository;
 
     @Autowired

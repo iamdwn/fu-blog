@@ -23,11 +23,8 @@ import java.util.List;
 public class VoteController {
     private final VoteService voteService;
     private final AwardService awardService;
-
     private final NotificationStorageService notificationStorageService;
-
     private final UserRepository userRepository;
-
     private final BlogPostRepository blogPostRepository;
 
     @Autowired

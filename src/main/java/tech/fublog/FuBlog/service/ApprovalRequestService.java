@@ -18,16 +18,11 @@ import java.util.*;
 
 @Service
 public class ApprovalRequestService {
-
     private final BlogPostRepository blogPostRepository;
-
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-
     private final ApprovalRequestRepository approvalRequestRepository;
-
     private final TagRepository tagRepository;
-
     private final PostTagRepository postTagRepository;
 
     @Autowired

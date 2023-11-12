@@ -17,9 +17,7 @@ import java.util.List;
 @CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
 //@CrossOrigin(origins = "*")
 public class NotificationStorageController {
-
     private final NotificationStorageService notifService;
-
 
     public NotificationStorageController(NotificationStorageService notifService) {
         this.notifService = notifService;

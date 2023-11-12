@@ -17,10 +17,7 @@ import java.util.List;
 @Service
 @Slf4j
 public class PushNotificationService {
-
-
     private final NotificationRepository notificationStorageRepository;
-
 
     public PushNotificationService(NotificationRepository notificationStorageRepository) {
         this.notificationStorageRepository = notificationStorageRepository;

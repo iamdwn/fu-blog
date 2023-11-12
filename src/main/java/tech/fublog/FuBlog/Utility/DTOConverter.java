@@ -91,7 +91,6 @@ public class DTOConverter {
                     .collect(Collectors.toSet());
 
             UserInfoResponseDTO userDTO = convertUserDTO(userEntity);
-            blogPostEntity.setView(blogPostEntity.getView() + 1);
             blogPostRepository.save(blogPostEntity);
 
             BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),

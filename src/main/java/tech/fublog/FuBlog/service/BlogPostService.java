@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class BlogPostService {
-
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final BlogPostRepository blogPostRepository;

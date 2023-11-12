@@ -16,7 +16,6 @@ import java.util.Optional;
 
 @Service
 public class UserReportService {
-
     private final UserReportRepository userReportRepository;
     private final UserRepository userRepository;
 

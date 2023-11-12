@@ -20,7 +20,6 @@ import java.util.Optional;
 
 @Service
 public class CommentService {
-
     private final CommentRepository commentRepository;
     private final BlogPostRepository blogPostRepository;
     private final UserRepository userRepository;

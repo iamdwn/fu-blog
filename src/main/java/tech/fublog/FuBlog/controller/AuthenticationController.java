@@ -33,13 +33,10 @@ import java.util.*;
 @CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
 //@CrossOrigin(origins = "*")
 public class AuthenticationController {
-
-
     private final AuthenticationService authenticationService;
-
     private final JwtService jwtService;
 
-
+    @Autowired
     CategoryCustomRepo categoryCustomRepo;
 
     @Autowired
@@ -167,6 +164,7 @@ public class AuthenticationController {
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(signUpRequest.getEmail(), signUpRequest.getPassword());
         return ResponseEntity.ok(authenticationService.authenticate(authenticationRequest));
     }
+
     @GetMapping("/getUserInfo")
     public UserDTO InfoUser(@RequestHeader("Authorization") String token) {
 
