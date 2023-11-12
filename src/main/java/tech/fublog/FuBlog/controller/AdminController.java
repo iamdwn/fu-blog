@@ -49,4 +49,35 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/calculateBlogReportWeight")
+    public ResponseEntity<ResponseObject> calculateBlogReportWeight(@RequestHeader("Authorization") String token) {
+        try {
+            if (TokenChecker.checkRole(token, false)) {
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", adminService.calculateBlogReportWeight()));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/calculateUserReportWeight")
+    public ResponseEntity<ResponseObject> calculateUserReportWeight(@RequestHeader("Authorization") String token) {
+        try {
+            if (TokenChecker.checkRole(token, false)) {
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", adminService.calculateUserReportWeight()));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+
 }
