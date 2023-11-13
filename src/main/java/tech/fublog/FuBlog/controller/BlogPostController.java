@@ -221,7 +221,7 @@ public class BlogPostController {
     public ResponseEntity<ResponseObject> getAllBlogs() {
 
         try {
-            PaginationResponseDTO blogPosts = blogPostService.getAllBlogPosts();
+            PaginationResponseDTO blogPosts = blogPostService.getAllBlogPost();
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject("ok", "post found", blogPosts));
         } catch (BlogPostException ex) {

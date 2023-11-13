@@ -405,10 +405,16 @@ public class BlogPostService {
     }
 
     public PaginationResponseDTO getAllBlogPosts() {
-        List<BlogPostEntity> blogPostDTOList = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc();
-        return new PaginationResponseDTO(blogPostDTOList, (long) blogPostDTOList.size(), 1L);
+        List<BlogPostEntity> blogPostList = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc();
+
+        return new PaginationResponseDTO(blogPostList, (long) blogPostList.size(), 1L);
     }
 
+    public PaginationResponseDTO getAllBlogPost() {
+        List<BlogPostEntity> blogPostEntity = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc();
+        List<BlogPostDTO> blogPostDTOList = DTOConverter.convertPostListToDTO(blogPostEntity);
+        return new PaginationResponseDTO(blogPostDTOList, (long) blogPostDTOList.size(), 1L);
+    }
 
     public PaginationResponseDTO getAllBlogPostByTitle(String title, int page, int size) {
         return filterBlogPost(title, page, size);

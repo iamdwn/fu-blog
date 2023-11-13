@@ -113,6 +113,16 @@ public class DTOConverter {
 
     }
 
+    public static List<BlogPostDTO> convertPostListToDTO(List<BlogPostEntity> list) {
+        List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
+        if (list != null) {
+            for (BlogPostEntity entity : list) {
+                blogPostDTOList.add(DTOConverter.convertPostToDTO(entity.getId()));
+            }
+        }
+        return blogPostDTOList;
+    }
+
     public static UserInfoResponseDTO convertUserDTO(UserEntity userEntity) {
         if (userEntity != null) {
 
