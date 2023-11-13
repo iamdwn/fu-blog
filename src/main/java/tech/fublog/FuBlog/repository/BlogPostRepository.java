@@ -32,6 +32,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
     Page<BlogPostEntity> findByCategory(CategoryEntity category, Pageable pageable);
 
+    Integer countByCategoryAndIsApprovedTrueAndStatusTrue(CategoryEntity category);
 
     @Query("SELECT bp FROM BlogPostEntity bp WHERE bp.category IN:categoryEntityList AND " +
             "bp.isApproved = true AND bp.status = true ORDER BY bp.category.name asc ")
