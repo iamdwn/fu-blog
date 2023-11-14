@@ -99,7 +99,8 @@ public class BlogPostService {
                     blogPostEntity.getView(),
                     blogPostEntity.getCreatedDate(),
                     voteRepository.countByPostVote(blogPostEntity),
-                    commentRepository.countByPostComment(blogPostEntity)
+                    commentRepository.countByPostComment(blogPostEntity),
+                    countPostMarkByBlog(blogPostEntity.getId())
             );
 //                  Date.from(Instant.ofEpochMilli((blogPostEntity.getCreatedDate().getTime())))
 //                  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
@@ -405,10 +406,16 @@ public class BlogPostService {
     }
 
     public PaginationResponseDTO getAllBlogPosts() {
-        List<BlogPostEntity> blogPostDTOList = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc();
-        return new PaginationResponseDTO(blogPostDTOList, (long) blogPostDTOList.size(), 1L);
+        List<BlogPostEntity> blogPostList = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc();
+
+        return new PaginationResponseDTO(blogPostList, (long) blogPostList.size(), 1L);
     }
 
+    public PaginationResponseDTO getAllBlogPost() {
+        List<BlogPostEntity> blogPostEntity = blogPostRepository.findAllByStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc();
+        List<BlogPostDTO> blogPostDTOList = DTOConverter.convertPostListToDTO(blogPostEntity);
+        return new PaginationResponseDTO(blogPostDTOList, (long) blogPostDTOList.size(), 1L);
+    }
 
     public PaginationResponseDTO getAllBlogPostByTitle(String title, int page, int size) {
         return filterBlogPost(title, page, size);
@@ -472,6 +479,14 @@ public class BlogPostService {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
             return userEntity.get().getMarkPosts().size();
+        }
+        return 0L;
+    }
+
+    public long countPostMarkByBlog(Long postId){
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+        if (blogPostEntity.isPresent()) {
+            return blogPostEntity.get().getUserMarks().size();
         }
         return 0L;
     }

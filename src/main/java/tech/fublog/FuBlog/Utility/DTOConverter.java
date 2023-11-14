@@ -91,8 +91,6 @@ public class DTOConverter {
                     .collect(Collectors.toSet());
 
             UserInfoResponseDTO userDTO = convertUserDTO(userEntity);
-            blogPostRepository.save(blogPostEntity);
-
             BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
                     blogPostEntity.getTypePost(),
                     blogPostEntity.getTitle(),
@@ -105,12 +103,23 @@ public class DTOConverter {
                     blogPostEntity.getView(),
                     blogPostEntity.getCreatedDate(),
                     voteRepository.countByPostVote(blogPostEntity),
-                    commentRepository.countByPostComment(blogPostEntity)
+                    commentRepository.countByPostComment(blogPostEntity),
+                    (long )blogPostEntity.getUserMarks().size()
             );
             return blogPostDTO;
         } else
             throw new BlogPostException("not found blogpost with " + postId);
 
+    }
+
+    public static List<BlogPostDTO> convertPostListToDTO(List<BlogPostEntity> list) {
+        List<BlogPostDTO> blogPostDTOList = new ArrayList<>();
+        if (list != null) {
+            for (BlogPostEntity entity : list) {
+                blogPostDTOList.add(DTOConverter.convertPostToDTO(entity.getId()));
+            }
+        }
+        return blogPostDTOList;
     }
 
     public static UserInfoResponseDTO convertUserDTO(UserEntity userEntity) {
