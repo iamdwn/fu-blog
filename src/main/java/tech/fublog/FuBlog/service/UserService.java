@@ -62,7 +62,6 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
 
-
     public UserEntity saveUser(UserEntity user) {
 //        String pass = hashing.hasdPassword(user.getHashed_password());
 //        user.setHashed_password(pass);
@@ -279,7 +278,8 @@ public class UserService {
             user.setPicture(userUpdateDTO.getPicture());
             userRepository.save(user);
             return userUpdateDTO;
-        } throw new UserException("updated failed");
+        }
+        throw new UserException("updated failed");
     }
 
     public void updateUserPassword(Long userId, UserPasswordUpdateDTO userPasswordUpdateDTO) {
@@ -291,9 +291,12 @@ public class UserService {
                     UserEntity user = this.getUserById(userId);
                     user.setHashedpassword(encoder.encode(userPasswordUpdateDTO.getNewPassword()));
                     userRepository.save(user);
-                } throw new UserException("confirm password is not correct");
-            } throw new UserException("old password is not correct ");
-        } throw new UserException("updated failed");
+                }
+                throw new UserException("confirm password is not correct");
+            }
+            throw new UserException("old password is not correct ");
+        }
+        throw new UserException("updated failed");
     }
 
     public List<BlogPostDTO> getMarkPostByUser(Long userId) {
@@ -310,23 +313,18 @@ public class UserService {
         } else throw new UserException("User doesn't exists");
     }
 
-
-    public PaginationResponseDTO getBlogByBookMarkUser(Long userId, int page, int size) {
+    public PaginationResponseDTO getBlogByBookMarkUser(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
+        List<BlogPostDTO> dtoList = new ArrayList<>();
         if (userEntity.isPresent()) {
-            Pageable pageable = PageRequest.of(page - 1, size);
-            Page<BlogPostEntity> pageList = blogPostRepository.findByUserMarksAndStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(userEntity.get(), pageable);
-            if (!pageList.isEmpty()) {
-                List<BlogPostDTO> dtoList = new ArrayList<>();
-                for (BlogPostEntity entity : pageList.getContent()) {
+            List<BlogPostEntity> entityList = blogPostRepository.findByUserMarksAndStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(userEntity.get());
+            if (!entityList.isEmpty()) {
+                for (BlogPostEntity entity : entityList) {
                     dtoList.add(DTOConverter.convertPostToDTO(entity.getId()));
                 }
-
-                Long blogPostCount = pageList.getTotalElements();
-                Long pageCount = (long) pageList.getTotalPages();
-                return new PaginationResponseDTO(dtoList, blogPostCount, pageCount);
             } else throw new UserException("This user not marked any post");
         } else throw new UserException("User doesn't exists");
+        return new PaginationResponseDTO(dtoList, (long) dtoList.size(), 1L);
     }
 
     public Long countViewOfBlog(Long userId, Boolean isCheckAward) {
