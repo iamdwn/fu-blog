@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 
+
 @RestController
 @RequestMapping("/api/v1/auth/blogPosts")
 @CrossOrigin(origins = {"http://localhost:5173", "https://fublog.tech"})
@@ -256,24 +257,44 @@ public class BlogPostController {
     }
 
     @GetMapping("/getByCategory/{categoryId}")
-    public ResponseEntity<ResponseObject> getBlogPostsByCategoryId(@PathVariable Long categoryId) {
-//        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+    public ResponseEntity<ResponseObject> getBlogPostsByCategoryId(@RequestHeader("Authorization") String token,
+                                                                   @PathVariable Long categoryId) {
         try {
-            PaginationResponseDTO blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "post found", blogPosts));
-        } catch (BlogPostException ex) {
+            if (TokenChecker.checkToken(token)) {
+                try {
+                    PaginationResponseDTO blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId);
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "post found", blogPosts));
+                } catch (BlogPostException ex) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new ResponseObject("failed", ex.getMessage(), ""));
+                }
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
+
     }
 
     @GetMapping("/getBlogByFollow/{userId}")
-    public ResponseEntity<ResponseObject> getBlogByFollow(@PathVariable Long userId) {
+    public ResponseEntity<ResponseObject> getBlogByFollow(@RequestHeader("Authorization") String token,
+                                                          @PathVariable Long userId) {
         try {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "post found",  blogPostService.getBlogByFollow(userId)));
-        } catch (BlogPostException ex) {
+            if (TokenChecker.checkToken(token)) {
+                try {
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "post found",  blogPostService.getBlogByFollow(userId)));
+                } catch (BlogPostException ex) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new ResponseObject("failed", ex.getMessage(), ""));
+                }
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }

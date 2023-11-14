@@ -91,8 +91,6 @@ public class DTOConverter {
                     .collect(Collectors.toSet());
 
             UserInfoResponseDTO userDTO = convertUserDTO(userEntity);
-            blogPostRepository.save(blogPostEntity);
-
             BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
                     blogPostEntity.getTypePost(),
                     blogPostEntity.getTitle(),
@@ -105,7 +103,8 @@ public class DTOConverter {
                     blogPostEntity.getView(),
                     blogPostEntity.getCreatedDate(),
                     voteRepository.countByPostVote(blogPostEntity),
-                    commentRepository.countByPostComment(blogPostEntity)
+                    commentRepository.countByPostComment(blogPostEntity),
+                    (long )blogPostEntity.getUserMarks().size()
             );
             return blogPostDTO;
         } else
