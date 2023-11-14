@@ -258,16 +258,26 @@ public class BlogPostController {
     }
 
     @GetMapping("/getByCategory/{categoryId}")
-    public ResponseEntity<ResponseObject> getBlogPostsByCategoryId(@PathVariable Long categoryId) {
-//        Page<BlogPostEntity> blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId, page, size);
+    public ResponseEntity<ResponseObject> getBlogPostsByCategoryId(@RequestHeader String token,
+                                                                   @PathVariable Long categoryId) {
         try {
-            PaginationResponseDTO blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "post found", blogPosts));
-        } catch (BlogPostException ex) {
+            if (checkToken(token)) {
+                try {
+                    PaginationResponseDTO blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId);
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "post found", blogPosts));
+                } catch (BlogPostException ex) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new ResponseObject("failed", ex.getMessage(), ""));
+                }
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
+
     }
 
     @GetMapping("/getBlogByFollow/{userId}")
