@@ -98,5 +98,5 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
     @Query("SELECT bp FROM BlogPostEntity bp WHERE bp.status = true AND bp.isApproved = true ORDER BY SIZE(bp.votes) DESC, bp.createdDate DESC")
     Page<BlogPostEntity> findAllByVote(Pageable pageable);
 
-    Page<BlogPostEntity> findByUserMarksAndStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(UserEntity userEntity, Pageable pageable);
+    List<BlogPostEntity> findByUserMarksAndStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(UserEntity userEntity);
 }

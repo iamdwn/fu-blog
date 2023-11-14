@@ -103,14 +103,13 @@ public class UserController {
         }
     }
 
-    @GetMapping("/getBlogByBookMarkUser/{userId}/{page}/{size}")
+    @GetMapping("/getBlogByBookMarkUser/{userId}")
     public ResponseEntity<ResponseObject> getBlogByBookMarkUser(@RequestHeader("Authorization") String token,
-                                                                @PathVariable Long userId,
-                                                                @PathVariable int page, @PathVariable int size) {
+                                                                @PathVariable Long userId) {
         try {
             if (TokenChecker.checkToken(token))
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "found", userService.getBlogByBookMarkUser(userId, page, size)));
+                        .body(new ResponseObject("ok", "found", userService.getBlogByBookMarkUser(userId)));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));
         } catch (RuntimeException ex) {
