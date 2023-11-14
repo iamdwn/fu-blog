@@ -33,7 +33,9 @@ public class AdminService {
         int month = calendar.get(Calendar.MONTH) + 1;
         return month;
     }
-
+    public long getCountAllUsers(){
+        return userRepository.count();
+    }
     public Long countBlogInMonth() {
         Long countBlog = Math.round(blogPostRepository.countAllInCurrentMonth());
         return countBlog;

@@ -2,6 +2,7 @@ package tech.fublog.FuBlog.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.Utility.TokenChecker;
 import tech.fublog.FuBlog.model.ResponseObject;
@@ -108,5 +109,21 @@ public class AdminController {
         }
     }
 
-
+    @GetMapping("/countAllUsers")
+    public ResponseEntity<ResponseObject> countAllUsers(@RequestHeader("Authorization") String token) {
+        try {
+            if (TokenChecker.checkRole(token, false)) {
+                if (adminService.getCountAllUsers() == 0) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new ResponseObject("failed", "do not have any user exit", ""));
+                }
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok", "number of all users", adminService.getCountAllUsers()));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
 }
