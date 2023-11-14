@@ -99,7 +99,8 @@ public class BlogPostService {
                     blogPostEntity.getView(),
                     blogPostEntity.getCreatedDate(),
                     voteRepository.countByPostVote(blogPostEntity),
-                    commentRepository.countByPostComment(blogPostEntity)
+                    commentRepository.countByPostComment(blogPostEntity),
+                    countPostMarkByBlog(blogPostEntity.getId())
             );
 //                  Date.from(Instant.ofEpochMilli((blogPostEntity.getCreatedDate().getTime())))
 //                  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
@@ -478,6 +479,14 @@ public class BlogPostService {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {
             return userEntity.get().getMarkPosts().size();
+        }
+        return 0L;
+    }
+
+    public long countPostMarkByBlog(Long postId){
+        Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(postId);
+        if (blogPostEntity.isPresent()) {
+            return blogPostEntity.get().getUserMarks().size();
         }
         return 0L;
     }

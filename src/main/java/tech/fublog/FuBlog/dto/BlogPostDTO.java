@@ -30,6 +30,7 @@ public class BlogPostDTO {
     private Date createdDate;
     private Long voteCount;
     private Long commentCount;
+    private Long bookMarkCount;
 
     public BlogPostDTO(String typePost, String title, String content, String categoryName, CategoryEntity parentCategoryId, Set<TagDTO> tagList, UserInfoResponseDTO user, Long views, Date createdDate, Long voteCount, Long commentCount) {
         this.typePost = typePost;
