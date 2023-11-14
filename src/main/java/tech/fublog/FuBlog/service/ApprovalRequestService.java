@@ -1,6 +1,8 @@
 package tech.fublog.FuBlog.service;
 
 
+import tech.fublog.FuBlog.Utility.DTOConverter;
+import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.request.ApprovalRequestRequestDTO;
 import tech.fublog.FuBlog.dto.response.ApprovalRequestResponseDTO;
@@ -84,6 +86,25 @@ public class ApprovalRequestService {
         } else throw new BlogPostException("Category doesn't exists");
     }
 
+    public List<BlogPostEntity> findBlogByCategory(String name, Long parentCategoryId) {
+        Optional<CategoryEntity> categoryEntity = findCategoryByNameAndParentId(name, parentCategoryId);
+        if (categoryEntity.isPresent()) {
+            List<CategoryEntity> categoryEntityList = findCategoryToSearch(categoryEntity.get(), new ArrayList<>());
+            if (!categoryEntityList.isEmpty()) {
+                List<BlogPostEntity> blogPostEntity = new ArrayList<>();
+                Set<BlogPostEntity> blogPostEntitySet = new HashSet<>();
+                List<BlogPostEntity> blogPostEntityList = blogPostRepository.findByCategoryInAndIsApprovedFalse(categoryEntityList);
+                if (blogPostEntityList != null) {
+                    blogPostEntity.addAll(blogPostEntityList);
+                }
+                for (BlogPostEntity entity : blogPostEntity) {
+                    blogPostEntitySet.add(entity);
+                }
+                return blogPostEntityList;
+            } else return new ArrayList<>();
+        } else throw new BlogPostException("Category doesn't exists");
+    }
+
 
     public ResponseEntity<ResponseObject> approveBlogPost(String action, ApprovalRequestRequestDTO approvalRequestRequestDTO) {
         Optional<UserEntity> userEntity = userRepository.findById(approvalRequestRequestDTO.getReviewId());
@@ -151,6 +172,21 @@ public class ApprovalRequestService {
     public Optional<CategoryEntity> findCategoryByNameAndParentId(String name, Long parentCategoryId) {
         CategoryEntity parentCategory = categoryRepository.findParentCategoryById(parentCategoryId);
         return categoryRepository.findByNameAndParentCategory(name, parentCategory);
+    }
+
+    public PaginationResponseDTO getBlogByRequest(Long categoryId) {
+        Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
+        List<BlogPostEntity> approvalRequestEntityList = findBlogByCategory(categoryOptional.get().getName(),
+                categoryOptional.get().getParentCategory() == null ? null
+                        : categoryOptional.get().getParentCategory().getId());
+
+        List<BlogPostDTO> dtoList = new ArrayList<>();
+        for (BlogPostEntity entity : approvalRequestEntityList) {
+            if (!entity.getIsApproved()) {
+                dtoList.add(DTOConverter.convertPostToDTO(entity.getId()));
+            }
+        }
+        return new PaginationResponseDTO(dtoList, (long) dtoList.size(), 1L);
     }
 
 }

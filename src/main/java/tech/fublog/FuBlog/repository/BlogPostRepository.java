@@ -3,14 +3,11 @@ package tech.fublog.FuBlog.repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
-import tech.fublog.FuBlog.entity.BlogPostEntity;
+import tech.fublog.FuBlog.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import tech.fublog.FuBlog.entity.CategoryEntity;
-import tech.fublog.FuBlog.entity.TagEntity;
-import tech.fublog.FuBlog.entity.UserEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -99,4 +96,8 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
     Page<BlogPostEntity> findAllByVote(Pageable pageable);
 
     List<BlogPostEntity> findByUserMarksAndStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(UserEntity userEntity);
+
+    @Query("SELECT bp FROM BlogPostEntity bp JOIN ApprovalRequestEntity a WHERE bp.category IN:categoryEntityList AND " +
+            "bp.isApproved = false AND a.review.id = null")
+    List<BlogPostEntity> findByCategoryInAndIsApprovedFalse(@Param("categoryEntityList") List<CategoryEntity> categoryEntityList);
 }

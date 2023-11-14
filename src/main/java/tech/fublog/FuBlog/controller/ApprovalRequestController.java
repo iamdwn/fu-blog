@@ -79,7 +79,7 @@ public class ApprovalRequestController {
                                                       @RequestBody ApprovalRequestRequestDTO approvalRequestRequestDTO) {
         try {
             if (TokenChecker.checkRole(token, true)) {
-                    return approvalRequestService.approveBlogPost(action, approvalRequestRequestDTO);
+                return approvalRequestService.approveBlogPost(action, approvalRequestRequestDTO);
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));
@@ -87,6 +87,25 @@ public class ApprovalRequestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", ex.getMessage(), ""));
         }
+    }
+
+    @GetMapping("/getBlogByRequest/{categoryId}")
+    public ResponseEntity<ResponseObject> getBlogByRequest(@RequestHeader("Authorization") String token,
+                                                           @PathVariable Long categoryId) {
+
+        try {
+            if (TokenChecker.checkRole(token, true)) {
+                PaginationResponseDTO dtoList = approvalRequestService.getBlogByRequest(categoryId);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", dtoList));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+
     }
 
 }
