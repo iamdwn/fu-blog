@@ -17,7 +17,6 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
-import static tech.fublog.FuBlog.Utility.TokenChecker.*;
 
 
 @RestController
@@ -52,7 +51,7 @@ public class BlogPostController {
     public ResponseEntity<ResponseObject> deleteBlog(@RequestHeader("Authorization") String token,
                                                      @PathVariable Long postId) {
         try {
-            if (checkToken(token)) {
+            if (TokenChecker.checkToken(token)) {
                 blogPostService.deleteBlogPost(postId);
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "deleted successful", ""));
@@ -69,7 +68,7 @@ public class BlogPostController {
     ResponseEntity<ResponseObject> insertBlogPost(@RequestHeader("Authorization") String token,
                                                   @RequestBody BlogPostRequestDTO blogPostDTO) {
         try {
-            if (checkToken(token)) {
+            if (TokenChecker.checkToken(token)) {
                 BlogPostEntity blogPostEntity = blogPostService.insertBlogPost(blogPostDTO);
                 approvalRequestService.insertApprovalRequest(blogPostEntity);
                 postTagService.insertPostTag(blogPostDTO.getTagList(), blogPostEntity);
@@ -89,7 +88,7 @@ public class BlogPostController {
     public ResponseEntity<ResponseObject> updateBlog(@RequestHeader("Authorization") String token,
                                                      @RequestBody BlogPostRequestDTO blogPostRequestDTO) {
         try {
-            if (checkToken(token)) {
+            if (TokenChecker.checkToken(token)) {
                 BlogPostEntity blogPostEntity = blogPostService.updateBlogPost(blogPostRequestDTO);
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "updated successful", blogPostEntity));
@@ -105,7 +104,7 @@ public class BlogPostController {
     @GetMapping("/getPinnedBlog")
     public ResponseEntity<ResponseObject> getPinnedBlog(@RequestHeader("Authorization") String token) {
         try {
-            if (checkRole(token, false)) {
+            if (TokenChecker.checkRole(token, false)) {
                 return blogPostService.getPinnedBlog();
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -120,7 +119,7 @@ public class BlogPostController {
     public ResponseEntity<ResponseObject> pinBlog(@RequestHeader("Authorization") String token,
                                                   @PathVariable Long postId) {
         try {
-            if (checkRole(token, false)) {
+            if (TokenChecker.checkRole(token, false)) {
                 return blogPostService.pinBlogAction(postId);
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -261,7 +260,7 @@ public class BlogPostController {
     public ResponseEntity<ResponseObject> getBlogPostsByCategoryId(@RequestHeader String token,
                                                                    @PathVariable Long categoryId) {
         try {
-            if (checkToken(token)) {
+            if (TokenChecker.checkToken(token)) {
                 try {
                     PaginationResponseDTO blogPosts = blogPostService.getBlogPostsByCategoryId(categoryId);
                     return ResponseEntity.status(HttpStatus.OK)
@@ -284,7 +283,7 @@ public class BlogPostController {
     public ResponseEntity<ResponseObject> getBlogByFollow(@RequestHeader String token,
                                                           @PathVariable Long userId) {
         try {
-            if (checkToken(token)) {
+            if (TokenChecker.checkToken(token)) {
                 try {
                     return ResponseEntity.status(HttpStatus.OK)
                             .body(new ResponseObject("ok", "post found",  blogPostService.getBlogByFollow(userId)));
