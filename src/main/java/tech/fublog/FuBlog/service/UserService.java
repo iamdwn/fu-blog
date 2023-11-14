@@ -310,6 +310,7 @@ public class UserService {
         } else throw new UserException("User doesn't exists");
     }
 
+
     public PaginationResponseDTO getBlogByBookMarkUser(Long userId, int page, int size) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (userEntity.isPresent()) {

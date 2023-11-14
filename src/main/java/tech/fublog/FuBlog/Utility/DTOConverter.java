@@ -103,7 +103,8 @@ public class DTOConverter {
                     blogPostEntity.getView(),
                     blogPostEntity.getCreatedDate(),
                     voteRepository.countByPostVote(blogPostEntity),
-                    commentRepository.countByPostComment(blogPostEntity)
+                    commentRepository.countByPostComment(blogPostEntity),
+                    (long )blogPostEntity.getUserMarks().size()
             );
             return blogPostDTO;
         } else
