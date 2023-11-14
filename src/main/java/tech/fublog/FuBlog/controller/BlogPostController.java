@@ -257,7 +257,7 @@ public class BlogPostController {
     }
 
     @GetMapping("/getByCategory/{categoryId}")
-    public ResponseEntity<ResponseObject> getBlogPostsByCategoryId(@RequestHeader String token,
+    public ResponseEntity<ResponseObject> getBlogPostsByCategoryId(@RequestHeader("Authorization") String token,
                                                                    @PathVariable Long categoryId) {
         try {
             if (TokenChecker.checkToken(token)) {
@@ -280,7 +280,7 @@ public class BlogPostController {
     }
 
     @GetMapping("/getBlogByFollow/{userId}")
-    public ResponseEntity<ResponseObject> getBlogByFollow(@RequestHeader String token,
+    public ResponseEntity<ResponseObject> getBlogByFollow(@RequestHeader("Authorization") String token,
                                                           @PathVariable Long userId) {
         try {
             if (TokenChecker.checkToken(token)) {
