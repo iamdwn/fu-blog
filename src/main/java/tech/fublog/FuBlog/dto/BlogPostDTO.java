@@ -1,5 +1,6 @@
 package tech.fublog.FuBlog.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
 import tech.fublog.FuBlog.entity.CategoryEntity;
@@ -24,7 +25,9 @@ public class BlogPostDTO {
     private String picture;
     private String categoryName;
     private CategoryEntity parentCategoryId;
+    @JsonIgnore
     private Set<TagDTO> tagList;
+
     private UserInfoResponseDTO user;
     private Long views;
     private Date createdDate;

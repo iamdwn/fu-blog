@@ -313,18 +313,18 @@ public class UserService {
         } else throw new UserException("User doesn't exists");
     }
 
-    public List<BlogPostDTO> getBlogByBookMarkUser(Long userId) {
+    public PaginationResponseDTO getBlogByBookMarkUser(Long userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
+        List<BlogPostDTO> dtoList = new ArrayList<>();
         if (userEntity.isPresent()) {
             List<BlogPostEntity> entityList = blogPostRepository.findByUserMarksAndStatusTrueAndIsApprovedTrueOrderByCreatedDateDesc(userEntity.get());
             if (!entityList.isEmpty()) {
-                List<BlogPostDTO> dtoList = new ArrayList<>();
                 for (BlogPostEntity entity : entityList) {
                     dtoList.add(DTOConverter.convertPostToDTO(entity.getId()));
                 }
-                return dtoList;
             } else throw new UserException("This user not marked any post");
         } else throw new UserException("User doesn't exists");
+        return new PaginationResponseDTO(dtoList, (long) dtoList.size(), 1L);
     }
 
     public Long countViewOfBlog(Long userId, Boolean isCheckAward) {
