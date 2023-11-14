@@ -85,57 +85,44 @@ public class ApprovalRequestService {
     }
 
 
-    public ApprovalRequestEntity getApprovalRequestById(Long postId) {
-
-        return approvalRequestRepository.findById(postId).orElse(null);
-    }
-
-
-    public ResponseEntity<ResponseObject> createApprovalRequestById(BlogPostEntity newBlogPost) {
-        Optional<UserEntity> userEntity = userRepository.findById(newBlogPost.getAuthors().getId());
-
-        ApprovalRequestEntity newApprovalRequest = new ApprovalRequestEntity(newBlogPost.getId(), false, userEntity.get(),
-                null, newBlogPost);
-
-        approvalRequestRepository.save(newApprovalRequest);
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseObject("ok", "the post is waiting approve", ""));
-    }
-
-
-    public ResponseEntity<ResponseObject> approveBlogPost(ApprovalRequestRequestDTO approvalRequestRequestDTO) {
+    public ResponseEntity<ResponseObject> approveBlogPost(String action, ApprovalRequestRequestDTO approvalRequestRequestDTO) {
         Optional<UserEntity> userEntity = userRepository.findById(approvalRequestRequestDTO.getReviewId());
         Optional<BlogPostEntity> blogPostEntity = blogPostRepository.findById(approvalRequestRequestDTO.getPostId());
         if (blogPostEntity.isPresent() && userEntity.isPresent()) {
             ApprovalRequestEntity approvalRequestEntity = approvalRequestRepository.findByBlogPost(blogPostEntity.get());
             if (approvalRequestEntity != null) {
-                approvalRequestEntity.setReview(userEntity.get());
-                approvalRequestEntity.setApproved(true);
-                blogPostEntity.get().setApprovedBy(userEntity.get().getId());
-                blogPostEntity.get().setIsApproved(true);
-                blogPostRepository.save(blogPostEntity.get());
-                approvalRequestRepository.save(approvalRequestEntity);
-                for (TagDTO tag : approvalRequestRequestDTO.getTagList()) {
-                    String tagName = tag.getTagName();
-                    TagEntity tagEntity = tagRepository.findByTagName(tagName);
-                    PostTagEntity postTagEntity = new PostTagEntity();
-                    if (tagEntity != null) {
-                        postTagEntity.setTag(tagEntity);
-                        postTagEntity.setPost(blogPostEntity.get());
-                        postTagRepository.save(postTagEntity);
-                    } else {
-                        TagEntity postTag = new TagEntity();
-                        postTag.setTagName(tagName);
-                        tagRepository.save(postTag);
-                        TagEntity tagNameEntity = tagRepository.findByTagName(tagName);
-                        postTagEntity.setTag(tagNameEntity);
-                        postTagEntity.setPost(blogPostEntity.get());
-                        postTagRepository.save(postTagEntity);
-                    }
+                if (action.equalsIgnoreCase("approve")) {
+                    approvalRequestEntity.setReview(userEntity.get());
+                    approvalRequestEntity.setApproved(true);
+                    blogPostEntity.get().setApprovedBy(userEntity.get().getId());
+                    blogPostEntity.get().setIsApproved(true);
+                    blogPostRepository.save(blogPostEntity.get());
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseObject("ok", "approved successful", ""));
+                } else if (action.equalsIgnoreCase("reject")) {
+                    approvalRequestEntity.setReview(userEntity.get());
                 }
+                approvalRequestRepository.save(approvalRequestEntity);
+//                for (TagDTO tag : approvalRequestRequestDTO.getTagList()) {
+//                    String tagName = tag.getTagName();
+//                    TagEntity tagEntity = tagRepository.findByTagName(tagName);
+//                    PostTagEntity postTagEntity = new PostTagEntity();
+//                    if (tagEntity != null) {
+//                        postTagEntity.setTag(tagEntity);
+//                        postTagEntity.setPost(blogPostEntity.get());
+//                        postTagRepository.save(postTagEntity);
+//                    } else {
+//                        TagEntity postTag = new TagEntity();
+//                        postTag.setTagName(tagName);
+//                        tagRepository.save(postTag);
+//                        TagEntity tagNameEntity = tagRepository.findByTagName(tagName);
+//                        postTagEntity.setTag(tagNameEntity);
+//                        postTagEntity.setPost(blogPostEntity.get());
+//                        postTagRepository.save(postTagEntity);
+//                    }
+//                }
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "approved successful", ""));
+                        .body(new ResponseObject("ok", "rejected successful", ""));
             }
         }
 

@@ -16,6 +16,5 @@ public class ApprovalRequestRequestDTO {
     private Long postId;
 //    private Long requestId;
     private Long reviewId;
-    private List<TagDTO> tagList;
 
 }

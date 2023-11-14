@@ -73,12 +73,13 @@ public class ApprovalRequestController {
 
     }
 
-    @PutMapping("/approve")
+    @PutMapping("/{action}")
     public ResponseEntity<ResponseObject> approveBlog(@RequestHeader("Authorization") String token,
+                                                      @PathVariable String action,
                                                       @RequestBody ApprovalRequestRequestDTO approvalRequestRequestDTO) {
         try {
             if (TokenChecker.checkRole(token, true)) {
-                return approvalRequestService.approveBlogPost(approvalRequestRequestDTO);
+                    return approvalRequestService.approveBlogPost(action, approvalRequestRequestDTO);
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));
