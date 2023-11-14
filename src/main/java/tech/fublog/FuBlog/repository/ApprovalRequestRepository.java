@@ -14,11 +14,11 @@ import java.util.List;
 public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequestEntity, Long> {
     ApprovalRequestEntity findByBlogPost(BlogPostEntity blogPost);
 
-    @Query("SELECT a FROM ApprovalRequestEntity a WHERE a.isApproved = false ")
+    @Query("SELECT a FROM ApprovalRequestEntity a WHERE a.isApproved = false AND a.review.id = null")
     List<ApprovalRequestEntity> findAllByApprovedIsFalse();
 
     @Query("SELECT a FROM ApprovalRequestEntity a JOIN BlogPostEntity bp WHERE bp.category IN:categoryEntityList AND " +
-            "a.isApproved = false")
+            "a.isApproved = false AND a.review.id = null")
     List<ApprovalRequestEntity> findByCategoryInAndIsApprovedFalse(@Param("categoryEntityList") List<CategoryEntity> categoryEntityList);
 
 
