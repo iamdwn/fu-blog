@@ -2,7 +2,6 @@ package tech.fublog.FuBlog.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.CategoryDTO;
 import tech.fublog.FuBlog.dto.TagDTO;
@@ -32,11 +31,11 @@ public class DTOConverter {
     private static UserRepository userRepository = null;
     private static AwardRepository awardRepository = null;
     private static BlogPostRepository blogPostRepository = null;
-
-    private final UserReportRepository userReportRepository;
+    private static UserReportRepository userReportRepository = null;
+    private static BlogPostReportRepository blogPostReportRepository = null;
 
     @Autowired
-    public DTOConverter(CategoryRepository categoryRepository, CommentRepository commentRepository, VoteRepository voteRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, AwardRepository awardRepository, UserReportRepository userReportRepository, UserService userService) {
+    public DTOConverter(CategoryRepository categoryRepository, CommentRepository commentRepository, VoteRepository voteRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, AwardRepository awardRepository, UserReportRepository userReportRepository, UserService userService, BlogPostReportRepository blogPostReportRepository) {
         this.categoryRepository = categoryRepository;
         this.commentRepository = commentRepository;
         this.voteRepository = voteRepository;
@@ -45,6 +44,7 @@ public class DTOConverter {
         this.awardRepository = awardRepository;
         this.userReportRepository = userReportRepository;
         this.userService = userService;
+        this.blogPostReportRepository = blogPostReportRepository;
     }
 
     public static CategoryResponseDTO convertResponseCategoryToDTO(CategoryEntity categoryEntity) {
@@ -89,7 +89,7 @@ public class DTOConverter {
                         return tagDTO;
                     })
                     .collect(Collectors.toSet());
-
+            BlogPostReportEntity blogRejectedId = blogPostReportRepository.findBlogRejectedById(blogPostEntity.getId());
             UserInfoResponseDTO userDTO = convertUserDTO(userEntity);
             BlogPostDTO blogPostDTO = new BlogPostDTO(blogPostEntity.getId(),
                     blogPostEntity.getTypePost(),
@@ -104,7 +104,11 @@ public class DTOConverter {
                     blogPostEntity.getCreatedDate(),
                     voteRepository.countByPostVote(blogPostEntity),
                     commentRepository.countByPostComment(blogPostEntity),
-                    (long )blogPostEntity.getUserMarks().size()
+                    (long )blogPostEntity.getUserMarks().size(),
+                    blogPostEntity.getIsApproved() ? "Approved" : "Rejected",
+                    blogPostEntity.getIsApproved() ? null
+                            : (blogPostReportRepository.findBlogRejectedById(blogPostEntity.getId()) != null
+                    ? blogPostReportRepository.findBlogRejectedById(blogPostEntity.getId()).getReason() : null)
             );
             return blogPostDTO;
         } else

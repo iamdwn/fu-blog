@@ -26,4 +26,7 @@ public interface BlogPostReportRepository extends JpaRepository<BlogPostReportEn
 
     List<BlogPostReportEntity> findByOrderByCreatedDateDesc();
 
+    @Query("SELECT bp FROM BlogPostReportEntity bp JOIN ApprovalRequestEntity a WHERE bp.blog.id = :postId AND bp.blog.isApproved = false AND a.review.id != null")
+    BlogPostReportEntity findBlogRejectedById(@Param("postId") Long postId);
+
 }

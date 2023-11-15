@@ -79,7 +79,7 @@ public class BlogPostEntity {
     private Set<CommentEntity> postComments = new HashSet<>();
 
     @OneToMany(mappedBy = "post")
-//    @JsonIgnore
+    @JsonIgnore
     private Set<PostTagEntity> postTags = new HashSet<>();
 
     @OneToMany(mappedBy = "blog")

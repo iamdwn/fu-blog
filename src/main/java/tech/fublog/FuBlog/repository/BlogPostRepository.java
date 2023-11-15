@@ -3,6 +3,7 @@ package tech.fublog.FuBlog.repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
+import tech.fublog.FuBlog.dto.response.MonthlyPostCountDTO;
 import tech.fublog.FuBlog.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -103,4 +104,10 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
     @Query("SELECT bp FROM BlogPostEntity bp JOIN ApprovalRequestEntity a WHERE bp.isApproved = false AND a.review.id = null")
     List<BlogPostEntity> findByBlogByRequestIsApprovedFalse();
+
+    @Query("SELECT MONTH(b.createdDate) as month, COUNT(b.id) as postCount " +
+            "FROM BlogPostEntity b " +
+            "WHERE YEAR(b.createdDate) = YEAR(CURRENT_DATE) " +
+            "GROUP BY MONTH(b.createdDate)")
+    List<Object[]> countPostsByMonth();
 }

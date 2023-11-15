@@ -19,4 +19,5 @@ public class BlogPostResponseDTO {
     private Long parentCategoryId;
     private long vote;
     private List<CommentResponseDTO> comment;
+
 }
