@@ -82,12 +82,12 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/calculateBlogReportWeight")
-    public ResponseEntity<ResponseObject> calculateBlogReportWeight(@RequestHeader("Authorization") String token) {
+    @GetMapping("/calculateBlogReportWeightRatio")
+    public ResponseEntity<ResponseObject> calculateBlogReportWeightRatio(@RequestHeader("Authorization") String token) {
         try {
             if (TokenChecker.checkRole(token, false)) {
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "found", adminService.calculateBlogReportWeight()));
+                        .body(new ResponseObject("ok", "found", adminService.calculateBlogReportWeightRatio()));
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));
@@ -97,12 +97,12 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/calculateUserReportWeight")
-    public ResponseEntity<ResponseObject> calculateUserReportWeight(@RequestHeader("Authorization") String token) {
+    @GetMapping("/calculateUserReportWeightRatio")
+    public ResponseEntity<ResponseObject> calculateUserReportWeightRatio(@RequestHeader("Authorization") String token) {
         try {
             if (TokenChecker.checkRole(token, false)) {
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "found", adminService.calculateUserReportWeight()));
+                        .body(new ResponseObject("ok", "found", adminService.calculateUserReportWeightRatio()));
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));
@@ -112,12 +112,12 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/calculateBlogWeight")
+    @GetMapping("/calculateBlogWeightRatio")
     public ResponseEntity<ResponseObject> calculateBlogWeight(@RequestHeader("Authorization") String token) {
         try {
             if (TokenChecker.checkRole(token, false)) {
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "found", adminService.calculateBlogWeight()));
+                        .body(new ResponseObject("ok", "found", adminService.calculateBlogWeightRatio()));
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));
