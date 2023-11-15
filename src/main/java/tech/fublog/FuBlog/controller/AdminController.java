@@ -5,9 +5,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 import tech.fublog.FuBlog.Utility.TokenChecker;
+import tech.fublog.FuBlog.dto.response.MonthlyPostCountDTO;
 import tech.fublog.FuBlog.model.ResponseObject;
 import tech.fublog.FuBlog.service.AdminService;
 import tech.fublog.FuBlog.service.BlogPostService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth/admin/")
@@ -133,6 +136,20 @@ public class AdminController {
                             .body(new ResponseObject("failed", "do not have any user exit", ""));
                 }
                 return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok", "number of all users", adminService.getCountAllUsers()));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
+    @GetMapping("/postCountFollowMothInCurrentYear")
+    public ResponseEntity<ResponseObject> getPostCountByMonth(@RequestHeader("Authorization") String token) {
+        try {
+            if (TokenChecker.checkRole(token, false)) {
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ok", "all blogs allow month", adminService.countPostsByMonth()));
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));

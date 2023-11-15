@@ -3,12 +3,14 @@ package tech.fublog.FuBlog.service;
 import org.springframework.stereotype.Service;
 import tech.fublog.FuBlog.dto.response.CategoryResponseDTO;
 import tech.fublog.FuBlog.dto.response.CategoryWithNumBlogDTO;
+import tech.fublog.FuBlog.dto.response.MonthlyPostCountDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.exception.BlogPostException;
 import tech.fublog.FuBlog.repository.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminService {
@@ -33,6 +35,7 @@ public class AdminService {
         int month = calendar.get(Calendar.MONTH) + 1;
         return month;
     }
+
 
     public int getCurrentYear() {
         Date currentDate = new Date();
@@ -130,4 +133,22 @@ public class AdminService {
         CategoryEntity parentCategory = categoryRepository.findParentCategoryById(parentCategoryId);
         return categoryRepository.findByNameAndParentCategory(name, parentCategory);
     }
+
+
+public List<MonthlyPostCountDTO> countPostsByMonth() {
+    List<Object[]> result = blogPostRepository.countPostsByMonth();
+
+    // Create a map to store post counts by month
+    Map<Integer, Long> postCountsByMonth = new HashMap<>();
+    result.forEach(array -> postCountsByMonth.put((int) array[0], (long) array[1]));
+
+    // Create a list of MonthlyPostCountDTO with counts for all months
+    List<MonthlyPostCountDTO> monthlyPostCounts = new ArrayList<>();
+    for (int i = 1; i <= 12; i++) {
+        long postCount = postCountsByMonth.getOrDefault(i, 0L);
+        monthlyPostCounts.add(new MonthlyPostCountDTO(i, postCount));
+    }
+
+    return monthlyPostCounts;
+}
 }
