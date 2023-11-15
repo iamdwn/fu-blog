@@ -103,4 +103,5 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
 
     @Query("SELECT bp FROM BlogPostEntity bp JOIN ApprovalRequestEntity a WHERE bp.isApproved = false AND a.review.id = null")
     List<BlogPostEntity> findByBlogByRequestIsApprovedFalse();
+
 }

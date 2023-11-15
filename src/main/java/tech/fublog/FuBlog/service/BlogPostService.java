@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import tech.fublog.FuBlog.Utility.DTOConverter;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
 import tech.fublog.FuBlog.dto.TagDTO;
-import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.dto.request.BlogPostRequestDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
@@ -33,10 +32,11 @@ public class BlogPostService {
     private final VoteRepository voteRepository;
     private final CommentRepository commentRepository;
     private final PostTagRepository postTagRepository;
+    private final BlogPostReportRepository blogPostReportRepository;
 
     @Autowired
     public BlogPostService(CategoryRepository categoryRepository, UserRepository userRepository, BlogPostRepository blogPostRepository, TagRepository tagRepository, VoteRepository voteRepository, CommentRepository commentRepository,
-                           PostTagRepository postTagRepository) {
+                           PostTagRepository postTagRepository, BlogPostReportRepository blogPostReportRepository) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.blogPostRepository = blogPostRepository;
@@ -44,6 +44,7 @@ public class BlogPostService {
         this.voteRepository = voteRepository;
         this.commentRepository = commentRepository;
         this.postTagRepository = postTagRepository;
+        this.blogPostReportRepository = blogPostReportRepository;
     }
 
 
@@ -100,7 +101,11 @@ public class BlogPostService {
                     blogPostEntity.getCreatedDate(),
                     voteRepository.countByPostVote(blogPostEntity),
                     commentRepository.countByPostComment(blogPostEntity),
-                    countPostMarkByBlog(blogPostEntity.getId())
+                    countPostMarkByBlog(blogPostEntity.getId()),
+                    blogPostEntity.getIsApproved() ? "Approved" : "Rejected",
+                    blogPostEntity.getIsApproved() ? null
+                            : (blogPostReportRepository.findBlogRejectedById(blogPostEntity.getId()) != null
+                            ? blogPostReportRepository.findBlogRejectedById(blogPostEntity.getId()).getReason() : null)
             );
 //                  Date.from(Instant.ofEpochMilli((blogPostEntity.getCreatedDate().getTime())))
 //                  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
