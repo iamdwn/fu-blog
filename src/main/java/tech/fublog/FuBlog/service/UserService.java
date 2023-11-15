@@ -227,7 +227,7 @@ public class UserService {
             userRepository.save(user);
 
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("OK", "deleted successful", user));
+                    .body(new ResponseObject("OK", "deleted successfully", user));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ResponseObject("Not found", "user not found", ""));
@@ -250,7 +250,7 @@ public class UserService {
                 user.setStatus(userDTO.getStatus());
                 userRepository.save(user);
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "updated successful", user));
+                        .body(new ResponseObject("ok", "updated successfully", user));
             } else {
                 UserEntity user = this.getUserById(userId);
                 user.setFullName(userDTO.getFullName());
@@ -259,7 +259,7 @@ public class UserService {
                 user.setStatus(userDTO.getStatus());
                 userRepository.save(user);
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "updated successful", user));
+                        .body(new ResponseObject("ok", "updated successfully", user));
             }
         }
 

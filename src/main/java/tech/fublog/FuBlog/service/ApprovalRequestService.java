@@ -114,15 +114,15 @@ public class ApprovalRequestService {
         if (blogPostEntity.isPresent() && userEntity.isPresent()) {
             ApprovalRequestEntity approvalRequestEntity = approvalRequestRepository.findByBlogPost(blogPostEntity.get());
             if (approvalRequestEntity != null) {
-                if (action.equalsIgnoreCase("approve")) {
+                if (action.trim().equalsIgnoreCase("approve")) {
                     approvalRequestEntity.setReview(userEntity.get());
                     approvalRequestEntity.setApproved(true);
                     blogPostEntity.get().setApprovedBy(userEntity.get().getId());
                     blogPostEntity.get().setIsApproved(true);
                     blogPostRepository.save(blogPostEntity.get());
                     return ResponseEntity.status(HttpStatus.OK)
-                            .body(new ResponseObject("ok", "approved successful", ""));
-                } else if (action.equalsIgnoreCase("reject")) {
+                            .body(new ResponseObject("ok", "approved successfully", ""));
+                } else if (action.trim().equalsIgnoreCase("reject")) {
                     approvalRequestEntity.setReview(userEntity.get());
                     BlogPostReportEntity blogPostReportEntity = blogPostReportRepository.findByUserAndBlog(blogPostEntity.get().getAuthors(), blogPostEntity.get());
                     if (blogPostReportEntity == null) {
@@ -150,7 +150,7 @@ public class ApprovalRequestService {
                     }
 //                }
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "rejected successful", ""));
+                        .body(new ResponseObject("ok", "rejected successfully", ""));
             }
         }
 
