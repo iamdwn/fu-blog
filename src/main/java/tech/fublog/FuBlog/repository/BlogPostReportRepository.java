@@ -24,6 +24,7 @@ public interface BlogPostReportRepository extends JpaRepository<BlogPostReportEn
     @Query("SELECT count(b) FROM BlogPostReportEntity b WHERE year(b.createdDate)= year(current_date) - 1 AND month(b.createdDate)= month(current_date) + 11")
     Double countAllInPreviousMonthAndYear();
 
+    @Query("SELECT bp FROM BlogPostReportEntity bp JOIN ApprovalRequestEntity a WHERE bp.blog.isApproved = true")
     List<BlogPostReportEntity> findByOrderByCreatedDateDesc();
 
     @Query("SELECT bp FROM BlogPostReportEntity bp JOIN ApprovalRequestEntity a WHERE bp.blog.id = :postId AND bp.blog.isApproved = false AND a.review.id != null")
