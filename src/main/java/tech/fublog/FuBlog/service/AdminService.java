@@ -3,6 +3,7 @@ package tech.fublog.FuBlog.service;
 import org.springframework.stereotype.Service;
 import tech.fublog.FuBlog.dto.response.CategoryResponseDTO;
 import tech.fublog.FuBlog.dto.response.CategoryWithNumBlogDTO;
+import tech.fublog.FuBlog.dto.response.WeightRatioResponseDTO;
 import tech.fublog.FuBlog.entity.BlogPostEntity;
 import tech.fublog.FuBlog.entity.CategoryEntity;
 import tech.fublog.FuBlog.exception.BlogPostException;
@@ -51,28 +52,31 @@ public class AdminService {
         return countBlog;
     }
 
-    public Double calculateBlogReportWeight() {
+    public WeightRatioResponseDTO calculateBlogReportWeightRatio() {
         Double countCurrent = blogPostReportRepository.countAllInCurrentMonth();
         Double countPrevious = getCurrentMonth() == 1
                 ? blogPostReportRepository.countAllInPreviousMonthAndYear()
                 : blogPostReportRepository.countAllInPreviousMonth();
-        return countPrevious != 0 ? (countCurrent / countPrevious) - 1 : 0;
+        Double weightRatio =  countPrevious != 0 ? (countCurrent / countPrevious) - 1 : 0;
+        return new WeightRatioResponseDTO(countCurrent, countPrevious, weightRatio);
     }
 
-    public Double calculateUserReportWeight() {
+    public WeightRatioResponseDTO calculateUserReportWeightRatio() {
         Double countCurrent = userReportRepository.countAllInCurrentMonth();
         Double countPrevious = getCurrentMonth() == 1
                 ? userReportRepository.countAllInPreviousMonthAndYear()
                 : userReportRepository.countAllInPreviousMonth();
-        return countPrevious != 0 ? (countCurrent / countPrevious) - 1 : 0;
+        Double weightRatio = countPrevious != 0 ? (countCurrent / countPrevious) - 1 : 0;
+        return new WeightRatioResponseDTO(countCurrent, countPrevious, weightRatio);
     }
 
-    public Double calculateBlogWeight() {
+    public WeightRatioResponseDTO calculateBlogWeightRatio() {
         Double countCurrent = blogPostRepository.countAllInCurrentMonth();
         Double countPrevious = getCurrentMonth() == 1
                 ? blogPostRepository.countAllInPreviousMonthAndYear()
                 : blogPostRepository.countAllInPreviousMonth();
-        return countPrevious != 0 ? (countCurrent / countPrevious) - 1 : 0;
+        Double weightRatio = countPrevious != 0 ? (countCurrent / countPrevious) - 1 : 0;
+        return new WeightRatioResponseDTO(countCurrent, countPrevious, weightRatio);
     }
 
     public Long countBlogByCategory(Long categoryId) {
@@ -84,6 +88,7 @@ public class AdminService {
     }
 
     public List<CategoryWithNumBlogDTO> countBlogByAllCategory() {
+
         List<CategoryEntity> categoryOptional = categoryRepository.findAll();
         List<CategoryWithNumBlogDTO> dtoList = new ArrayList<>();
         for (CategoryEntity cate : categoryOptional) {
