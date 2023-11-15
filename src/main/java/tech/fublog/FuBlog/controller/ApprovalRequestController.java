@@ -108,4 +108,22 @@ public class ApprovalRequestController {
 
     }
 
+    @GetMapping("/getBlogByRequest")
+    public ResponseEntity<ResponseObject> getBlogByRequest(@RequestHeader("Authorization") String token) {
+
+        try {
+            if (TokenChecker.checkRole(token, true)) {
+                PaginationResponseDTO dtoList = approvalRequestService.getBlogByRequest();
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", dtoList));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+
+    }
+
 }

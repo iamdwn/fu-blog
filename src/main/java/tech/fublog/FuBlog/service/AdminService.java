@@ -33,6 +33,16 @@ public class AdminService {
         int month = calendar.get(Calendar.MONTH) + 1;
         return month;
     }
+
+    public int getCurrentYear() {
+        Date currentDate = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+        int year = calendar.get(Calendar.YEAR) + 1;
+        return year;
+    }
+
+
     public long getCountAllUsers(){
         return userRepository.count();
     }

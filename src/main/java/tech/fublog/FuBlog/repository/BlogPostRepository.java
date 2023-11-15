@@ -100,4 +100,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> 
     @Query("SELECT bp FROM BlogPostEntity bp JOIN ApprovalRequestEntity a WHERE bp.category IN:categoryEntityList AND " +
             "bp.isApproved = false AND a.review.id = null")
     List<BlogPostEntity> findByCategoryInAndIsApprovedFalse(@Param("categoryEntityList") List<CategoryEntity> categoryEntityList);
+
+    @Query("SELECT bp FROM BlogPostEntity bp JOIN ApprovalRequestEntity a WHERE bp.isApproved = false AND a.review.id = null")
+    List<BlogPostEntity> findByBlogByRequestIsApprovedFalse();
 }
