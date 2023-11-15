@@ -3,8 +3,8 @@ package tech.fublog.FuBlog.service;
 
 import tech.fublog.FuBlog.Utility.DTOConverter;
 import tech.fublog.FuBlog.dto.BlogPostDTO;
-import tech.fublog.FuBlog.dto.TagDTO;
 import tech.fublog.FuBlog.dto.request.ApprovalRequestRequestDTO;
+import tech.fublog.FuBlog.dto.request.BlogPostReportDTO;
 import tech.fublog.FuBlog.dto.response.ApprovalRequestResponseDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
 import tech.fublog.FuBlog.entity.*;
@@ -26,15 +26,17 @@ public class ApprovalRequestService {
     private final ApprovalRequestRepository approvalRequestRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
+    private final BlogPostReportRepository blogPostReportRepository;
 
     @Autowired
-    public ApprovalRequestService(BlogPostRepository blogPostRepository, UserRepository userRepository, CategoryRepository categoryRepository, ApprovalRequestRepository approvalRequestRepository, TagRepository tagRepository, PostTagRepository postTagRepository) {
+    public ApprovalRequestService(BlogPostRepository blogPostRepository, UserRepository userRepository, CategoryRepository categoryRepository, ApprovalRequestRepository approvalRequestRepository, TagRepository tagRepository, PostTagRepository postTagRepository, BlogPostReportRepository blogPostReportRepository) {
         this.blogPostRepository = blogPostRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.approvalRequestRepository = approvalRequestRepository;
         this.tagRepository = tagRepository;
         this.postTagRepository = postTagRepository;
+        this.blogPostReportRepository = blogPostReportRepository;
     }
 
     public List<ApprovalRequestResponseDTO> getAllApprovalRequest() {
@@ -122,6 +124,11 @@ public class ApprovalRequestService {
                             .body(new ResponseObject("ok", "approved successful", ""));
                 } else if (action.equalsIgnoreCase("reject")) {
                     approvalRequestEntity.setReview(userEntity.get());
+                    BlogPostReportEntity blogPostReportEntity = blogPostReportRepository.findByUserAndBlog(blogPostEntity.get().getAuthors(), blogPostEntity.get());
+                    if (blogPostReportEntity == null) {
+                        blogPostReportEntity = new BlogPostReportEntity(approvalRequestRequestDTO.getReason(), blogPostEntity.get().getAuthors(), blogPostEntity.get());
+                        blogPostReportRepository.save(blogPostReportEntity);
+                    blogPostReportRepository.save(blogPostReportEntity);
                 }
                 approvalRequestRepository.save(approvalRequestEntity);
 //                for (TagDTO tag : approvalRequestRequestDTO.getTagList()) {
@@ -140,7 +147,7 @@ public class ApprovalRequestService {
 //                        postTagEntity.setTag(tagNameEntity);
 //                        postTagEntity.setPost(blogPostEntity.get());
 //                        postTagRepository.save(postTagEntity);
-//                    }
+                    }
 //                }
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObject("ok", "rejected successful", ""));
