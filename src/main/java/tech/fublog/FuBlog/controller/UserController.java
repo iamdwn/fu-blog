@@ -1,12 +1,14 @@
 package tech.fublog.FuBlog.controller;
 
 import org.springframework.web.bind.annotation.*;
+import tech.fublog.FuBlog.Utility.DTOConverter;
 import tech.fublog.FuBlog.Utility.TokenChecker;
 import tech.fublog.FuBlog.dto.PostMarkDTO;
 import tech.fublog.FuBlog.dto.UserDTO;
 import tech.fublog.FuBlog.dto.request.UserPasswordUpdateDTO;
 import tech.fublog.FuBlog.dto.request.UserUpdateDTO;
 import tech.fublog.FuBlog.dto.response.PaginationResponseDTO;
+import tech.fublog.FuBlog.dto.response.UserInfoResponseDTO;
 import tech.fublog.FuBlog.entity.RoleEntity;
 import tech.fublog.FuBlog.entity.UserEntity;
 import tech.fublog.FuBlog.model.ResponseObject;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,6 +59,25 @@ public class UserController {
         }
     }
 
+    @GetMapping("/getAll")
+    public ResponseEntity<ResponseObject> getAllUser(@RequestHeader("Authorization") String token) {
+        try {
+            if (TokenChecker.checkToken(token)) {
+                List<UserInfoResponseDTO> userDTOs = new ArrayList<>();
+                List<UserEntity> list = userRepository.findAllByStatusIsTrue();
+                for (UserEntity dto : list) {
+                    userDTOs.add(DTOConverter.convertUserDTO(dto));
+                }
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", userDTOs));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
     @PostMapping("/markAction/{action}")
     public ResponseEntity<ResponseObject> markBook(@RequestHeader("Authorization") String token,
                                                    @PathVariable String action,

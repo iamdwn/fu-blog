@@ -26,6 +26,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     List<UserEntity> findAllByOrderByPointDesc();
 
     Page<UserEntity> findAllByStatusIsTrue(Pageable pageable);
+    List<UserEntity> findAllByStatusIsTrue();
+
     Page<UserEntity> findAllByStatusIsTrueOrderByPointDesc(Pageable pageable);
     List<UserEntity> findAllByStatusIsTrueOrderByPointDesc();
 
