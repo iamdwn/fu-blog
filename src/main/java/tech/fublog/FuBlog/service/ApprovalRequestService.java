@@ -176,12 +176,23 @@ public class ApprovalRequestService {
 
     public PaginationResponseDTO getBlogByRequest(Long categoryId) {
         Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
-        List<BlogPostEntity> approvalRequestEntityList = findBlogByCategory(categoryOptional.get().getName(),
+        List<BlogPostEntity> blogPostEntityList = findBlogByCategory(categoryOptional.get().getName(),
                 categoryOptional.get().getParentCategory() == null ? null
                         : categoryOptional.get().getParentCategory().getId());
 
         List<BlogPostDTO> dtoList = new ArrayList<>();
-        for (BlogPostEntity entity : approvalRequestEntityList) {
+        for (BlogPostEntity entity : blogPostEntityList) {
+            if (!entity.getIsApproved()) {
+                dtoList.add(DTOConverter.convertPostToDTO(entity.getId()));
+            }
+        }
+        return new PaginationResponseDTO(dtoList, (long) dtoList.size(), 1L);
+    }
+
+    public PaginationResponseDTO getBlogByRequest() {
+        List<BlogPostDTO> dtoList = new ArrayList<>();
+        List<BlogPostEntity> blogPostEntityList = blogPostRepository.findByBlogByRequestIsApprovedFalse();
+        for (BlogPostEntity entity : blogPostEntityList) {
             if (!entity.getIsApproved()) {
                 dtoList.add(DTOConverter.convertPostToDTO(entity.getId()));
             }

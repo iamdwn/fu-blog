@@ -64,6 +64,21 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/countBlogInYear")
+    public ResponseEntity<ResponseObject> countBlogInYear(@RequestHeader("Authorization") String token) {
+        try {
+            if (TokenChecker.checkRole(token, false)) {
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject("ok", "found", adminService.countBlogInMonth()));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", "not found", ""));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject("failed", ex.getMessage(), ""));
+        }
+    }
+
     @GetMapping("/calculateBlogReportWeight")
     public ResponseEntity<ResponseObject> calculateBlogReportWeight(@RequestHeader("Authorization") String token) {
         try {
