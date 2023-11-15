@@ -54,7 +54,7 @@ public class BlogPostController {
             if (TokenChecker.checkToken(token)) {
                 blogPostService.deleteBlogPost(postId);
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "deleted successful", ""));
+                        .body(new ResponseObject("ok", "deleted successfully", ""));
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));
@@ -91,7 +91,7 @@ public class BlogPostController {
             if (TokenChecker.checkToken(token)) {
                 BlogPostEntity blogPostEntity = blogPostService.updateBlogPost(blogPostRequestDTO);
                 return ResponseEntity.status(HttpStatus.OK)
-                        .body(new ResponseObject("ok", "updated successful", blogPostEntity));
+                        .body(new ResponseObject("ok", "updated successfully", blogPostEntity));
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObject("failed", "not found", ""));

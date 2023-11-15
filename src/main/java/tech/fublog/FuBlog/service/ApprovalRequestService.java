@@ -121,7 +121,7 @@ public class ApprovalRequestService {
                     blogPostEntity.get().setIsApproved(true);
                     blogPostRepository.save(blogPostEntity.get());
                     return ResponseEntity.status(HttpStatus.OK)
-                            .body(new ResponseObject("ok", "approved successful", ""));
+                            .body(new ResponseObject("ok", "approved successfully", ""));
                 } else if (action.trim().equalsIgnoreCase("reject")) {
                     approvalRequestEntity.setReview(userEntity.get());
                     BlogPostReportEntity blogPostReportEntity = blogPostReportRepository.findByUserAndBlog(blogPostEntity.get().getAuthors(), blogPostEntity.get());

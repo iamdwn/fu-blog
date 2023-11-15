@@ -55,7 +55,7 @@ public class AwardService {
 
             userAwardRepository.save(userAward);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject("ok", "awarded successful", ""));
+                    .body(new ResponseObject("ok", "awarded successfully", ""));
         }
 
 
