@@ -19,5 +19,5 @@ The system was created to support F school students, who are writers and readers
 To run this project locally, follow step:
 
    ```bash
-   git clone https://github.com/iamdwn/FUBlog.git
+   git clone https://github.com/iamdwn/fu-blog.git
 
